@@ -3,7 +3,7 @@ using UnityEngine;
 public class PlayerAttack : MonoBehaviour
 {
 	[SerializeField] PlayerControls p;
-	[SerializeField] bool shawAttack;
+	[SerializeField] bool isShawAttack;
 
 	private void OnTriggerEnter2D(Collider2D other) 
 	{
@@ -13,6 +13,8 @@ public class PlayerAttack : MonoBehaviour
 			Enemy target = other.GetComponent<Enemy>();
 			if (target != null) 
 				target.TakeDamage(p.atkDmg, p.self);
+			if (isShawAttack)
+				p.ShawRetreat();
 		}
 	}
 }

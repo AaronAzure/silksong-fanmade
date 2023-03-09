@@ -46,6 +46,8 @@ public class PlayerControls : MonoBehaviour
 	private float jumpTimer;
 	private bool canLedgeGrab;
 	private bool ledgeGrab;
+	private bool noControl;
+	private bool isInvincible;
 	[SerializeField] bool hasLedge;
 	[SerializeField] bool hasWall;
 	[SerializeField] Transform ledgeCheckPos;
@@ -133,7 +135,7 @@ public class PlayerControls : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
-		if (!isLedgeGrabbing && !inShawAtk && !beenHurt)
+		if (!isLedgeGrabbing && !inShawAtk && !beenHurt && !noControl)
 		{
 			if (player.GetButtonDown("Y") && atkCo == null)
 				Attack();
@@ -155,7 +157,7 @@ public class PlayerControls : MonoBehaviour
 
 	void FixedUpdate()
 	{
-		if (!isLedgeGrabbing && !beenHurt)
+		if (!isLedgeGrabbing && !beenHurt && !noControl)
 		{
 			if (inShawAtk)
 			{
@@ -272,6 +274,7 @@ public class PlayerControls : MonoBehaviour
 		anim.speed = 1;
 		activeMoveSpeed = moveSpeed;
 		bindCo = null;
+		noControl = false;
 	}
 
 	void CalcMove()
@@ -459,6 +462,25 @@ public class PlayerControls : MonoBehaviour
 		SetHp();
 	}
 
+	public void ShawRetreat()
+	{
+		anim.SetBool("isAttacking", false);
+		rb.velocity = Vector2.zero;
+		rb.AddForce( new Vector2(-moveDir * shawForce, shawForce), ForceMode2D.Impulse);
+		StartCoroutine( RegainControlCo(0.1f) );
+	}
+
+	IEnumerator RegainControlCo(float duration, bool invincibility=false)
+	{
+		if (invincibility) 
+			isInvincible = true;
+		noControl = true;
+		
+		yield return new WaitForSeconds(duration);
+		if (invincibility) 
+			isInvincible = false;
+		noControl = false;
+	}
 
 	private void OnTriggerEnter2D(Collider2D other) 
 	{
@@ -468,11 +490,17 @@ public class PlayerControls : MonoBehaviour
 
 	IEnumerator TakeDamageCo(Transform opponent)
 	{
+		if (isInvincible)
+		{
+			hurtCo = null;
+			yield break;
+		}
+
 		foreach (SpriteRenderer sprite in sprites)
 			sprite.material = dmgMat;
 
-		hp = Mathf.Max(0, hp - 1);
 		anim.SetBool("isHurt", true);
+		hp = Mathf.Max(0, hp - 1);
 		ResetAllBools();
 		beenHurt = true;
 		SetHp();
@@ -480,14 +508,13 @@ public class PlayerControls : MonoBehaviour
 
 		Vector2 direction = (opponent.position - transform.position).normalized;
         rb.velocity = new Vector2(-direction.x * 10, 5);
-		CinemachineShake.Instance.ShakeCam(25, 0.25f);
+		CinemachineShake.Instance.ShakeCam(15, 0.25f);
 
 		// stop healing
 		if (bindCo != null) 
 			StopCoroutine(bindCo);
 		bindCo = null;
 
-		// yield return new WaitForSeconds(0.1f);
 		Time.timeScale = 0;
 
 		yield return new WaitForSecondsRealtime(0.25f);
