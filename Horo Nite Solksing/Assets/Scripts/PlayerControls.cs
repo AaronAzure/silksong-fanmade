@@ -22,11 +22,12 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] SpriteRenderer[] sprites;
 	[SerializeField] Material defaultMat;
 	[SerializeField] Material dmgMat;
+	[SerializeField] Material flashMat;
 
 
 	[Space] [Header("Platformer")]
 	[SerializeField] Rigidbody2D rb;
-	[SerializeField] Transform model;
+	public Transform model;
 	[SerializeField] float moveSpeed=5;
 	[SerializeField] float jumpDashForce=10;
 	[SerializeField] float jumpForce=10;
@@ -47,7 +48,7 @@ public class PlayerControls : MonoBehaviour
 	private bool canLedgeGrab;
 	private bool ledgeGrab;
 	private bool noControl;
-	private bool isInvincible;
+	[SerializeField] bool isInvincible;
 	[SerializeField] bool hasLedge;
 	[SerializeField] bool hasWall;
 	[SerializeField] Transform ledgeCheckPos;
@@ -89,6 +90,9 @@ public class PlayerControls : MonoBehaviour
 	[Space] [Header("Particle effects")]
 	[SerializeField] GameObject dashEffectL;
 	[SerializeField] GameObject dashEffectR;
+	[SerializeField] GameObject healingPs;
+	[SerializeField] GameObject bloodBurstPs;
+	[SerializeField] GameObject bindPs;
 	[SerializeField] Transform dashSpawnPos;
 
 
@@ -97,8 +101,14 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] bool cantRotate;
 	[SerializeField] bool inAtkState;
 	[SerializeField] bool inShawAtk;
+	[SerializeField] bool isBinding;
+	[SerializeField] bool downwardStrike;
+	[SerializeField] bool dashStrike;
 	[SerializeField] bool beenHurt;
 
+
+	[Space] [Header("Debug")]
+	[SerializeField] [Range(1,10)] int silkMultiplier=1;
 	
 
 	void Awake()
@@ -111,15 +121,19 @@ public class PlayerControls : MonoBehaviour
 	{
 		player = ReInput.players.GetPlayer(playerId);
 		activeMoveSpeed = moveSpeed;
+		bindPs.transform.parent = null;
+		healingPs.transform.parent = null;
+		bloodBurstPs.transform.parent = null;
 		FullRestore();
+	}
+
+	bool CanControl()
+	{
+		return (!isLedgeGrabbing && !beenHurt && !noControl && !isBinding);
 	}
 
 	private void OnDrawGizmosSelected() 
 	{
-		// if (groundCheck != null)
-		// 	Gizmos.DrawCube(groundCheck.position, groundCheckSize);
-		// if (wallCheck != null)
-		// 	Gizmos.DrawCube(wallCheck.position, wallCheckSize);
 		if (ledgeCheckPos != null)
 		{
 			Gizmos.color = Color.green;
@@ -135,13 +149,13 @@ public class PlayerControls : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
-		if (!isLedgeGrabbing && !inShawAtk && !beenHurt && !noControl)
+		if (CanControl() && !inShawAtk )
 		{
 			if (player.GetButtonDown("Y") && atkCo == null)
 				Attack();
 
 			// bind (heal)
-			if (player.GetButtonDown("A") && bindCo == null)
+			if (player.GetButtonDown("A") && silkMeter >= bindCost && bindCo == null)
 				bindCo = StartCoroutine( BindCo() );
 
 			// jump
@@ -157,11 +171,14 @@ public class PlayerControls : MonoBehaviour
 
 	void FixedUpdate()
 	{
-		if (!isLedgeGrabbing && !beenHurt && !noControl)
+		if (CanControl())
 		{
 			if (inShawAtk)
 			{
-				rb.velocity = new Vector2(moveDir * shawForce, -shawForce);
+				if (downwardStrike)
+					rb.velocity = new Vector2(moveDir * shawForce, -shawForce);
+				else if (dashStrike)
+					rb.velocity = new Vector2(moveDir * dashSpeed, rb.velocity.y);
 
 				CheckIsGrounded();
 				CheckIsWalledWhistShaw();
@@ -227,9 +244,15 @@ public class PlayerControls : MonoBehaviour
 		}
 		if (isDashing && player.GetButtonUp("ZR") && dashCounter <= 0)
 		{
-			isDashing = false;
-			activeMoveSpeed = moveSpeed;
+			CancelDash();
 		}
+	}
+
+	void CancelDash()
+	{
+		dashCounter = 0;
+		isDashing = false;
+		activeMoveSpeed = moveSpeed;
 	}
 
 	void JumpMechanic()
@@ -268,10 +291,11 @@ public class PlayerControls : MonoBehaviour
 	{
 		jumpDashed = jumped = false;
 		isDashing = false;
+		canLedgeGrab = ledgeGrab = false;
 		isWallSliding = false;
 		isWallJumping = false;
-		canLedgeGrab = ledgeGrab = false;
 		anim.speed = 1;
+		rb.gravityScale = 1;
 		activeMoveSpeed = moveSpeed;
 		bindCo = null;
 		noControl = false;
@@ -310,24 +334,26 @@ public class PlayerControls : MonoBehaviour
 
 	void Attack()
 	{
+		if (isDashing)
+			atkCo = StartCoroutine( AttackCo(3) );
 		// attack up
-		if (player.GetAxis("Move Vertical") > 0.9f)
+		else if (player.GetAxis("Move Vertical") > 0.9f)
 			atkCo = StartCoroutine( AttackCo(1) );
 		// shaw attack
 		else if (player.GetAxis("Move Vertical") < -0.9f)
-		{
 			atkCo = StartCoroutine( AttackCo(2) );
-			shawSound.Play();
-		}
 		// attack front
 		else
-			atkCo = StartCoroutine( AttackCo() );
+			atkCo = StartCoroutine( AttackCo(0) );
 	}
 
 	IEnumerator AttackCo(int atkDir=0)
 	{
 		if (atkCo != null) yield break;
+		if (atkDir == 2 && isGrounded)
+			atkDir = 0;
 		this.atkDir = atkDir;
+		CancelDash();
 
 		if (slashObj != null)
 		{
@@ -335,8 +361,17 @@ public class PlayerControls : MonoBehaviour
 			anim.SetFloat("atkDir", atkDir);
 			anim.SetTrigger("attack");
 			anim.SetBool("isAttacking", true);
+			if (atkDir == 2)
+			{
+				shawSound.Play();
+				jumpDashed = false;
+				rb.velocity = Vector2.zero;
+				rb.gravityScale = 0;
+				yield return new WaitForSeconds(0.1f);
+				rb.gravityScale = 1;
+			}
 
-			yield return new WaitForSeconds(atkDir != 2 ? 0.25f : 0.5f);
+			yield return new WaitForSeconds(atkDir != 2 ? 0.25f : 0.4f);
 			anim.SetBool("isAttacking", false);
 		}
 
@@ -358,7 +393,6 @@ public class PlayerControls : MonoBehaviour
 		{
 			isDashing = false;
 		}
-
 		isJumping = true;
 		jumpTimer = 0;
 	}
@@ -385,11 +419,10 @@ public class PlayerControls : MonoBehaviour
 	void LedgeGrab()
 	{
 		isJumping = jumped = false;
-		isDashing = false;
+		CancelDash();
 		jumpDashed = false;
 
 		moveDir = model.localScale.x;
-		activeMoveSpeed = moveSpeed;
 		rb.gravityScale = 0;
 		rb.velocity = Vector2.zero;
 		anim.SetFloat("moveDir", moveDir);
@@ -412,7 +445,10 @@ public class PlayerControls : MonoBehaviour
 			rb.velocity = new Vector2(dashDir * jumpDashForce, rb.velocity.y);
 			
 		if (isWallJumping || jumpDashed || isLedgeGrabbing || inShawAtk) return;
-		anim.SetBool("isWalking", moveX != 0);
+
+		float moveY = player.GetAxis("Move Vertical");
+		float x = (isGrounded && moveY > 0.8f) ? 0 : moveX;
+		anim.SetBool("isWalking", x != 0);
 		anim.SetBool("isDashing", isDashing);
 
 		if (!cantRotate)
@@ -432,12 +468,12 @@ public class PlayerControls : MonoBehaviour
 		{
 			if (!inAtkState)
 			{
-				if (moveX != 0)
-					anim.speed = Mathf.Abs(moveX * activeMoveSpeed);
+				if (x != 0)
+					anim.speed = Mathf.Abs(x * activeMoveSpeed);
 				else 
 					anim.speed = 1;
 			}
-			rb.velocity = new Vector2(moveX * activeMoveSpeed, rb.velocity.y);
+			rb.velocity = new Vector2(x * activeMoveSpeed, rb.velocity.y);
 		}
 		else
 		{
@@ -456,6 +492,13 @@ public class PlayerControls : MonoBehaviour
 
 	// todo --------------------------------------------------------------------
 
+	void SpawnExistingObjAtSelf(GameObject obj)
+	{
+		obj.SetActive(false);
+		obj.SetActive(true);
+		obj.transform.position = self.position;
+	}
+
 	void FullRestore()
 	{
 		hp = maxHp;
@@ -466,7 +509,8 @@ public class PlayerControls : MonoBehaviour
 	{
 		anim.SetBool("isAttacking", false);
 		rb.velocity = Vector2.zero;
-		rb.AddForce( new Vector2(-moveDir * shawForce, shawForce), ForceMode2D.Impulse);
+
+		rb.AddForce( new Vector2(-moveDir * shawForce, atkDir == 2 ? shawForce : 0), ForceMode2D.Impulse);
 		StartCoroutine( RegainControlCo(0.1f) );
 	}
 
@@ -475,14 +519,14 @@ public class PlayerControls : MonoBehaviour
 		if (invincibility) 
 			isInvincible = true;
 		noControl = true;
-		
+
 		yield return new WaitForSeconds(duration);
 		if (invincibility) 
 			isInvincible = false;
 		noControl = false;
 	}
 
-	private void OnTriggerEnter2D(Collider2D other) 
+	private void OnTriggerStay2D(Collider2D other) 
 	{
 		if (other.CompareTag("Enemy") && hurtCo == null)	
 			hurtCo = StartCoroutine( TakeDamageCo(other.transform) );
@@ -505,6 +549,7 @@ public class PlayerControls : MonoBehaviour
 		beenHurt = true;
 		SetHp();
 		rb.velocity = Vector2.zero;
+		SpawnExistingObjAtSelf(bloodBurstPs);
 
 		Vector2 direction = (opponent.position - transform.position).normalized;
         rb.velocity = new Vector2(-direction.x * 10, 5);
@@ -512,8 +557,12 @@ public class PlayerControls : MonoBehaviour
 
 		// stop healing
 		if (bindCo != null) 
+		{
 			StopCoroutine(bindCo);
-		bindCo = null;
+			anim.SetBool("isBinding", false);
+			bindCo = null;
+			rb.gravityScale = 1;
+		}
 
 		Time.timeScale = 0;
 
@@ -537,12 +586,36 @@ public class PlayerControls : MonoBehaviour
 			bindCo = null;
 			yield break;
 		} 
+		anim.SetBool("isBinding", true);
+		anim.speed = 1;
 		SetSilk(-bindCost);
+		rb.gravityScale = 0;
+		rb.velocity = Vector2.zero;
+		activeMoveSpeed = moveSpeed;
+		jumpDashed = jumped = false;
+		isDashing = false;
+		canLedgeGrab = ledgeGrab = false;
+		SpawnExistingObjAtSelf(healingPs);
 
 		yield return new WaitForSeconds(0.25f);
+		rb.gravityScale = 1;
+		// anim.SetBool("isBinding", false);
 		hp = Mathf.Min(hp+3, hpMasks.Length);
 		SetHp();
 		bindCo = null;
+	}
+
+	public IEnumerator FlashCo()
+	{
+		foreach (SpriteRenderer sprite in sprites)
+			sprite.material = flashMat;
+
+		SpawnExistingObjAtSelf(bindPs);
+		// Instantiate(bindPs, transform.position, Quaternion.identity);
+		yield return new WaitForSeconds(0.1f);
+		foreach (SpriteRenderer sprite in sprites)
+			sprite.material = defaultMat;
+		anim.SetBool("isBinding", false);
 	}
 
 	void SetHp()
@@ -561,7 +634,10 @@ public class PlayerControls : MonoBehaviour
 	public void SetSilk(int addToSilk=0)
 	{
 		int prevSilk = silkMeter;
-		silkMeter = Mathf.Min(silkMeter + addToSilk, silks.Length);
+		silkMeter = Mathf.Min(
+			silkMeter + addToSilk * (addToSilk > 0 ? silkMultiplier : 1), 
+			silks.Length
+		);
 
 		// cancel if no changes
 		if (prevSilk == silkMeter) return;
