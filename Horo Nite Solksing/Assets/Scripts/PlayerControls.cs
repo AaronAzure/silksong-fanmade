@@ -116,6 +116,7 @@ public class PlayerControls : MonoBehaviour
 
 	[Space] [Header("Debug")]
 	[SerializeField] [Range(1,10)] int silkMultiplier=1;
+	[SerializeField] bool invincible;
 	
 
 	void Awake()
@@ -207,24 +208,7 @@ public class PlayerControls : MonoBehaviour
 					anim.SetFloat("jumpVelocity", rb.velocity.y);
 
 				// Dash
-				if (dashCounter > 0)
-				{
-					dashCounter -= Time.fixedDeltaTime;
-					if (!isGrounded) 
-						rb.velocity = new Vector2(rb.velocity.x, -0.5f);
-
-					if (dashCounter <= 0)
-					{
-						if (!isGrounded || !player.GetButton("ZR")) isDashing = false;
-						activeMoveSpeed = (isDashing) ? dashSpeed : moveSpeed;
-						anim.speed = activeMoveSpeed;
-						dashCooldownCounter = dashCooldownDuration;
-					}
-				}
-				if (!isDashing && dashCooldownCounter > 0)
-				{
-					dashCooldownCounter -= Time.fixedDeltaTime;
-				}
+				CalcDash();
 				
 				Move();
 				CheckIsGrounded();
@@ -237,24 +221,53 @@ public class PlayerControls : MonoBehaviour
 
 	void DashMechanic()
 	{
+		// First frame of pressing dash button
 		if (player.GetButtonDown("ZR") && dashCounter <= 0 && 
 			dashCooldownCounter <= 0)
 		{
 			isDashing = true; // keep dashing if on ground
 			jumpDashed = jumped = false;
 			jumpTimer = jumpMaxTimer;
+
+			if (!isGrounded)
+				anim.SetBool("isAirDash", true);
 				
 			dashCounter = dashDuration;
 			activeMoveSpeed = dashBurstSpeed;
-			anim.speed = dashBurstSpeed;
+			anim.SetFloat("moveSpeed", dashBurstSpeed);
+
 			if (model.transform.localScale.x > 0)
 				Instantiate(dashEffectL, dashSpawnPos.position, dashEffectL.transform.rotation, null);
 			else
 				Instantiate(dashEffectR, dashSpawnPos.position, dashEffectR.transform.rotation, null);
 		}
+		// First frame of finishing dash
 		if (isDashing && player.GetButtonUp("ZR") && dashCounter <= 0)
 		{
 			CancelDash();
+		}
+	}
+
+	void CalcDash()
+	{
+		if (dashCounter > 0)
+		{
+			dashCounter -= Time.fixedDeltaTime;
+			if (!isGrounded) 
+				rb.velocity = new Vector2(rb.velocity.x, -0.5f);
+
+			if (dashCounter <= 0)
+			{
+				if (!isGrounded || !player.GetButton("ZR")) 
+					isDashing = false;
+				activeMoveSpeed = (isDashing) ? dashSpeed : moveSpeed;
+				anim.SetFloat("moveSPeed", activeMoveSpeed);
+				dashCooldownCounter = dashCooldownDuration;
+			}
+		}
+		if (!isDashing && dashCooldownCounter > 0)
+		{
+			dashCooldownCounter -= Time.fixedDeltaTime;
 		}
 	}
 
@@ -304,11 +317,11 @@ public class PlayerControls : MonoBehaviour
 		canLedgeGrab = ledgeGrab = false;
 		isWallSliding = false;
 		isWallJumping = false;
-		anim.speed = 1;
 		rb.gravityScale = 1;
 		activeMoveSpeed = moveSpeed;
 		bindCo = null;
 		noControl = false;
+		anim.SetBool("isAirDash", false);
 	}
 
 	void CalcMove()
@@ -316,10 +329,60 @@ public class PlayerControls : MonoBehaviour
 		moveX = player.GetAxis("Move Horizontal");
 	}
 
+	void Move()
+	{
+		if (jumpDashed)
+			rb.velocity = new Vector2(dashDir * jumpDashForce, rb.velocity.y);
+			
+		if (isWallJumping || jumpDashed || isLedgeGrabbing || inShawAtk) return;
+
+		float moveY = player.GetAxis("Move Vertical");
+		float x = (isGrounded && moveY > 0.8f) ? 0 : moveX;
+		anim.SetBool("isWalking", x != 0);
+		anim.SetBool("isDashing", isDashing);
+
+		if (!cantRotate)
+		{
+			// right
+			if (moveX > 0) 
+				model.localScale = new Vector3(1, 1, 1);
+			// left
+			else if (moveX < 0) 
+				model.localScale = new Vector3(-1, 1, 1);
+			moveDir = model.localScale.x;
+		}
+
+			
+		// Controlled movement
+		if (!isDashing)
+		{
+			if (!inAtkState)
+			{
+				anim.SetFloat("moveSpeed", x != 0 ? x * activeMoveSpeed : 1);
+			}
+			rb.velocity = new Vector2(x * activeMoveSpeed, rb.velocity.y);
+		}
+		else
+		{
+			bool facingRight = (model.localScale.x > 0);
+			rb.AddForce(
+				new Vector2((facingRight ? 1 : -1) * activeMoveSpeed * 5, 0), 
+				ForceMode2D.Force
+			);
+			rb.velocity = new Vector2(
+				Mathf.Clamp(rb.velocity.x, -dashSpeed, dashSpeed), 
+				rb.velocity.y
+			);
+		}
+	}
+
 	void CheckIsGrounded()
 	{
 		isGrounded = Physics2D.OverlapBox(groundCheck.position, groundCheckSize, 0, whatIsGround);
-		if (!inAtkState) anim.SetBool("isGrounded", isGrounded);
+		if (!inAtkState) 
+			anim.SetBool("isGrounded", isGrounded);
+		if (isGrounded && anim.GetBool("isAirDash")) 
+			anim.SetBool("isAirDash", false);
 	}
 	void CheckIsWalled()
 	{
@@ -367,7 +430,6 @@ public class PlayerControls : MonoBehaviour
 
 		if (slashObj != null)
 		{
-			anim.speed = 1;
 			anim.SetFloat("atkDir", atkDir);
 			anim.SetTrigger("attack");
 			anim.SetBool("isAttacking", true);
@@ -409,7 +471,6 @@ public class PlayerControls : MonoBehaviour
 		jumpDashed = false;
 		rb.gravityScale = 0;
 		rb.velocity = Vector2.zero;
-		anim.speed = 1;
 
 		// Gossamer Storm
 		if (atkDir == 1)
@@ -446,20 +507,16 @@ public class PlayerControls : MonoBehaviour
 	public void CancelGossamerStorm()
 	{
 		// done
-		if (!player.GetButton("X"))
+		if (!player.GetButton("X") || silkMeter <= 0)
 		{
 			anim.SetBool("isGossamerStorm", false);
-			anim.ResetTrigger("cancelGossamerStorm");
 			rb.gravityScale = 1;
 			atkCo = null;
 		}
 		// Continue Performing Gossamer Storm
 		else
 		{
-			if (silkMeter <= 0)
-				anim.SetTrigger("cancelGossamerStorm");
-			else
-				SetSilk(-1);
+			SetSilk(-1);
 		}
 	}
 
@@ -500,6 +557,11 @@ public class PlayerControls : MonoBehaviour
 		isWallJumping = false;
 	}
 
+	public void FinishAirDash()
+	{
+		anim.SetBool("isAirDash", false);
+	}
+
 	void LedgeGrab()
 	{
 		isJumping = jumped = false;
@@ -511,7 +573,6 @@ public class PlayerControls : MonoBehaviour
 		rb.velocity = Vector2.zero;
 		anim.SetFloat("moveDir", moveDir);
 		anim.SetBool("isLedgeGrabbing", true);
-		anim.speed = 1;
 		ledgeGrab = true;
 	}
 	public void GRAB_LEDGE()
@@ -521,56 +582,6 @@ public class PlayerControls : MonoBehaviour
 		rb.gravityScale = 1;
 		rb.velocity = Vector2.zero;
 		anim.SetBool("isLedgeGrabbing", false);
-	}
-
-	void Move()
-	{
-		if (jumpDashed)
-			rb.velocity = new Vector2(dashDir * jumpDashForce, rb.velocity.y);
-			
-		if (isWallJumping || jumpDashed || isLedgeGrabbing || inShawAtk) return;
-
-		float moveY = player.GetAxis("Move Vertical");
-		float x = (isGrounded && moveY > 0.8f) ? 0 : moveX;
-		anim.SetBool("isWalking", x != 0);
-		anim.SetBool("isDashing", isDashing);
-
-		if (!cantRotate)
-		{
-			// right
-			if (moveX > 0) 
-				model.localScale = new Vector3(1, 1, 1);
-			// left
-			else if (moveX < 0) 
-				model.localScale = new Vector3(-1, 1, 1);
-			moveDir = model.localScale.x;
-		}
-
-			
-		// Controlled movement
-		if (!isDashing)
-		{
-			if (!inAtkState)
-			{
-				if (x != 0)
-					anim.speed = Mathf.Abs(x * activeMoveSpeed);
-				else 
-					anim.speed = 1;
-			}
-			rb.velocity = new Vector2(x * activeMoveSpeed, rb.velocity.y);
-		}
-		else
-		{
-			bool facingRight = (model.localScale.x > 0);
-			rb.AddForce(
-				new Vector2((facingRight ? 1 : -1) * activeMoveSpeed * 5, 0), 
-				ForceMode2D.Force
-			);
-			rb.velocity = new Vector2(
-				Mathf.Clamp(rb.velocity.x, -dashSpeed, dashSpeed), 
-				rb.velocity.y
-			);
-		}
 	}
 
 
@@ -612,7 +623,7 @@ public class PlayerControls : MonoBehaviour
 
 	private void OnTriggerStay2D(Collider2D other) 
 	{
-		if (other.CompareTag("Enemy") && hurtCo == null)	
+		if (!invincible && other.CompareTag("Enemy") && hurtCo == null)	
 			hurtCo = StartCoroutine( TakeDamageCo(other.transform) );
 	}
 
@@ -641,8 +652,6 @@ public class PlayerControls : MonoBehaviour
 		CinemachineShake.Instance.ShakeCam(15, 0.25f);
 		anim.SetBool("isSkillAttacking", false);
 		anim.SetBool("isGossamerStorm", false);
-		// if (anim.GetBool("isGossamerStorm"))
-		// 	anim.SetTrigger("cancelGossamerStorm");
 
 		// stop healing
 		if (bindCo != null) 
@@ -676,7 +685,6 @@ public class PlayerControls : MonoBehaviour
 			yield break;
 		} 
 		anim.SetBool("isBinding", true);
-		anim.speed = 1;
 		SetSilk(-bindCost);
 		rb.gravityScale = 0;
 		rb.velocity = Vector2.zero;
