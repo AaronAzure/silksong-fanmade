@@ -63,6 +63,7 @@ Transform:
   - {fileID: 7530309673767833169}
   - {fileID: 9114477566536772447}
   - {fileID: 1351233206461515513}
+  - {fileID: 7452915362852078129}
   m_Father: {fileID: 1376537067151301452}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -192,7 +193,7 @@ Rigidbody2D:
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: d6fa2b0bb186d48e7bd7d5feb8372e36, type: 2}
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 1
@@ -209,7 +210,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d61d0cea084c4643958416daeba1e2e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hp: 50
+  hp: 40
   self: {fileID: 1376537067151301452}
   model: {fileID: 1376537066910156643}
   sprites:
@@ -226,6 +227,8 @@ MonoBehaviour:
   dmgMat: {fileID: 2100000, guid: f0189229f97634ce3995c74d1163b3cc, type: 2}
   sortGroup: {fileID: 1376537067151301449}
   moveSpeed: 2.5
+  chaseSpeed: 7.5
+  jumpForce: 10
   runSpeed: 5
   groundDetect: {fileID: 9114477566536772447}
   wallDetect: {fileID: 1351233206461515513}
@@ -240,6 +243,8 @@ MonoBehaviour:
   finalMask:
     serializedVersion: 2
     m_Bits: 72
+  groundCheck: {fileID: 7452915362852078129}
+  groundCheckSize: {x: 0.5, y: 0.05}
   currentAction: -1
   idleCounter: 0
   idleTotalCounter: 5
@@ -394,6 +399,36 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &6502570826747816531
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7452915362852078129}
+  m_Layer: 0
+  m_Name: Ground Check
+  m_TagString: Untagged
+  m_Icon: {fileID: 3306451490063965843, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7452915362852078129
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6502570826747816531}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -0.5, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1376537066910156643}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &111031665990019283
 PrefabInstance:
   m_ObjectHideFlags: 0

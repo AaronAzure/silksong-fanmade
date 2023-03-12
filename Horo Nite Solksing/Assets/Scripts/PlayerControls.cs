@@ -16,6 +16,8 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] int maxHp=7;
 	[SerializeField] int hp;
 	public int atkDmg=10;
+	public int gossamerDmg=5;
+	public int stabDmg=20;
 	[SerializeField] int silkMeter;
 	[SerializeField] Animator[] silks;
 	[SerializeField] GameObject[] hpMasks;
@@ -78,13 +80,15 @@ public class PlayerControls : MonoBehaviour
 	private Coroutine hurtCo;
 	private Coroutine bindCo;
 	[SerializeField] int bindCost=9;
+	[SerializeField] int skillStabCost=2;
 	[SerializeField] Image spoolImg;
 	[SerializeField] Sprite fullSpoolSpr;
 	[SerializeField] Sprite emptySpoolSpr;
 
 
-	[Space] [Header("Particle effects")]
+	[Space] [Header("Sound effects")]
 	[SerializeField] AudioSource shawSound;
+	[SerializeField] AudioSource agaleSound;
 
 
 	[Space] [Header("Particle effects")]
@@ -94,10 +98,13 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] GameObject bloodBurstPs;
 	[SerializeField] GameObject bindPs;
 	[SerializeField] Transform dashSpawnPos;
+	[SerializeField] Animator flashAnim;
 
 
 	[Space] [Header("Animator Controlled")]
 	[SerializeField] bool isLedgeGrabbing; // controlled by animator
+	[SerializeField] bool inAnimation;
+	[SerializeField] bool performingGossamerStorm;
 	[SerializeField] bool cantRotate;
 	[SerializeField] bool inAtkState;
 	[SerializeField] bool inShawAtk;
@@ -129,7 +136,8 @@ public class PlayerControls : MonoBehaviour
 
 	bool CanControl()
 	{
-		return (!isLedgeGrabbing && !beenHurt && !noControl && !isBinding);
+		return (!isLedgeGrabbing && !beenHurt && !noControl && !isBinding &&
+			!inAnimation);
 	}
 
 	private void OnDrawGizmosSelected() 
@@ -153,6 +161,8 @@ public class PlayerControls : MonoBehaviour
 		{
 			if (player.GetButtonDown("Y") && atkCo == null)
 				Attack();
+			else if (player.GetButtonDown("X") && atkCo == null)
+				SkillAttack();
 
 			// bind (heal)
 			if (player.GetButtonDown("A") && silkMeter >= bindCost && bindCo == null)
@@ -166,6 +176,9 @@ public class PlayerControls : MonoBehaviour
 
 			CalcMove();
 			CheckCanLedgeGrab();
+			// Ledge Grab
+			if (canLedgeGrab && !isWallJumping && !isLedgeGrabbing && !ledgeGrab)
+				LedgeGrab();
 		}
 	}
 
@@ -218,10 +231,6 @@ public class PlayerControls : MonoBehaviour
 				CheckIsWalled();
 				if (jumpDashed && jumped && (isGrounded || isWallSliding || canLedgeGrab))
 					jumpDashed = jumped = false;
-
-				// Ledge Grab
-				if (canLedgeGrab && !isLedgeGrabbing && !ledgeGrab)
-					LedgeGrab();
 			}
 		}
 	}
@@ -233,6 +242,7 @@ public class PlayerControls : MonoBehaviour
 		{
 			isDashing = true; // keep dashing if on ground
 			jumpDashed = jumped = false;
+			jumpTimer = jumpMaxTimer;
 				
 			dashCounter = dashDuration;
 			activeMoveSpeed = dashBurstSpeed;
@@ -272,7 +282,7 @@ public class PlayerControls : MonoBehaviour
 		{
 			if (jumpTimer < jumpMaxTimer)
 			{
-				rb.velocity = Vector2.up * jumpForce;
+				rb.velocity = new Vector2(rb.velocity.x, jumpForce);
 				jumpTimer += Time.deltaTime;
 			}
 			else
@@ -379,6 +389,80 @@ public class PlayerControls : MonoBehaviour
 		yield return new WaitForSeconds(atkCooldownDuration);
 		atkCo = null;
 	}
+	
+	void SkillAttack()
+	{
+		if (silkMeter >= skillStabCost && player.GetAxis("Move Vertical") > 0.9f)
+			atkCo = StartCoroutine( SkillAttackCo(1) );
+		else if (silkMeter >= skillStabCost)
+			atkCo = StartCoroutine( SkillAttackCo() );
+	}
+
+	IEnumerator SkillAttackCo(int atkDir=0)
+	{
+		if (atkCo != null) yield break;
+		SetSilk(-skillStabCost);
+		// CinemachineShake.Instance.ShakeCam(20,0.5f);
+
+		this.atkDir = atkDir;
+		CancelDash();
+		jumpDashed = false;
+		rb.gravityScale = 0;
+		rb.velocity = Vector2.zero;
+		anim.speed = 1;
+
+		// Gossamer Storm
+		if (atkDir == 1)
+		{
+			anim.SetBool("isGossamerStorm", true);
+
+			yield return new WaitForSeconds(0.25f);
+			agaleSound.Play();
+			SkillAttackEffect();
+		}
+		else
+		{
+			anim.SetBool("isSkillAttacking", true);
+
+			yield return new WaitForSeconds(0.25f);
+			SkillAttackEffect();
+
+			yield return new WaitForSeconds(0.25f);
+			anim.SetBool("isSkillAttacking", false);
+			rb.gravityScale = 1;
+
+			// atk cooldown
+			yield return new WaitForSeconds(atkCooldownDuration);
+			atkCo = null;
+		}
+	}
+
+	void SkillAttackEffect()
+	{
+		CinemachineShake.Instance.ShakeCam(5, 0.5f);
+		flashAnim.SetTrigger("flash");
+	}
+
+	public void CancelGossamerStorm()
+	{
+		// done
+		if (!player.GetButton("X"))
+		{
+			anim.SetBool("isGossamerStorm", false);
+			anim.ResetTrigger("cancelGossamerStorm");
+			rb.gravityScale = 1;
+			atkCo = null;
+		}
+		// Continue Performing Gossamer Storm
+		else
+		{
+			if (silkMeter <= 0)
+				anim.SetTrigger("cancelGossamerStorm");
+			else
+				SetSilk(-1);
+		}
+	}
+
 	void Jump()
 	{
 		// jumped while dashing
@@ -546,6 +630,7 @@ public class PlayerControls : MonoBehaviour
 		anim.SetBool("isHurt", true);
 		hp = Mathf.Max(0, hp - 1);
 		ResetAllBools();
+		atkCo = null;
 		beenHurt = true;
 		SetHp();
 		rb.velocity = Vector2.zero;
@@ -554,6 +639,10 @@ public class PlayerControls : MonoBehaviour
 		Vector2 direction = (opponent.position - transform.position).normalized;
         rb.velocity = new Vector2(-direction.x * 10, 5);
 		CinemachineShake.Instance.ShakeCam(15, 0.25f);
+		anim.SetBool("isSkillAttacking", false);
+		anim.SetBool("isGossamerStorm", false);
+		// if (anim.GetBool("isGossamerStorm"))
+		// 	anim.SetTrigger("cancelGossamerStorm");
 
 		// stop healing
 		if (bindCo != null) 
