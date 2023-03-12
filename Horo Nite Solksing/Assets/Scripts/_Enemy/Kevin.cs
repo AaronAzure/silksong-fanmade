@@ -4,15 +4,43 @@ using UnityEngine;
 
 public class Kevin : Enemy
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+	private float closeDistTimer;
+	private float closeDistTotal=1f;
+	[SerializeField] float lungeForce=5;
+	[SerializeField] bool inAttackAnim; // assigned by animation
+	[SerializeField] bool lungeForward; // assigned by animation
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+
+    protected override void IdleAction()
+	{
+		WalkAround();
+	}
+
+	protected override void AttackingAction()
+	{
+		if (!inAttackAnim)
+		{
+			if (isGrounded)
+				ChasePlayer();
+			else
+				MoveInPrevDirection();
+
+			if (closeDistTimer > closeDistTotal)
+			{
+				anim.SetTrigger("attack");
+				closeDistTimer = 0;
+			}
+			else if (isClose)
+				closeDistTimer += Time.fixedDeltaTime;
+			else if (closeDistTimer > 0)
+				closeDistTimer -= Time.fixedDeltaTime;
+		}
+		else if (!beenHurt)
+		{
+			if (!lungeForward)
+				rb.velocity = new Vector2(0, rb.velocity.y);
+			else
+				rb.velocity = new Vector2(lungeForce * model.localScale.x, rb.velocity.y);
+		}
+	}
 }

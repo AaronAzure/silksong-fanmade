@@ -25,9 +25,9 @@ public class Stuart : Enemy
 		else
 			MoveInPrevDirection();
 		if (isGrounded && jumpCo == null && target.self.position.y - self.position.y > 1)
-			jumpCo = StartCoroutine( JumpCo() );
+			jumpCo = StartCoroutine( JumpCo(1) );
 		else if (isGrounded && canJump && jumpCo == null && PlayerInFront())
-			jumpCo = StartCoroutine( JumpCo() );
+			jumpCo = StartCoroutine( JumpCo(1) );
 	}
 
 	IEnumerator ToggleJump()

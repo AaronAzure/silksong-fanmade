@@ -7,9 +7,9 @@ public abstract class Enemy : MonoBehaviour
 {
 	[SerializeField] int hp=10;
 	public Transform self;
-	[SerializeField] Transform model;
+	[SerializeField] protected Transform model;
 	[SerializeField] SpriteRenderer[] sprites;
-	[SerializeField] Animator anim;
+	[SerializeField] protected Animator anim;
 	[SerializeField] protected Rigidbody2D rb;
 	[SerializeField] Collider2D col;
 
@@ -32,13 +32,17 @@ public abstract class Enemy : MonoBehaviour
 	[SerializeField] LayerMask whatIsGround;
 	[SerializeField] LayerMask finalMask;
 	protected bool isGrounded;
-	private bool beenHurt;
+	[SerializeField] protected bool idleActionOnly;
+	protected bool beenHurt;
 	[SerializeField] Transform groundCheck;
 	[SerializeField] Vector2 groundCheckSize;
-	[Space] [SerializeField] CurrentAction currentAction=0;
+
+	
+	[Space] protected CurrentAction currentAction=0;
 	[SerializeField] float idleCounter=0;
 	[SerializeField] float idleTotalCounter=5;
 	[SerializeField] [Range(-1,1)] int initDir=-1;
+	protected int nextDir;
 	protected Coroutine jumpCo;
 	protected Coroutine hurtCo;
 	// protected RaycastHit2D playerInfo;
@@ -51,11 +55,12 @@ public abstract class Enemy : MonoBehaviour
 	public bool alwaysInRange;
 	public bool inRange; // player in area
 	public bool inSight; // player in line of sight within area
+	public bool isClose; // player in close area
 	protected bool cannotRotate;
 	protected float moveDir;
-	private bool attackingPlayer;
-	private float searchCounter;
-	private float maxSearchTime=2;
+	protected bool attackingPlayer;
+	protected float searchCounter;
+	protected float maxSearchTime=2;
 
 
 
@@ -86,15 +91,34 @@ public abstract class Enemy : MonoBehaviour
 		}
 	}
 
+	protected virtual void CallChildOnStart() { }
+
     // Start is called before the first frame update
     public virtual void Start() 
     {
 		initDir = (int) model.localScale.x;
+		nextDir = -initDir;
 		currentAction = (initDir == 1) ? CurrentAction.right : CurrentAction.left;
 		CallChildOnStart();
     }
 
-	protected virtual void CallChildOnStart() { }
+	public virtual void FixedUpdate()
+    {
+		if (idleActionOnly || !attackingPlayer)
+			IdleAction();
+		else
+			AttackingAction();
+
+		inSight = PlayerInSight();
+		KeepLookingForPlayer();
+		CheckIsGrounded();
+
+		if (!isGrounded)
+			anim.SetFloat("jumpVelocity", rb.velocity.y);
+
+		if (alert != null) alert.SetActive( attackingPlayer );
+    }
+
 
 	protected bool PlayerInSight()
 	{
@@ -158,27 +182,6 @@ public abstract class Enemy : MonoBehaviour
 
 	protected virtual void AttackingAction() { }
 
-    // // Update is called once per frame
-    public virtual void FixedUpdate()
-    {
-		if (!inSight && currentAction != 0 && CheckSurrounding())
-			currentAction = CurrentAction.none;
-
-		if (!attackingPlayer)
-			IdleAction();
-		else
-			AttackingAction();
-
-		inSight = PlayerInSight();
-		KeepLookingForPlayer();
-		CheckIsGrounded();
-
-		if (!isGrounded)
-			anim.SetFloat("jumpVelocity", rb.velocity.y);
-
-		if (alert != null) alert.SetActive( attackingPlayer );
-    }
-
 	public void TakeDamage(int dmg, Transform opponent, Vector2 forceDir, float force)
 	{
 		hurtCo = StartCoroutine( TakeDamageCo(dmg, opponent, forceDir, force) );
@@ -194,6 +197,11 @@ public abstract class Enemy : MonoBehaviour
 			Mathf.Atan2(Mathf.Abs(forceDir.y), forceDir.x) * Mathf.Rad2Deg;
 		Instantiate(silkEffectObj, transform.position, Quaternion.Euler(0,0,angleZ+offset*forceDir.x));
 		Instantiate(bloodEffectObj, transform.position, Quaternion.Euler(0,0,angleZ+offset*forceDir.x));
+		if (force != 0)
+		{
+			rb.velocity = Vector2.zero;
+			rb.velocity = forceDir * force;
+		}
 		if (hp <= 0)
 		{
 			Died();
@@ -202,11 +210,6 @@ public abstract class Enemy : MonoBehaviour
 		foreach (SpriteRenderer sprite in sprites)
 			sprite.material = dmgMat;
 
-		if (force != 0)
-		{
-			rb.velocity = Vector2.zero;
-			rb.velocity = forceDir * force;
-		}
 
 		yield return new WaitForSeconds(0.2f);
 		foreach (SpriteRenderer sprite in sprites)
@@ -239,6 +242,17 @@ public abstract class Enemy : MonoBehaviour
 	// todo --------------------------------------------------------------------
 	// todo ------------------ Attack Patterns ---------------------------------
 
+	protected CurrentAction GetAction(int actionInd)
+	{
+		switch (actionInd)
+		{
+			case -1: return CurrentAction.left;
+			case 0: return CurrentAction.none;
+			case 1: return CurrentAction.right;
+			default: return CurrentAction.none;
+		}
+	}
+
 	protected void FacePlayer(int playerDir=0)
 	{
 		if (playerDir == 0)
@@ -252,8 +266,18 @@ public abstract class Enemy : MonoBehaviour
 		if (idleCounter > idleTotalCounter)
 		{
 			idleCounter = 0;
-			initDir = -initDir;
-			currentAction = (initDir == 1) ? CurrentAction.right : CurrentAction.left;
+			currentAction = currentAction + nextDir;
+			if (currentAction == CurrentAction.right)
+				nextDir = -1;
+			else if (currentAction == CurrentAction.left)
+				nextDir = 1;
+		}
+
+		// stop moving if about to walk into wall or off cliff
+		else if (!inSight && currentAction != 0 && CheckSurrounding())
+		{
+			idleCounter = 0;
+			currentAction = CurrentAction.none;
 		}
 
 		if (beenHurt)
@@ -311,12 +335,12 @@ public abstract class Enemy : MonoBehaviour
 		}
 	}
 
-	protected IEnumerator JumpCo()
+	protected IEnumerator JumpCo(float delay=0.2f)
 	{
 		rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
 		moveDir = moveSpeed * model.localScale.x;
 		
-		yield return new WaitForSeconds(0.2f);
+		yield return new WaitForSeconds(delay);
 		jumpCo = null;
 	}
 }

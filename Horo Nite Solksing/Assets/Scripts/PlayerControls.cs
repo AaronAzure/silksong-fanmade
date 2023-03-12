@@ -493,15 +493,18 @@ public class PlayerControls : MonoBehaviour
 			rb.gravityScale = 1;
 
 			// atk cooldown
-			yield return new WaitForSeconds(atkCooldownDuration);
+			// yield return new WaitForSeconds(atkCooldownDuration/2);
 			atkCo = null;
 		}
 	}
 
 	void SkillAttackEffect()
 	{
-		CinemachineShake.Instance.ShakeCam(5, 0.5f);
-		flashAnim.SetTrigger("flash");
+		if (!beenHurt)
+		{
+			CinemachineShake.Instance.ShakeCam(5, 0.5f);
+			flashAnim.SetTrigger("flash");
+		}
 	}
 
 	public void CancelGossamerStorm()
@@ -565,6 +568,7 @@ public class PlayerControls : MonoBehaviour
 	void LedgeGrab()
 	{
 		isJumping = jumped = false;
+		anim.SetBool("isAirDash", false);
 		CancelDash();
 		jumpDashed = false;
 
