@@ -2,33 +2,50 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Kevin : Enemy
+public class Edulitoh : Enemy
 {
+	[Header("Edulitoh")]
 	private float closeDistTimer;
-	private float closeDistTotal=1f;
+	private float closeDistTotal=2;
 	[SerializeField] float lungeForce=5;
 	[SerializeField] bool inAttackAnim; // assigned by animation
 	[SerializeField] bool lungeForward; // assigned by animation
+	private bool chase;
 
 
     protected override void IdleAction()
 	{
-		WalkAround();
+		FlyAround();
+		if (chase)
+		{
+			chase = false;
+			anim.SetFloat("moveSpeed", 1);
+		}
 	}
+
 
 	protected override void AttackingAction()
 	{
 		if (!inAttackAnim)
 		{
-			if (isGrounded)
-				ChasePlayer();
-			else
-				MoveInPrevDirection();
+			Vector2 dir = (target.self.position - transform.position).normalized;
+			rb.AddForce(dir * chaseSpeed * 5, ForceMode2D.Force);
+			rb.velocity = new Vector2(
+				Mathf.Clamp(rb.velocity.x, -chaseSpeed, chaseSpeed),
+				Mathf.Clamp(rb.velocity.y, -chaseSpeed, chaseSpeed)
+			);
+			FacePlayer();
+			if (!chase)
+			{
+				chase = true;
+				anim.SetFloat("moveSpeed", chaseSpeed);
+			}
 
 			if (closeDistTimer > closeDistTotal)
 			{
-				anim.SetTrigger("attack");
 				closeDistTimer = 0;
+				rb.velocity = Vector2.zero;
+				anim.SetTrigger("attack");
 			}
 			else if (isClose)
 				closeDistTimer += Time.fixedDeltaTime;
@@ -37,7 +54,7 @@ public class Kevin : Enemy
 		}
 		else if (!beenHurt)
 		{
-			if (!lungeForward || !CheckCliff())
+			if (!lungeForward)
 				rb.velocity = new Vector2(0, rb.velocity.y);
 			else 
 				rb.velocity = new Vector2(lungeForce * model.localScale.x, rb.velocity.y);

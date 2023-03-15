@@ -162,7 +162,7 @@ public class PlayerControls : MonoBehaviour
 		{
 			if (player.GetButtonDown("Y") && atkCo == null)
 				Attack();
-			else if (player.GetButtonDown("X") && atkCo == null)
+			else if (player.GetButtonDown("X") && !anim.GetBool("isAttacking"))
 				SkillAttack();
 
 			// bind (heal)
@@ -410,10 +410,10 @@ public class PlayerControls : MonoBehaviour
 		if (isDashing)
 			atkCo = StartCoroutine( AttackCo(3) );
 		// attack up
-		else if (player.GetAxis("Move Vertical") > 0.9f)
+		else if (player.GetAxis("Move Vertical") > 0.8f)
 			atkCo = StartCoroutine( AttackCo(1) );
 		// shaw attack
-		else if (player.GetAxis("Move Vertical") < -0.9f)
+		else if (player.GetAxis("Move Vertical") < -0.8f)
 			atkCo = StartCoroutine( AttackCo(2) );
 		// attack front
 		else
@@ -609,7 +609,7 @@ public class PlayerControls : MonoBehaviour
 		anim.SetBool("isAttacking", false);
 		rb.velocity = Vector2.zero;
 
-		rb.AddForce( new Vector2(-moveDir * shawForce, atkDir == 2 ? shawForce : 0), ForceMode2D.Impulse);
+		rb.AddForce( new Vector2(-moveDir * shawForce, shawForce), ForceMode2D.Impulse);
 		StartCoroutine( RegainControlCo(0.1f) );
 	}
 
@@ -641,6 +641,11 @@ public class PlayerControls : MonoBehaviour
 
 		foreach (SpriteRenderer sprite in sprites)
 			sprite.material = dmgMat;
+
+		if (anim.GetBool("isLedgeGrabbing"))
+		{
+			GRAB_LEDGE();
+		}
 
 		anim.SetBool("isHurt", true);
 		hp = Mathf.Max(0, hp - 1);
