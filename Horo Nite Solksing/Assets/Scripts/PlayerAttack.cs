@@ -10,12 +10,22 @@ public class PlayerAttack : MonoBehaviour
 	[SerializeField] bool isGossamerStorm;
 	[SerializeField] GameObject strikePs;
 	[SerializeField] float offset=15;
+	[SerializeField] GameObject parryEffect;
+
 
 	private void OnTriggerEnter2D(Collider2D other) 
 	{
-		if (other.CompareTag("EnemyAttack") && isShawAttack)
+		if (other.CompareTag("EnemyAttack"))
 		{
-			p.ShawRetreat();
+			if (parryEffect != null)
+			{
+				Vector2 orig = Vector2.Lerp(other.transform.position, transform.position, 0.5f);
+				Instantiate(parryEffect, orig, Quaternion.identity);
+				p.Parry();
+			}
+			
+			if (isShawAttack)
+				p.ShawRetreat();
 		}
 		if (other.CompareTag("Enemy"))
 		{

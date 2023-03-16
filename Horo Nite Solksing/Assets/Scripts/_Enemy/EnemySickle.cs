@@ -18,7 +18,7 @@ public class EnemySickle : MonoBehaviour
 		if (hitWall)
 		{
 			LaunchInDirection((returnPos.position - transform.position).normalized);
-			if (Vector2.Distance(transform.position, returnPos.position) < 0.1f)
+			if (Vector2.Distance(transform.position, returnPos.position) < 0.25f)
 			{
 				death.RetrieveSickle();
 				Destroy(this.gameObject);
@@ -39,10 +39,6 @@ public class EnemySickle : MonoBehaviour
 			hitWall = true;
 			LaunchInDirection((returnPos.position - transform.position).normalized);
 		}
-		// else if (hitWall && other.CompareTag("Ground"))
-		// {
-		// 	LaunchInDirection((returnPos.position - transform.position).normalized);
-		// }
 	}
 
 

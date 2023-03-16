@@ -772,5 +772,18 @@ public class PlayerControls : MonoBehaviour
 		}
 	}
 
+	public void Parry()
+	{
+		if (parryCo != null) StopCoroutine( ParryCo() );
+		parryCo = StartCoroutine( ParryCo() );
+	}
 
+	public IEnumerator ParryCo()
+	{
+		Time.timeScale = 0;
+
+		yield return new WaitForSecondsRealtime(0.25f);
+		Time.timeScale = 1;
+		parryCo = null;
+	}
 }
