@@ -5,7 +5,8 @@ using UnityEngine.Rendering;
 
 public abstract class Enemy : MonoBehaviour
 {
-	[SerializeField] int hp=10;
+	[SerializeField] protected int hp=10;
+	[SerializeField] protected int maxHp;
 	public Transform self;
 	[SerializeField] protected Transform model;
 	[SerializeField] SpriteRenderer[] sprites;
@@ -121,6 +122,7 @@ public abstract class Enemy : MonoBehaviour
     public virtual void Start() 
     {
 		// isFlying = rb.gravityScale == 0 ? true : false;
+		maxHp = hp;
 		initDir = (int) model.localScale.x;
 		nextDir = -initDir;
 		currentAction = (initDir == 1) ? CurrentAction.right : CurrentAction.left;
@@ -232,6 +234,8 @@ public abstract class Enemy : MonoBehaviour
 
 	public void TakeDamage(int dmg, Transform opponent, Vector2 forceDir, float force)
 	{
+		if (hp > 0 && hurtCo != null)
+			StopCoroutine(hurtCo);
 		hurtCo = StartCoroutine( TakeDamageCo(dmg, opponent, forceDir, force) );
 	}
 

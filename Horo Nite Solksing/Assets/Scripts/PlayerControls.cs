@@ -462,7 +462,8 @@ public class PlayerControls : MonoBehaviour
 
 	IEnumerator SkillAttackCo(int atkDir=0)
 	{
-		if (atkCo != null) yield break;
+		// if (atkCo != null) yield break;
+		// atkCo = null;
 		SetSilk(-skillStabCost);
 		// CinemachineShake.Instance.ShakeCam(20,0.5f);
 
@@ -703,7 +704,9 @@ public class PlayerControls : MonoBehaviour
 		canLedgeGrab = ledgeGrab = false;
 		SpawnExistingObjAtSelf(healingPs);
 
-		yield return new WaitForSeconds(0.25f);
+		yield return new WaitForSeconds(0.333f);
+		if (bindCo == null)
+			yield break;
 		rb.gravityScale = 1;
 		// anim.SetBool("isBinding", false);
 		hp = Mathf.Min(hp+3, hpMasks.Length);

@@ -8,6 +8,9 @@ public class Death : Enemy
 	[SerializeField] bool inAttackAnim;
 	[SerializeField] bool tripleStrike;
 	[SerializeField] float tripleStrikeForce=20;
+	[SerializeField] FlameTrailProjectile flameAtk;
+	[SerializeField] Transform flameAtkPos;
+	private bool jumpedAgain=true;
 	// [SerializeField] float jumpForce=15;
 
 
@@ -16,10 +19,12 @@ public class Death : Enemy
 		FacePlayer();
 		if (!cannotAtk)
 		{
-			Debug.Log(Vector2.Distance(target.transform.position, self.position));
+			jumpedAgain = true;
+			float distToTarget = Vector2.Distance(target.transform.position, self.position);
+			Debug.Log(distToTarget);
 			anim.SetBool("jumped", false);
 			anim.SetTrigger("attack");
-			int rng = Random.Range(0,3);
+			int rng = (distToTarget < 5f) ? Random.Range(0,3) : 1;
 			if (rng == 1)
 				anim.SetBool("jumped", true);
 			anim.SetFloat("atkPattern", rng);
@@ -67,5 +72,21 @@ public class Death : Enemy
 			), 
 			ForceMode2D.Impulse
 		);
+	}
+
+	public void JUMP_AGAIN()
+	{
+		if (jumpedAgain && hp < maxHp / 2)
+		{
+			jumpedAgain = false;
+			anim.SetBool("jumped", true);
+			anim.SetFloat("atkPattern", 1);
+		}
+	}
+
+	public void FLAME_ATTACK()
+	{
+		var obj = Instantiate(flameAtk, flameAtkPos.position, Quaternion.identity);
+		obj.toRight = (model.localScale.x > 0) ? true : false;
 	}
 }
