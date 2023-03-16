@@ -55,9 +55,9 @@ public class Edulitoh : Enemy
 		else if (!beenHurt)
 		{
 			if (!lungeForward)
-				rb.velocity = new Vector2(0, rb.velocity.y);
+				rb.velocity = new Vector2(0, 0);
 			else 
-				rb.velocity = new Vector2(lungeForce * model.localScale.x, rb.velocity.y);
+				rb.velocity = new Vector2(lungeForce * model.localScale.x, 0);
 		}
 	}
 }

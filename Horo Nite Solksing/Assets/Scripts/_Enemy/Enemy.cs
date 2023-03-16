@@ -21,9 +21,11 @@ public abstract class Enemy : MonoBehaviour
 	
 	[Space] [Header("Platformer Related")]
 	[SerializeField] protected bool isSmart; // if attacked face direction;
+	[SerializeField] protected bool controlledByAnim;
+	[SerializeField] protected bool cannotTakeKb;
 	[SerializeField] float moveSpeed=2.5f;
 	[SerializeField] protected float chaseSpeed=7.5f;
-	[SerializeField] float jumpForce=10f;
+	[SerializeField] protected float jumpForce=10f;
 	[SerializeField] float runSpeed=5;
 	[SerializeField] Transform groundDetect;
 	[SerializeField] Transform wallDetect;
@@ -64,6 +66,7 @@ public abstract class Enemy : MonoBehaviour
 	protected float searchCounter;
 	protected float maxSearchTime=2;
 	[SerializeField] protected bool spawningIn; // set by animation
+	public bool cannotAtk;
 
 
 
@@ -71,6 +74,11 @@ public abstract class Enemy : MonoBehaviour
 	[SerializeField] GameObject silkEffectObj;
 	[SerializeField] GameObject bloodEffectObj;
 	[SerializeField] GameObject alert;
+
+
+	[Space] [Header("Room Related")]
+	[SerializeField] Room room;
+	private bool roomEntered;
 
 
 	[Space] [Header("Debug")]
@@ -96,6 +104,18 @@ public abstract class Enemy : MonoBehaviour
 
 	protected virtual void CallChildOnStart() { }
 	protected virtual void CallChildOnFixedUpdate() { }
+	protected virtual void CallChildOnEarlyUpdate() { }
+
+
+	public void RoomEnter()
+	{
+		if (!roomEntered)
+		{
+			roomEntered = true;
+			CallChildOnRoomEnter();
+		}
+	}
+	public virtual void CallChildOnRoomEnter() { }
 
     // Start is called before the first frame update
     public virtual void Start() 
@@ -109,7 +129,8 @@ public abstract class Enemy : MonoBehaviour
 
 	public virtual void FixedUpdate()
     {
-		if (spawningIn) return;
+		CallChildOnEarlyUpdate();
+		if (spawningIn || controlledByAnim) return;
 
 		if (idleActionOnly || !attackingPlayer)
 			IdleAction();
@@ -199,7 +220,7 @@ public abstract class Enemy : MonoBehaviour
 		return (playerInfo.collider != null);
 	}
 
-	void CheckIsGrounded()
+	protected void CheckIsGrounded()
 	{
 		isGrounded = Physics2D.OverlapBox(groundCheck.position, groundCheckSize, 0, whatIsGround);
 		anim.SetBool("isGrounded", isGrounded);
@@ -224,7 +245,7 @@ public abstract class Enemy : MonoBehaviour
 			Mathf.Atan2(Mathf.Abs(forceDir.y), forceDir.x) * Mathf.Rad2Deg;
 		Instantiate(silkEffectObj, transform.position, Quaternion.Euler(0,0,angleZ+offset*forceDir.x));
 		Instantiate(bloodEffectObj, transform.position, Quaternion.Euler(0,0,angleZ+offset*forceDir.x));
-		if (force != 0)
+		if (!cannotTakeKb && force != 0)
 		{
 			rb.velocity = Vector2.zero;
 			rb.velocity = forceDir * force;
@@ -245,7 +266,7 @@ public abstract class Enemy : MonoBehaviour
 			sprite.material = defaultMat;
 
 		beenHurt = false;
-		if (force != 0)
+		if (!cannotTakeKb && force != 0)
 			rb.velocity = new Vector2(0, rb.velocity.y);
 	}
 	

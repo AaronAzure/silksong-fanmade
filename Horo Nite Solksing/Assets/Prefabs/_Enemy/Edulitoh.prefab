@@ -351,7 +351,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8e5e8c6a13b541869468666637a9b0d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hp: 60
+  hp: 50
   self: {fileID: 1376537067151301452}
   model: {fileID: 1376537066910156643}
   sprites:
@@ -374,6 +374,7 @@ MonoBehaviour:
   dmgMat: {fileID: 2100000, guid: 432135ab22bc84106b4fe0a466cbb4d4, type: 2}
   sortGroup: {fileID: 2099911773895242119}
   isSmart: 1
+  controlledByAnim: 0
   moveSpeed: 1.5
   chaseSpeed: 3.5
   jumpForce: 10
@@ -403,9 +404,11 @@ MonoBehaviour:
   inSight: 0
   isClose: 0
   spawningIn: 0
+  cannotAtk: 0
   silkEffectObj: {fileID: 7056141771011346426, guid: fb1f8aab62db342b48719794d38c90d1, type: 3}
   bloodEffectObj: {fileID: 7056141771011346426, guid: 80b9547a3f3f744689ac71dfe20b6e50, type: 3}
   alert: {fileID: 4215765334170310324}
+  room: {fileID: 0}
   offset: 30
   lungeForce: 7.5
   inAttackAnim: 0
