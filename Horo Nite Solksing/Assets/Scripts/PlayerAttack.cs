@@ -13,6 +13,10 @@ public class PlayerAttack : MonoBehaviour
 
 	private void OnTriggerEnter2D(Collider2D other) 
 	{
+		if (other.CompareTag("EnemyAttack") && isShawAttack)
+		{
+			p.ShawRetreat();
+		}
 		if (other.CompareTag("Enemy"))
 		{
 			Enemy target = other.GetComponent<Enemy>();

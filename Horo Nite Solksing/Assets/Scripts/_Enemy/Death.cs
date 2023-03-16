@@ -27,7 +27,7 @@ public class Death : Enemy
 			Debug.Log(distToTarget);
 			anim.SetBool("jumped", false);
 			anim.SetTrigger("attack");
-			int rng = (distToTarget < 6f) ? Random.Range(1,4) : Random.Range(0,3);
+			int rng = (distToTarget < 6f) ? Random.Range(0,4) : Random.Range(0,3);
 			if (rng == 0)
 				anim.SetBool("jumped", true);
 			else if (rng == 1)

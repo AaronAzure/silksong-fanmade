@@ -10,6 +10,7 @@ public class PlayerControls : MonoBehaviour
 	private Rewired.Player player;
 	public Transform self {get; private set;}
 	[SerializeField] Animator anim;
+	public static PlayerControls Instance;
 
 
 	[Space] [Header("Status")]
@@ -79,6 +80,7 @@ public class PlayerControls : MonoBehaviour
 	private Coroutine atkCo;
 	private Coroutine hurtCo;
 	private Coroutine bindCo;
+	private Coroutine parryCo;
 	[SerializeField] int bindCost=9;
 	[SerializeField] int skillStabCost=2;
 	[SerializeField] Image spoolImg;
@@ -671,6 +673,8 @@ public class PlayerControls : MonoBehaviour
 			bindCo = null;
 			rb.gravityScale = 1;
 		}
+		if (parryCo != null)
+			StopCoroutine(parryCo);
 
 		Time.timeScale = 0;
 
@@ -767,5 +771,6 @@ public class PlayerControls : MonoBehaviour
 				silks[i].SetTrigger("unlatch");
 		}
 	}
+
 
 }

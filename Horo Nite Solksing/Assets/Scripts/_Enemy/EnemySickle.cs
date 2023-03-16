@@ -9,6 +9,7 @@ public class EnemySickle : MonoBehaviour
 	public Transform returnPos;
 	[SerializeField] float speed=15;
 	private bool hitWall;
+	private bool playerHit;
 	public Death death;
 
 
@@ -27,10 +28,10 @@ public class EnemySickle : MonoBehaviour
 
 	private void OnTriggerEnter2D(Collider2D other) 
 	{
-		if (other.CompareTag("Finish"))
+		if (!playerHit && other.CompareTag("Finish"))
 		{
-			hitWall = true;
-			LaunchInDirection((returnPos.position - transform.position).normalized);
+			playerHit = true;
+			LaunchInDirection((transform.position - other.transform.position).normalized);
 			hurtBox.enabled = false;
 		}
 		else if (!hitWall && other.CompareTag("Ground"))

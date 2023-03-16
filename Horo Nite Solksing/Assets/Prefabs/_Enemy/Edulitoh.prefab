@@ -42,9 +42,10 @@ GameObject:
   - component: {fileID: 5685890912387289068}
   - component: {fileID: 3770558558293019702}
   - component: {fileID: 1061056800034397270}
+  - component: {fileID: 6403667273794332325}
   m_Layer: 0
   m_Name: slashes_0
-  m_TagString: Enemy
+  m_TagString: EnemyAttack
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -151,6 +152,20 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
+--- !u!114 &6403667273794332325
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 913075395492112569}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ddcee7f3b99e64927ab9f2533e08fc3b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  col: {fileID: 3770558558293019702}
+  parryEffect: {fileID: 1316515699482474837, guid: a312011d380e4433eaba2f8d0db43cc3, type: 3}
 --- !u!1 &1376537066910156640
 GameObject:
   m_ObjectHideFlags: 0
@@ -352,6 +367,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hp: 50
+  maxHp: 0
   self: {fileID: 1376537067151301452}
   model: {fileID: 1376537066910156643}
   sprites:
@@ -375,6 +391,7 @@ MonoBehaviour:
   sortGroup: {fileID: 2099911773895242119}
   isSmart: 1
   controlledByAnim: 0
+  cannotTakeKb: 0
   moveSpeed: 1.5
   chaseSpeed: 3.5
   jumpForce: 10

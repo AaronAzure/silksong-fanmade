@@ -141,12 +141,16 @@ public abstract class Enemy : MonoBehaviour
 
 		inSight = PlayerInSight();
 		KeepLookingForPlayer();
-		CheckIsGrounded();
 
-		if (!isGrounded)
-			anim.SetFloat("jumpVelocity", rb.velocity.y);
+		if (!isFlying)
+		{
+			CheckIsGrounded();
 
-		if (alert != null) alert.SetActive( attackingPlayer );
+			if (!isGrounded)
+				anim.SetFloat("jumpVelocity", rb.velocity.y);
+		}
+
+		// if (alert != null) alert.SetActive( attackingPlayer );
 		CallChildOnFixedUpdate();
     }
 
@@ -342,7 +346,6 @@ public abstract class Enemy : MonoBehaviour
 			else if (currentAction == CurrentAction.left)
 				nextDir = 1;
 		}
-
 		// stop moving if about to walk into wall or off cliff
 		else if (!inSight && currentAction != 0 && CheckSurrounding())
 		{
@@ -390,7 +393,6 @@ public abstract class Enemy : MonoBehaviour
 			else if (currentAction == CurrentAction.left)
 				nextDir = 1;
 		}
-
 		// stop moving if about to walk into wall or off cliff
 		else if (!inSight && currentAction != 0 && CheckWall())
 		{
@@ -398,21 +400,27 @@ public abstract class Enemy : MonoBehaviour
 			currentAction = CurrentAction.none;
 		}
 
+		Debug.Log("flying around");
+
 		if (beenHurt)
 		{
+
 		}
 		else if (currentAction == CurrentAction.left)
 		{
-			rb.velocity = new Vector2(-moveSpeed, rb.velocity.y);
+			Debug.Log("flying left");
+			rb.velocity = new Vector2(-moveSpeed, 0);
 			model.localScale = new Vector3(-1,1,1);
 		}
 		else if (currentAction == CurrentAction.none)
 		{
-			rb.velocity = new Vector2(0, rb.velocity.y);
+			Debug.Log("flying still");
+			rb.velocity = new Vector2(0, 0);
 		}
 		else if (currentAction == CurrentAction.right)
 		{
-			rb.velocity = new Vector2(moveSpeed, rb.velocity.y);
+			Debug.Log("flying right");
+			rb.velocity = new Vector2(moveSpeed, 0);
 			model.localScale = new Vector3(1,1,1);
 		}
 	}
