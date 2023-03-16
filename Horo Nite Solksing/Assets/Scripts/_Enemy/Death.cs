@@ -8,10 +8,13 @@ public class Death : Enemy
 	[SerializeField] bool inAttackAnim;
 	[SerializeField] bool tripleStrike;
 	[SerializeField] float tripleStrikeForce=20;
-	[SerializeField] FlameTrailProjectile flameAtk;
+	
+	[Space] [SerializeField] FlameTrailProjectile flameAtk;
 	[SerializeField] Transform flameAtkPos;
 	private bool jumpedAgain=true;
-	// [SerializeField] float jumpForce=15;
+
+	[Space] [SerializeField] EnemySickle sickleAtk;
+	[Space] [SerializeField] Transform sickleAtkPos;
 
 
     public void ATTACK_PATTERN()
@@ -24,9 +27,11 @@ public class Death : Enemy
 			Debug.Log(distToTarget);
 			anim.SetBool("jumped", false);
 			anim.SetTrigger("attack");
-			int rng = (distToTarget < 5f) ? Random.Range(0,3) : 1;
-			if (rng == 1)
+			int rng = (distToTarget < 6f) ? Random.Range(1,4) : Random.Range(0,3);
+			if (rng == 0)
 				anim.SetBool("jumped", true);
+			else if (rng == 1)
+				anim.SetBool("sickled", true);
 			anim.SetFloat("atkPattern", rng);
 		}
 	}
@@ -39,11 +44,7 @@ public class Death : Enemy
 		{
 			if (tripleStrike)
 			{
-				rb.AddForce(new Vector2(model.localScale.x * tripleStrikeForce * 5, 0), ForceMode2D.Force);
-				rb.velocity = new Vector2(
-					Mathf.Clamp(rb.velocity.x, -tripleStrikeForce, tripleStrikeForce),
-					rb.velocity.y
-				);
+				rb.velocity = new Vector2(model.localScale.x * tripleStrikeForce, rb.velocity.y);
 			}
 			else if (!inAttackAnim)
 				rb.velocity = new Vector2(0, rb.velocity.y);
@@ -67,7 +68,7 @@ public class Death : Enemy
 			return;
 		rb.AddForce(
 			new Vector2(
-				(target.transform.position.x - self.position.x) * 1.2f, 
+				(target.transform.position.x - self.position.x) * 2f, 
 				jumpForce
 			), 
 			ForceMode2D.Impulse
@@ -88,5 +89,22 @@ public class Death : Enemy
 	{
 		var obj = Instantiate(flameAtk, flameAtkPos.position, Quaternion.identity);
 		obj.toRight = (model.localScale.x > 0) ? true : false;
+		obj.transform.localScale = model.localScale;
+	}
+
+	public void THROW_SICKLE()
+	{
+		var obj = Instantiate(sickleAtk, sickleAtkPos.position, Quaternion.identity);
+		obj.LaunchInDirection(
+			(target.transform.position + new Vector3(0,0.5f) - sickleAtkPos.position).normalized
+		);
+		obj.returnPos = sickleAtkPos;
+		obj.death = this;
+	}
+
+	public void RetrieveSickle()
+	{
+		anim.SetBool("sickled", false);
+		anim.SetTrigger("retrieveSickle");
 	}
 }

@@ -211,7 +211,6 @@ public abstract class Enemy : MonoBehaviour
 		return (groundInfo.collider != null);
 	}
 
-
 	protected bool PlayerInFront()
 	{
 		RaycastHit2D playerInfo = Physics2D.Linecast(

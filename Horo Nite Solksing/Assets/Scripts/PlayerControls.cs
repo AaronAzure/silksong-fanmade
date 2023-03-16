@@ -312,7 +312,7 @@ public class PlayerControls : MonoBehaviour
 
 	void ResetAllBools()
 	{
-		jumpDashed = jumped = false;
+		isJumping = jumpDashed = jumped = false;
 		isDashing = false;
 		canLedgeGrab = ledgeGrab = false;
 		isWallSliding = false;
@@ -628,7 +628,7 @@ public class PlayerControls : MonoBehaviour
 
 	private void OnTriggerStay2D(Collider2D other) 
 	{
-		if (!invincible && other.CompareTag("Enemy") && hurtCo == null)	
+		if (!invincible && (other.CompareTag("Enemy") || other.CompareTag("EnemyAttack")) && hurtCo == null)
 			hurtCo = StartCoroutine( TakeDamageCo(other.transform) );
 	}
 
@@ -699,7 +699,7 @@ public class PlayerControls : MonoBehaviour
 		rb.gravityScale = 0;
 		rb.velocity = Vector2.zero;
 		activeMoveSpeed = moveSpeed;
-		jumpDashed = jumped = false;
+		isJumping = jumpDashed = jumped = false;
 		isDashing = false;
 		canLedgeGrab = ledgeGrab = false;
 		SpawnExistingObjAtSelf(healingPs);
