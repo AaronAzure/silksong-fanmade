@@ -14,7 +14,10 @@ public class Death : Enemy
 	private bool jumpedAgain=true;
 
 	[Space] [SerializeField] EnemySickle sickleAtk;
-	[Space] [SerializeField] Transform sickleAtkPos;
+	[SerializeField] Transform[] sickleAtkPos;
+	[SerializeField] GameObject[] sickles;
+	private int nSickleOut;
+	private int nSickleRetrieved;
 
 
     public void ATTACK_PATTERN()
@@ -31,7 +34,10 @@ public class Death : Enemy
 			if (rng == 0)
 				anim.SetBool("jumped", true);
 			else if (rng == 1)
+			{
+				nSickleRetrieved = 0;
 				anim.SetBool("sickled", true);
+			}
 			anim.SetFloat("atkPattern", rng);
 		}
 	}
@@ -49,6 +55,11 @@ public class Death : Enemy
 			else if (!inAttackAnim)
 				rb.velocity = new Vector2(0, rb.velocity.y);
 		}
+	}
+
+	protected override void CallChildOnHalfHp()
+	{
+		anim.SetBool("isHalfHp", true);
 	}
 
 	public override void CallChildOnRoomEnter()
@@ -77,12 +88,12 @@ public class Death : Enemy
 
 	public void JUMP_AGAIN()
 	{
-		if (jumpedAgain && hp < maxHp / 2)
-		{
-			jumpedAgain = false;
-			anim.SetBool("jumped", true);
-			anim.SetFloat("atkPattern", 1);
-		}
+		// if (jumpedAgain && hp < halfHp)
+		// {
+		// 	jumpedAgain = false;
+		// 	anim.SetBool("jumped", true);
+		// 	anim.SetFloat("atkPattern", 0);
+		// }
 	}
 
 	public void FLAME_ATTACK()
@@ -92,19 +103,30 @@ public class Death : Enemy
 		obj.transform.localScale = model.localScale;
 	}
 
-	public void THROW_SICKLE()
+	public void THROW_SICKLE(int x)
 	{
-		var obj = Instantiate(sickleAtk, sickleAtkPos.position, Quaternion.identity);
+		FacePlayer();
+		var obj = Instantiate(sickleAtk, sickleAtkPos[x].position, Quaternion.identity);
 		obj.LaunchInDirection(
-			(target.transform.position + new Vector3(0,0.5f) - sickleAtkPos.position).normalized
+			(target.transform.position + new Vector3(0,0.5f) - sickleAtkPos[x].position).normalized
 		);
-		obj.returnPos = sickleAtkPos;
+		obj.returnPos = sickleAtkPos[x];
 		obj.death = this;
+		obj.nSickle = nSickleOut;
+		sickles[nSickleOut++].SetActive(false);
 	}
 
-	public void RetrieveSickle()
+	public void RetrieveSickle(int x)
 	{
-		anim.SetBool("sickled", false);
-		anim.SetTrigger("retrieveSickle");
+		if (!anim.GetBool("isDead"))
+		{
+			sickles[x].SetActive(true);
+			nSickleOut--;
+			if (nSickleOut <= 0)
+			{
+				anim.SetBool("sickled", false);
+				anim.SetTrigger("retrieveSickle");
+			}
+		}
 	}
 }

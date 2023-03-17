@@ -11,6 +11,7 @@ public class EnemySickle : MonoBehaviour
 	private bool hitWall;
 	private bool playerHit;
 	public Death death;
+	public int nSickle;
 
 
     void FixedUpdate() 
@@ -20,7 +21,7 @@ public class EnemySickle : MonoBehaviour
 			LaunchInDirection((returnPos.position - transform.position).normalized);
 			if (Vector2.Distance(transform.position, returnPos.position) < 0.25f)
 			{
-				death.RetrieveSickle();
+				death.RetrieveSickle(nSickle);
 				Destroy(this.gameObject);
 			}
 		}	
@@ -30,9 +31,10 @@ public class EnemySickle : MonoBehaviour
 	{
 		if (!playerHit && other.CompareTag("Finish"))
 		{
-			playerHit = true;
-			LaunchInDirection((transform.position - other.transform.position).normalized);
 			hurtBox.enabled = false;
+			playerHit = true;
+			hitWall = false;
+			LaunchInDirection((transform.position - other.transform.position).normalized);
 		}
 		else if (!hitWall && other.CompareTag("Ground"))
 		{

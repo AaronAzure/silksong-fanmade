@@ -6,7 +6,7 @@ using UnityEngine.Rendering;
 public abstract class Enemy : MonoBehaviour
 {
 	[SerializeField] protected int hp=10;
-	[SerializeField] protected int maxHp;
+	[SerializeField] protected int halfHp;
 	public Transform self;
 	[SerializeField] protected Transform model;
 	[SerializeField] SpriteRenderer[] sprites;
@@ -106,6 +106,7 @@ public abstract class Enemy : MonoBehaviour
 	protected virtual void CallChildOnStart() { }
 	protected virtual void CallChildOnFixedUpdate() { }
 	protected virtual void CallChildOnEarlyUpdate() { }
+	protected virtual void CallChildOnHalfHp() { }
 
 
 	public void RoomEnter()
@@ -122,7 +123,6 @@ public abstract class Enemy : MonoBehaviour
     public virtual void Start() 
     {
 		// isFlying = rb.gravityScale == 0 ? true : false;
-		maxHp = hp;
 		initDir = (int) model.localScale.x;
 		nextDir = -initDir;
 		currentAction = (initDir == 1) ? CurrentAction.right : CurrentAction.left;
@@ -256,6 +256,10 @@ public abstract class Enemy : MonoBehaviour
 		{
 			rb.velocity = Vector2.zero;
 			rb.velocity = forceDir * force;
+		}
+		if (hp <= halfHp)
+		{
+			CallChildOnHalfHp();
 		}
 		if (hp <= 0)
 		{
