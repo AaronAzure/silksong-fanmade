@@ -6,11 +6,11 @@ public class EnemySickle : MonoBehaviour
 {
 	[SerializeField] Collider2D hurtBox;
 	[SerializeField] Rigidbody2D rb;
-	public Transform returnPos;
+	[HideInInspector] public Transform returnPos;
 	[SerializeField] float speed=15;
 	private bool hitWall;
 	private bool playerHit;
-	public Death death;
+	[HideInInspector] public Death death;
 	public int nSickle;
 
 

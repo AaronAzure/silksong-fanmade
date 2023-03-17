@@ -18,6 +18,7 @@ public class Death : Enemy
 	[SerializeField] GameObject[] sickles;
 	private int nSickleOut;
 	private int nSickleRetrieved;
+	private Vector2 sickleDir;
 
 
     public void ATTACK_PATTERN()
@@ -29,6 +30,7 @@ public class Death : Enemy
 			float distToTarget = Vector2.Distance(target.transform.position, self.position);
 			Debug.Log(distToTarget);
 			anim.SetBool("jumped", false);
+			anim.SetBool("sickled", false);
 			anim.SetTrigger("attack");
 			int rng = (distToTarget < 6f) ? Random.Range(0,4) : Random.Range(0,3);
 			if (rng == 0)
@@ -103,13 +105,16 @@ public class Death : Enemy
 		obj.transform.localScale = model.localScale;
 	}
 
+	public void GET_SICKLE_DIR(int x)
+	{
+		sickleDir = (target.transform.position + new Vector3(0,0.5f) - sickleAtkPos[x].position).normalized;
+	}
+
 	public void THROW_SICKLE(int x)
 	{
 		FacePlayer();
 		var obj = Instantiate(sickleAtk, sickleAtkPos[x].position, Quaternion.identity);
-		obj.LaunchInDirection(
-			(target.transform.position + new Vector3(0,0.5f) - sickleAtkPos[x].position).normalized
-		);
+		obj.LaunchInDirection(sickleDir);
 		obj.returnPos = sickleAtkPos[x];
 		obj.death = this;
 		obj.nSickle = nSickleOut;

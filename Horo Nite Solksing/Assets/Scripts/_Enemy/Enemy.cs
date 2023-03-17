@@ -104,8 +104,8 @@ public abstract class Enemy : MonoBehaviour
 	}
 
 	protected virtual void CallChildOnStart() { }
-	protected virtual void CallChildOnFixedUpdate() { }
 	protected virtual void CallChildOnEarlyUpdate() { }
+	protected virtual void CallChildOnFixedUpdate() { }
 	protected virtual void CallChildOnHalfHp() { }
 
 
@@ -202,7 +202,7 @@ public abstract class Enemy : MonoBehaviour
 			wallDetect.position + new Vector3(model.localScale.x * wallDistDetect, 0), 
 			whatIsGround
 		);
-		return (wallInfo.collider == null);
+		return (wallInfo.collider != null);
 	}
 
 	protected bool CheckCliff()
@@ -292,7 +292,7 @@ public abstract class Enemy : MonoBehaviour
 		foreach (SpriteRenderer sprite in sprites)
 			sprite.material = defaultMat;
 		foreach (SpriteRenderer sprite in sprites)
-			sprite.color = new Color(0.2f,0.2f,0.2f,1);
+			sprite.color = new Color(0.4f,0.4f,0.4f,1);
 		if (alert != null) alert.SetActive( false );
 		if (anim != null)
 			anim.SetBool("isDead", true);
@@ -412,18 +412,15 @@ public abstract class Enemy : MonoBehaviour
 		}
 		else if (currentAction == CurrentAction.left)
 		{
-			Debug.Log("flying left");
 			rb.velocity = new Vector2(-moveSpeed, 0);
 			model.localScale = new Vector3(-1,1,1);
 		}
 		else if (currentAction == CurrentAction.none)
 		{
-			Debug.Log("flying still");
 			rb.velocity = new Vector2(0, 0);
 		}
 		else if (currentAction == CurrentAction.right)
 		{
-			Debug.Log("flying right");
 			rb.velocity = new Vector2(moveSpeed, 0);
 			model.localScale = new Vector3(1,1,1);
 		}

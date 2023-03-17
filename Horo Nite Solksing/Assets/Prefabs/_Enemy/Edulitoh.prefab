@@ -165,7 +165,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   col: {fileID: 3770558558293019702}
-  parryEffect: {fileID: 1316515699482474837, guid: a312011d380e4433eaba2f8d0db43cc3, type: 3}
 --- !u!1 &1376537066910156640
 GameObject:
   m_ObjectHideFlags: 0
@@ -331,7 +330,7 @@ Rigidbody2D:
   m_AngularDrag: 0.05
   m_GravityScale: 0
   m_Material: {fileID: 6200000, guid: d6fa2b0bb186d48e7bd7d5feb8372e36, type: 2}
-  m_Interpolate: 0
+  m_Interpolate: 2
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
@@ -367,7 +366,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hp: 50
-  maxHp: 0
+  halfHp: 0
   self: {fileID: 1376537067151301452}
   model: {fileID: 1376537066910156643}
   sprites:
@@ -413,8 +412,8 @@ MonoBehaviour:
   idleActionOnly: 0
   groundCheck: {fileID: 7452915362852078129}
   groundCheckSize: {x: 0, y: 0}
-  idleTotalCounter: 5
-  initDir: -1
+  idleTotalCounter: 3
+  initDir: 1
   target: {fileID: 0}
   alwaysInRange: 0
   inRange: 0
