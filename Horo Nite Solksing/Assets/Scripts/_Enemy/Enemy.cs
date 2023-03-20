@@ -107,6 +107,7 @@ public abstract class Enemy : MonoBehaviour
 	protected virtual void CallChildOnEarlyUpdate() { }
 	protected virtual void CallChildOnFixedUpdate() { }
 	protected virtual void CallChildOnHalfHp() { }
+	protected virtual void CallChildOnHurt() { }
 
 
 	public void RoomEnter()
@@ -224,6 +225,15 @@ public abstract class Enemy : MonoBehaviour
 		);
 		return (playerInfo.collider != null);
 	}
+	protected bool PlayerInFarFront()
+	{
+		RaycastHit2D playerInfo = Physics2D.Linecast(
+			wallDetect.position, 
+			wallDetect.position + new Vector3(model.localScale.x * wallDistDetect * 4, 0), 
+			whatIsPlayer
+		);
+		return (playerInfo.collider != null);
+	}
 
 	protected void CheckIsGrounded()
 	{
@@ -279,6 +289,7 @@ public abstract class Enemy : MonoBehaviour
 		beenHurt = false;
 		if (!cannotTakeKb && force != 0)
 			rb.velocity = new Vector2(0, rb.velocity.y);
+		CallChildOnHurt();
 	}
 
 	void Died()
@@ -310,12 +321,14 @@ public abstract class Enemy : MonoBehaviour
 	public void SpawnIn()
 	{
 		anim.SetTrigger("spawn");
+		spawningIn = true;
 		col.enabled = false;
 	}
 
 	public void ACTIVATE_HITBOX()
 	{
 		col.enabled = true;
+		spawningIn = false;
 	}
 	
 

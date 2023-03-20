@@ -5066,6 +5066,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hp: 25
+  halfHp: 0
   self: {fileID: 1376537067151301452}
   model: {fileID: 1376537066910156643}
   sprites:
@@ -5084,6 +5085,8 @@ MonoBehaviour:
   dmgMat: {fileID: 2100000, guid: 432135ab22bc84106b4fe0a466cbb4d4, type: 2}
   sortGroup: {fileID: 2488659904530074791}
   isSmart: 1
+  controlledByAnim: 0
+  cannotTakeKb: 0
   moveSpeed: 0
   chaseSpeed: 0
   jumpForce: 10
@@ -5105,7 +5108,6 @@ MonoBehaviour:
   idleActionOnly: 0
   groundCheck: {fileID: 7452915362852078129}
   groundCheckSize: {x: 0, y: 0}
-  idleCounter: 0
   idleTotalCounter: 5
   initDir: -1
   target: {fileID: 0}
@@ -5114,11 +5116,14 @@ MonoBehaviour:
   inSight: 0
   isClose: 0
   spawningIn: 0
+  cannotAtk: 0
   silkEffectObj: {fileID: 7056141771011346426, guid: fb1f8aab62db342b48719794d38c90d1, type: 3}
   bloodEffectObj: {fileID: 7056141771011346426, guid: 80b9547a3f3f744689ac71dfe20b6e50, type: 3}
   alert: {fileID: 4215765334170310324}
+  room: {fileID: 0}
   offset: 30
   otto: {fileID: 962760112214625052, guid: 9f8cb6304e6db40d7a2ca36789a6fb6f, type: 3}
+  edulitoh: {fileID: 1927577681595496084, guid: 391a5b7cfc0fc4aebbaf265c3117a023, type: 3}
   spawnPos: {fileID: 1649217757513407039}
 --- !u!1 &3433202526179080487
 GameObject:

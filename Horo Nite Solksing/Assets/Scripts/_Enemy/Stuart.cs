@@ -17,6 +17,13 @@ public class Stuart : Enemy
 		WalkAround();
 	}
 
+	protected override void CallChildOnHurt()
+	{
+		// if (isGrounded && jumpCo == null)
+		if (isGrounded && Random.Range(0,2) == 0 && jumpCo == null && PlayerInFarFront())
+			jumpCo = StartCoroutine( JumpCo(1) );
+	}
+
 	protected override void AttackingAction()
 	{
 		// if (jumpCo)

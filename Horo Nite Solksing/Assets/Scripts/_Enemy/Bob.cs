@@ -5,6 +5,7 @@ using UnityEngine;
 public class Bob : Enemy
 {
 	[SerializeField] Enemy otto;
+	[SerializeField] Enemy edulitoh;
 	[SerializeField] Transform spawnPos;
 	private int x;
 
@@ -28,7 +29,8 @@ public class Bob : Enemy
 	{
 		if (x % 4 == 0)
 		{
-			var obj = Instantiate(otto, spawnPos.position, Quaternion.identity);
+			int rng = Random.Range(0,4);
+			var obj = Instantiate(rng == 0 ? edulitoh : otto, spawnPos.position, Quaternion.identity);
 			obj.SpawnIn();
 		}
 		x++;
