@@ -261,13 +261,13 @@ public abstract class Enemy : MonoBehaviour
 		{
 			CallChildOnHalfHp();
 		}
+		foreach (SpriteRenderer sprite in sprites)
+			sprite.material = dmgMat;
 		if (hp <= 0)
 		{
 			Died();
 			yield break;
 		}
-		foreach (SpriteRenderer sprite in sprites)
-			sprite.material = dmgMat;
 
 		if (isSmart && !attackingPlayer)
 			FacePlayer();
@@ -280,24 +280,31 @@ public abstract class Enemy : MonoBehaviour
 		if (!cannotTakeKb && force != 0)
 			rb.velocity = new Vector2(0, rb.velocity.y);
 	}
-	
+
 	void Died()
+	{
+		CinemachineShake.Instance.ShakeCam(2.5f, 0.5f);
+		StopAllCoroutines();
+		StartCoroutine( DiedCo() );
+	}
+	
+	IEnumerator DiedCo()
 	{
 		col.enabled = false;
 		this.gameObject.layer = 5;
 		rb.velocity = Vector2.zero;
 		rb.gravityScale = 1;
 		this.enabled = false;
-		StopAllCoroutines();
+		if (alert != null) alert.SetActive( false );
+		if (anim != null)
+			anim.SetBool("isDead", true);
+		sortGroup.sortingOrder = -1;
+
+		yield return new WaitForSeconds(0.2f);
 		foreach (SpriteRenderer sprite in sprites)
 			sprite.material = defaultMat;
 		foreach (SpriteRenderer sprite in sprites)
 			sprite.color = new Color(0.4f,0.4f,0.4f,1);
-		if (alert != null) alert.SetActive( false );
-		if (anim != null)
-			anim.SetBool("isDead", true);
-		// transform.rotation = Quaternion.Euler(0,0,90);
-		sortGroup.sortingOrder = -1;
 	}
 
 	public void SpawnIn()

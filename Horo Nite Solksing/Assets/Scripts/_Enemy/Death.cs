@@ -19,6 +19,8 @@ public class Death : Enemy
 	private int nSickleOut;
 	private int nSickleRetrieved;
 	private Vector2 sickleDir;
+	private int[] closeAtks={0,1,3};
+	// private int[] distAtks={0,1}; 
 
 
     public void ATTACK_PATTERN()
@@ -32,7 +34,9 @@ public class Death : Enemy
 			anim.SetBool("jumped", false);
 			anim.SetBool("sickled", false);
 			anim.SetTrigger("attack");
-			int rng = (distToTarget < 6f) ? Random.Range(0,4) : Random.Range(0,3);
+			int rng = (anim.GetBool("isHalfHp")) ? 
+				(distToTarget < 6f ? Random.Range(0,4) : Random.Range(0,3)) :
+				(distToTarget < 6f ? closeAtks[Random.Range(0, closeAtks.Length)] : Random.Range(0,2));
 			if (rng == 0)
 				anim.SetBool("jumped", true);
 			else if (rng == 1)

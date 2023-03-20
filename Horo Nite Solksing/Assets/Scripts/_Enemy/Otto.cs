@@ -54,6 +54,8 @@ public class Otto : Enemy
 		else
 		{
 			FacePlayer();
+			if (!beenHurt)
+				rb.velocity = Vector2.zero;
 		}
 	}
 

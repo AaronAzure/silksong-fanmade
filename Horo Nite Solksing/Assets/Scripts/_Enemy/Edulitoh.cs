@@ -8,6 +8,7 @@ public class Edulitoh : Enemy
 	private float closeDistTimer;
 	private float closeDistTotal=2;
 	[SerializeField] float lungeForce=5;
+	[SerializeField] float verticalLungeForce=1;
 	[SerializeField] bool inAttackAnim; // assigned by animation
 	[SerializeField] bool lungeForward; // assigned by animation
 	private bool chase;
@@ -57,7 +58,13 @@ public class Edulitoh : Enemy
 			if (!lungeForward)
 				rb.velocity = new Vector2(0, 0);
 			else 
-				rb.velocity = new Vector2(lungeForce * model.localScale.x, 0);
+			{
+				rb.velocity = new Vector2(
+					lungeForce * model.localScale.x, 
+					(target.transform.position.y - self.position.y < 0) ?
+						-verticalLungeForce : verticalLungeForce
+				);
+			}
 		}
 	}
 }
