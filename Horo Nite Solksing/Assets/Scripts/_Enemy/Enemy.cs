@@ -15,8 +15,8 @@ public abstract class Enemy : MonoBehaviour
 	[SerializeField] Collider2D col;
 
 
-	[SerializeField] Material defaultMat;
-	[SerializeField] Material dmgMat;
+	[SerializeField] protected Material defaultMat;
+	[SerializeField] protected Material dmgMat;
 	[SerializeField] SortingGroup sortGroup;
 
 	
@@ -68,17 +68,19 @@ public abstract class Enemy : MonoBehaviour
 	protected float maxSearchTime=2;
 	[SerializeField] protected bool spawningIn; // set by animation
 	public bool cannotAtk;
+	public bool inParryState;
 
 
 
 	[Space] [Header("Particle Effect Objs")]
 	[SerializeField] GameObject silkEffectObj;
 	[SerializeField] GameObject bloodEffectObj;
+	[SerializeField] GameObject stringEffectObj;
 	[SerializeField] GameObject alert;
 
 
 	[Space] [Header("Room Related")]
-	[SerializeField] Room room;
+	public Room room;
 	private bool roomEntered;
 
 
@@ -108,6 +110,8 @@ public abstract class Enemy : MonoBehaviour
 	protected virtual void CallChildOnFixedUpdate() { }
 	protected virtual void CallChildOnHalfHp() { }
 	protected virtual void CallChildOnHurt() { }
+	protected virtual void CallChildOnDeath() { }
+	protected virtual void CallChildOnParry() { }
 
 
 	public void RoomEnter()
@@ -167,6 +171,14 @@ public abstract class Enemy : MonoBehaviour
 			searchCounter = 0;
 		} 
 		return canSeePlayer;
+	}
+
+	protected bool FacingPlayer()
+	{
+		return (
+			(model.localScale.x > 0 && target.transform.position.x - self.position.x > 0) 
+			|| (model.localScale.x < 0 && target.transform.position.x - self.position.x < 0)
+		);
 	}
 
 	void KeepLookingForPlayer()
@@ -247,9 +259,16 @@ public abstract class Enemy : MonoBehaviour
 
 	public void TakeDamage(int dmg, Transform opponent, Vector2 forceDir, float force)
 	{
-		if (hp > 0 && hurtCo != null)
-			StopCoroutine(hurtCo);
-		hurtCo = StartCoroutine( TakeDamageCo(dmg, opponent, forceDir, force) );
+		if (inParryState && FacingPlayer())
+		{
+			CallChildOnParry();
+		}
+		else
+		{
+			if (hp > 0 && hurtCo != null)
+				StopCoroutine(hurtCo);
+			hurtCo = StartCoroutine( TakeDamageCo(dmg, opponent, forceDir, force) );
+		}
 	}
 
 	IEnumerator TakeDamageCo(int dmg, Transform opponent, Vector2 forceDir, float force)
@@ -292,15 +311,30 @@ public abstract class Enemy : MonoBehaviour
 		CallChildOnHurt();
 	}
 
+	public IEnumerator FlashCo()
+	{
+		foreach (SpriteRenderer sprite in sprites)
+			sprite.material = dmgMat;
+
+		yield return new WaitForSeconds(0.1f);
+		foreach (SpriteRenderer sprite in sprites)
+			sprite.material = defaultMat;
+	}
+
 	void Died()
 	{
 		CinemachineShake.Instance.ShakeCam(2.5f, 0.5f);
 		StopAllCoroutines();
 		StartCoroutine( DiedCo() );
+		CallChildOnDeath();
 	}
 	
 	IEnumerator DiedCo()
 	{
+		if (room != null)
+			room.Defeated();
+		if (stringEffectObj != null)
+			stringEffectObj.transform.parent = null;
 		col.enabled = false;
 		this.gameObject.layer = 5;
 		rb.velocity = Vector2.zero;

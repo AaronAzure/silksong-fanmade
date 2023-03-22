@@ -8,14 +8,19 @@ public class Death : Enemy
 	[SerializeField] bool inAttackAnim;
 	[SerializeField] bool tripleStrike;
 	[SerializeField] float tripleStrikeForce=20;
+	[SerializeField] SpriteRenderer sickleL;
+	[SerializeField] SpriteRenderer sickleR;
+	[Space] [SerializeField] int setAtk=-1;
 	
 	[Space] [SerializeField] FlameTrailProjectile flameAtk;
 	[SerializeField] Transform flameAtkPos;
 	private bool jumpedAgain=true;
+	private Coroutine parryCo;
 
 	[Space] [SerializeField] EnemySickle sickleAtk;
 	[SerializeField] Transform[] sickleAtkPos;
 	[SerializeField] GameObject[] sickles;
+	[SerializeField] GameObject silkExplosionVfx;
 	private int nSickleOut;
 	private int nSickleRetrieved;
 	private Vector2 sickleDir;
@@ -35,8 +40,10 @@ public class Death : Enemy
 			anim.SetBool("sickled", false);
 			anim.SetTrigger("attack");
 			int rng = (anim.GetBool("isHalfHp")) ? 
-				(distToTarget < 6f ? Random.Range(0,4) : Random.Range(0,3)) :
+				(distToTarget < 6f ? Random.Range(0,5) : Random.Range(0,3)) :
 				(distToTarget < 6f ? closeAtks[Random.Range(0, closeAtks.Length)] : Random.Range(0,2));
+			if (setAtk != -1)
+				rng = setAtk;
 			if (rng == 0)
 				anim.SetBool("jumped", true);
 			else if (rng == 1)
@@ -68,10 +75,49 @@ public class Death : Enemy
 		anim.SetBool("isHalfHp", true);
 	}
 
+	protected override void CallChildOnParry()
+	{
+		anim.SetTrigger("parry");
+		Parry();
+	}
+
 	public override void CallChildOnRoomEnter()
 	{
+		anim.SetTrigger("spawn");
+		
+		// cannotAtk = false;
+		// ATTACK_PATTERN();
+	}
+
+	protected override void CallChildOnDeath()
+	{
+		silkExplosionVfx.transform.parent = null;
+		StartCoroutine(DramaticFinish());
+	}
+
+	IEnumerator DramaticFinish()
+	{
+		Time.timeScale = 0.25f;
+
+		yield return new WaitForSecondsRealtime(0.5f);
+		Time.timeScale = 1;
+	}
+
+	public void START_FIGHTING()
+	{
 		cannotAtk = false;
-		ATTACK_PATTERN();
+	}
+
+	public void HIDE_SICKLES()
+	{
+		sickleL.gameObject.SetActive(false);
+		sickleR.gameObject.SetActive(false);
+	}
+
+	public void REVEAL_SICKLES()
+	{
+		sickleL.gameObject.SetActive(true);
+		sickleR.gameObject.SetActive(true);
 	}
 
 	public void FACE_PLAYER()
@@ -137,5 +183,26 @@ public class Death : Enemy
 				anim.SetTrigger("retrieveSickle");
 			}
 		}
+	}
+
+	public void Parry()
+	{
+		if (parryCo != null) StopCoroutine( ParryCo() );
+		Time.timeScale = 0;
+		parryCo = StartCoroutine( ParryCo() );
+		MusicManager.Instance.PlayParrySFX();
+	}
+
+	public IEnumerator ParryCo()
+	{
+		// Time.timeScale = 0;
+		sickleL.material = dmgMat;
+		sickleR.material = dmgMat;
+
+		yield return new WaitForSecondsRealtime(0.25f);
+		sickleL.material = defaultMat;
+		sickleR.material = defaultMat;
+		Time.timeScale = 1;
+		parryCo = null;
 	}
 }

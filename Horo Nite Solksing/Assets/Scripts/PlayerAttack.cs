@@ -33,14 +33,18 @@ public class PlayerAttack : MonoBehaviour
 			Vector2 temp = (other.transform.position - transform.position).normalized;
 			float angleZ = 
 				Mathf.Atan2(Mathf.Abs(temp.y), temp.x) * Mathf.Rad2Deg;
-			Instantiate(
-				strikePs, 
-				other.transform.position, 
-				Quaternion.Euler(0,0,angleZ + offset * temp.x)
-			);
 
 			if (target != null) 
 			{
+				if (!target.inParryState)
+				{
+					Instantiate(
+						strikePs, 
+						other.transform.position, 
+						Quaternion.Euler(0,0,angleZ + offset * temp.x)
+					);
+				}
+				
 				int dmg = !isStabAttack ? (!isGossamerStorm ? p.atkDmg : p.gossamerDmg) : p.stabDmg;
 				target.TakeDamage(
 					dmg, 

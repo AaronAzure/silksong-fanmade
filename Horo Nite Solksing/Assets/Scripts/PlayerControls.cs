@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Rewired;
 
@@ -51,6 +52,7 @@ public class PlayerControls : MonoBehaviour
 	private bool canLedgeGrab;
 	private bool ledgeGrab;
 	private bool noControl;
+	private bool inStunLock;
 	[SerializeField] bool isInvincible;
 	[SerializeField] bool hasLedge;
 	[SerializeField] bool hasWall;
@@ -77,8 +79,10 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] float atkCooldownDuration=0.4f;
 
 	[Space] [SerializeField] GameObject slashObj;
+	private bool atk1;
 	private Coroutine atkCo;
 	private Coroutine hurtCo;
+	private Coroutine stunLockCo;
 	private Coroutine bindCo;
 	private Coroutine parryCo;
 	[SerializeField] int bindCost=9;
@@ -86,11 +90,16 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] Image spoolImg;
 	[SerializeField] Sprite fullSpoolSpr;
 	[SerializeField] Sprite emptySpoolSpr;
+	[SerializeField] GameObject cacoonObj;
+	[SerializeField] GameObject blackScreenObj;
 
 
 	[Space] [Header("Sound effects")]
 	[SerializeField] AudioSource shawSound;
 	[SerializeField] AudioSource agaleSound;
+	[SerializeField] AudioSource adimaSound;
+	// [SerializeField] AudioSource parrySound;
+	[SerializeField] AudioSource gitGudSound;
 
 
 	[Space] [Header("Particle effects")]
@@ -99,6 +108,8 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] GameObject healingPs;
 	[SerializeField] GameObject bloodBurstPs;
 	[SerializeField] GameObject bindPs;
+	[SerializeField] ParticleSystem soulLeakPs;
+	[SerializeField] Animator animeLinesAnim;
 	[SerializeField] Transform dashSpawnPos;
 	[SerializeField] Animator flashAnim;
 
@@ -114,33 +125,53 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] bool downwardStrike;
 	[SerializeField] bool dashStrike;
 	[SerializeField] bool beenHurt;
+	private bool isDead=false;
 
 
 	[Space] [Header("Debug")]
 	[SerializeField] [Range(1,10)] int silkMultiplier=1;
 	[SerializeField] bool invincible;
-	
+	[SerializeField] string savedScene="Scene1";
+	[SerializeField] Vector2 savedPos;
+	[SerializeField] string deathScene;
+	[SerializeField] Vector2 deathPos;
+	// public static PlayerControls Instance;
+	private static GameObject singleton;
 
 	void Awake()
 	{
+		if (singleton == null)
+			singleton = gameObject;
+		else
+			Destroy(gameObject);
+		DontDestroyOnLoad(gameObject);
+
 		self = transform;
+		
 	}
+
 
 	// Start is called before the first frame update
 	void Start()
 	{
+		savedScene = SceneManager.GetActiveScene().name;
+		savedPos = self.position;
+
 		player = ReInput.players.GetPlayer(playerId);
 		activeMoveSpeed = moveSpeed;
 		bindPs.transform.parent = null;
 		healingPs.transform.parent = null;
 		bloodBurstPs.transform.parent = null;
+		cacoonObj.transform.parent = null;
+		DontDestroyOnLoad(cacoonObj);
 		FullRestore();
+		Screen.SetResolution((int) (16f/9f * Screen.height), Screen.height, true);
 	}
 
 	bool CanControl()
 	{
 		return (!isLedgeGrabbing && !beenHurt && !noControl && !isBinding &&
-			!inAnimation);
+			!inAnimation && !isDead && !inStunLock);
 	}
 
 	private void OnDrawGizmosSelected() 
@@ -168,7 +199,7 @@ public class PlayerControls : MonoBehaviour
 				SkillAttack();
 
 			// bind (heal)
-			if (player.GetButtonDown("A") && silkMeter >= bindCost && bindCo == null)
+			else if (player.GetButtonDown("A") && silkMeter >= bindCost && bindCo == null)
 				bindCo = StartCoroutine( BindCo() );
 
 			// jump
@@ -444,6 +475,11 @@ public class PlayerControls : MonoBehaviour
 				yield return new WaitForSeconds(0.1f);
 				rb.gravityScale = 1;
 			}
+			else
+			{
+				MusicManager.Instance.PlayHornetAtkSfx(atk1);
+				atk1 = !atk1;
+			}
 
 			yield return new WaitForSeconds(atkDir != 2 ? 0.25f : 0.4f);
 			anim.SetBool("isAttacking", false);
@@ -487,6 +523,7 @@ public class PlayerControls : MonoBehaviour
 		else
 		{
 			anim.SetBool("isSkillAttacking", true);
+			adimaSound.Play();
 
 			yield return new WaitForSeconds(0.25f);
 			SkillAttackEffect();
@@ -630,40 +667,35 @@ public class PlayerControls : MonoBehaviour
 
 	private void OnTriggerStay2D(Collider2D other) 
 	{
-		if (!invincible && (other.CompareTag("Enemy") || other.CompareTag("EnemyAttack")) && hurtCo == null)
+		if (!isDead && !invincible && (other.CompareTag("Enemy") || other.CompareTag("EnemyAttack")) && hurtCo == null)
 			hurtCo = StartCoroutine( TakeDamageCo(other.transform) );
+		if (!beenHurt && !isDead && !invincible && other.CompareTag("EnemyStun") && stunLockCo == null)
+			stunLockCo = StartCoroutine( StunLockCo(other.transform) );
 	}
 
-	IEnumerator TakeDamageCo(Transform opponent)
+	IEnumerator StunLockCo(Transform lockPos)
 	{
 		if (isInvincible)
 		{
-			hurtCo = null;
+			stunLockCo = null;
 			yield break;
 		}
-
-		foreach (SpriteRenderer sprite in sprites)
-			sprite.material = dmgMat;
-
-		if (anim.GetBool("isLedgeGrabbing"))
-		{
-			GRAB_LEDGE();
-		}
-
-		anim.SetBool("isHurt", true);
+		anim.SetBool("isStunLock", true);
+		inStunLock = true;
 		hp = Mathf.Max(0, hp - 1);
 		ResetAllBools();
 		atkCo = null;
-		beenHurt = true;
+		// beenHurt = true;
 		SetHp();
-		rb.velocity = Vector2.zero;
-		SpawnExistingObjAtSelf(bloodBurstPs);
-
-		Vector2 direction = (opponent.position - transform.position).normalized;
-        rb.velocity = new Vector2(-direction.x * 10, 5);
-		CinemachineShake.Instance.ShakeCam(15, 0.25f);
 		anim.SetBool("isSkillAttacking", false);
 		anim.SetBool("isGossamerStorm", false);
+		rb.gravityScale = 0;
+		rb.velocity = Vector2.zero;
+
+		transform.position = lockPos.position;
+
+		yield return new WaitForSeconds(0.1f);
+		rb.velocity = Vector2.zero;
 
 		// stop healing
 		if (bindCo != null) 
@@ -673,10 +705,128 @@ public class PlayerControls : MonoBehaviour
 			bindCo = null;
 			rb.gravityScale = 1;
 		}
+		// stop parry effect
 		if (parryCo != null)
 			StopCoroutine(parryCo);
 
+		// teleport to ledge if in animation
+		if (anim.GetBool("isLedgeGrabbing"))
+		{
+			GRAB_LEDGE();
+		}
+
+		yield return new WaitForSeconds(0.5f);
+		// beenHurt = false;
+		rb.gravityScale = 1;
+		inStunLock = false;
+
+		// yield return new WaitForSeconds(0.5f);
+		anim.SetBool("isStunLock", false);
+		// foreach (SpriteRenderer sprite in sprites)
+		// 	sprite.material = defaultMat;
+		stunLockCo = null;
+	}
+
+	IEnumerator TakeDamageCo(Transform opponent)
+	{
+		if (isInvincible)
+		{
+			hurtCo = null;
+			yield break;
+		}
+		MusicManager.Instance.PlayHurtSFX();
+
+		anim.SetBool("isHurt", true);
+		hp = Mathf.Max(0, hp - 1);
+		ResetAllBools();
+		atkCo = null;
+		beenHurt = true;
+		SetHp();
+		rb.velocity = Vector2.zero;
+		CinemachineShake.Instance.ShakeCam(15, 0.25f);
+		anim.SetBool("isSkillAttacking", false);
+		anim.SetBool("isGossamerStorm", false);
+		// rb.gravityScale = 1;
+
+		// stop healing
+		if (bindCo != null) 
+		{
+			StopCoroutine(bindCo);
+			anim.SetBool("isBinding", false);
+			bindCo = null;
+			rb.gravityScale = 1;
+		}
+		// stop stun lock
+		if (stunLockCo != null) 
+		{
+			StopCoroutine(stunLockCo);
+			anim.SetBool("isStunLock", false);
+			inStunLock = false;
+			stunLockCo = null;
+			rb.gravityScale = 1;
+		}
+		// stop parry effect
+		if (parryCo != null)
+			StopCoroutine(parryCo);
+
+		// Died
+		if (hp <= 0)
+		{
+			MusicManager.Instance.PlayMusic(null);
+			isDead = true;
+			rb.velocity = Vector2.zero;
+			rb.gravityScale = 0;
+			anim.SetBool("isDead", true);
+			deathScene = SceneManager.GetActiveScene().name;
+			deathPos = transform.position;
+
+			blackScreenObj.SetActive(false);
+			yield return new WaitForSeconds(2);
+			transform.position = savedPos;
+			AsyncOperation loadingOperation = SceneManager.LoadSceneAsync(savedScene);
+			float loadTime = 0;
+			// wait for scene to load
+			while (!loadingOperation.isDone && loadTime < 5)
+			{
+				loadTime += Time.deltaTime;
+				yield return null;
+			}
+			blackScreenObj.SetActive(true);
+
+			if (cacoonObj != null && deathScene == SceneManager.GetActiveScene().name)
+			{
+				cacoonObj.SetActive(true);
+				cacoonObj.transform.position = deathPos;
+			}
+			inStunLock = isDead = false;
+			rb.gravityScale = 1;
+			anim.SetBool("isDead", false);
+			anim.SetBool("isHurt", false);
+			beenHurt = false;
+			soulLeakPs.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+			FullRestore();
+			SetSilk(-silkMeter);
+			hurtCo = null;
+			yield break;
+		}
+
+		foreach (SpriteRenderer sprite in sprites)
+			sprite.material = dmgMat;
+		
+		SpawnExistingObjAtSelf(bloodBurstPs);
+
+		// Dramatic slow down
 		Time.timeScale = 0;
+
+		// teleport to ledge if in animation
+		if (anim.GetBool("isLedgeGrabbing"))
+		{
+			GRAB_LEDGE();
+		}
+
+		// Knockback
+		Vector2 direction = (opponent.position - transform.position).normalized;
+        rb.velocity = new Vector2(-direction.x * 10, 5);
 
 		yield return new WaitForSecondsRealtime(0.25f);
 		anim.SetBool("isHurt", false);
@@ -707,6 +857,7 @@ public class PlayerControls : MonoBehaviour
 		isDashing = false;
 		canLedgeGrab = ledgeGrab = false;
 		SpawnExistingObjAtSelf(healingPs);
+		gitGudSound.Play();
 
 		yield return new WaitForSeconds(0.333f);
 		if (bindCo == null)
@@ -742,6 +893,16 @@ public class PlayerControls : MonoBehaviour
 			else if (i >= hp && hpMasks[i].activeSelf)
 				hpMasks[i].SetActive(false);
 		}
+		if (hp == 1)
+		{
+			animeLinesAnim.SetBool("show",true);
+			soulLeakPs.Play();
+		}
+		else
+		{
+			animeLinesAnim.SetBool("show",false);
+			soulLeakPs.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+		}
 	}
 	
 	public void SetSilk(int addToSilk=0)
@@ -775,12 +936,14 @@ public class PlayerControls : MonoBehaviour
 	public void Parry()
 	{
 		if (parryCo != null) StopCoroutine( ParryCo() );
+		Time.timeScale = 0;
 		parryCo = StartCoroutine( ParryCo() );
 	}
 
 	public IEnumerator ParryCo()
 	{
-		Time.timeScale = 0;
+		// Time.timeScale = 0;
+		MusicManager.Instance.PlayParrySFX();
 
 		yield return new WaitForSecondsRealtime(0.25f);
 		Time.timeScale = 1;
