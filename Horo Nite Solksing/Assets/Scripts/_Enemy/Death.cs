@@ -39,7 +39,7 @@ public class Death : Enemy
 			anim.SetBool("jumped", false);
 			anim.SetBool("sickled", false);
 			anim.SetTrigger("attack");
-			int rng = (anim.GetBool("isHalfHp")) ? 
+			int rng = (anim.GetBool("atPhase2")) ? 
 				(distToTarget < 6f ? Random.Range(0,5) : Random.Range(0,3)) :
 				(distToTarget < 6f ? closeAtks[Random.Range(0, closeAtks.Length)] : Random.Range(0,2));
 			if (setAtk != -1)
@@ -68,11 +68,25 @@ public class Death : Enemy
 			else if (!inAttackAnim)
 				rb.velocity = new Vector2(0, rb.velocity.y);
 		}
+		if (hitCount > 0 && recoverTimer < recoverTime)
+		{
+			recoverTimer += Time.fixedDeltaTime;
+			if (recoverTimer > recoverTime)
+			{
+				hitCount = Mathf.Max(0, hitCount - 10);
+				recoverTimer = 0;
+			}
+		}
 	}
 
-	protected override void CallChildOnHalfHp()
+	protected override void CallChildOnPhase2()
 	{
-		anim.SetBool("isHalfHp", true);
+		anim.SetBool("atPhase2", true);
+	}
+
+	protected override void CallChildOnPhase3()
+	{
+		anim.SetBool("atPhase3", true);
 	}
 
 	protected override void CallChildOnParry()
@@ -89,10 +103,37 @@ public class Death : Enemy
 		// ATTACK_PATTERN();
 	}
 
+	protected override void CallChildOnHurt(int dmg=0)
+	{
+		if (anim.GetBool("isStagger"))
+			return;
+		hitCount += dmg;
+		recoverTimer = 0;
+		if (hitCount >= staggerCount)
+		{
+			hitCount = 0;
+			rb.AddForce(Vector2.up * 4, ForceMode2D.Impulse);
+			StartCoroutine( StaggerCo() );
+		}
+	}
+
 	protected override void CallChildOnDeath()
 	{
 		silkExplosionVfx.transform.parent = null;
 		StartCoroutine(DramaticFinish());
+	}
+
+	IEnumerator StaggerCo()
+	{
+		anim.SetBool("isStagger", true);
+		CinemachineShake.Instance.ShakeCam(15, 0.25f);
+		Time.timeScale = 0f;
+
+		yield return new WaitForSecondsRealtime(0.25f);
+		Time.timeScale = 1f;
+
+		yield return new WaitForSeconds(1.5f);
+		anim.SetBool("isStagger", false);
 	}
 
 	IEnumerator DramaticFinish()

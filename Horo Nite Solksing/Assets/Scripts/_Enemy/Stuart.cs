@@ -17,7 +17,7 @@ public class Stuart : Enemy
 		WalkAround();
 	}
 
-	protected override void CallChildOnHurt()
+	protected override void CallChildOnHurtAfter()
 	{
 		// if (isGrounded && jumpCo == null)
 		if (isGrounded && Random.Range(0,2) == 0 && jumpCo == null && PlayerInFarFront())

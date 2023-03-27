@@ -109,6 +109,7 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] GameObject bloodBurstPs;
 	[SerializeField] GameObject bindPs;
 	[SerializeField] ParticleSystem soulLeakPs;
+	[SerializeField] ParticleSystem soulLeakShortPs;
 	[SerializeField] Animator animeLinesAnim;
 	[SerializeField] Transform dashSpawnPos;
 	[SerializeField] Animator flashAnim;
@@ -641,7 +642,7 @@ public class PlayerControls : MonoBehaviour
 	void FullRestore()
 	{
 		hp = maxHp;
-		SetHp();
+		SetHp(true);
 	}
 
 	public void ShawRetreat()
@@ -772,6 +773,7 @@ public class PlayerControls : MonoBehaviour
 		// Died
 		if (hp <= 0)
 		{
+			CinemachineShake.Instance.ShakeCam(15, 5f);
 			MusicManager.Instance.PlayMusic(null);
 			isDead = true;
 			rb.velocity = Vector2.zero;
@@ -865,7 +867,7 @@ public class PlayerControls : MonoBehaviour
 		rb.gravityScale = 1;
 		// anim.SetBool("isBinding", false);
 		hp = Mathf.Min(hp+3, hpMasks.Length);
-		SetHp();
+		SetHp(true);
 		bindCo = null;
 	}
 
@@ -882,7 +884,7 @@ public class PlayerControls : MonoBehaviour
 		anim.SetBool("isBinding", false);
 	}
 
-	void SetHp()
+	void SetHp(bool healed=false)
 	{
 		for (int i=0 ; i<hpMasks.Length ; i++)
 		{
@@ -892,6 +894,12 @@ public class PlayerControls : MonoBehaviour
 			// invisble
 			else if (i >= hp && hpMasks[i].activeSelf)
 				hpMasks[i].SetActive(false);
+		}
+
+		if (!healed && hp != 1)
+		{
+			soulLeakShortPs.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+			soulLeakShortPs.Play();
 		}
 		if (hp == 1)
 		{

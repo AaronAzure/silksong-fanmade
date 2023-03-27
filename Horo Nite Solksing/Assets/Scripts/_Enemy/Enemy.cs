@@ -6,8 +6,16 @@ using UnityEngine.Rendering;
 public abstract class Enemy : MonoBehaviour
 {
 	[SerializeField] protected int hp=10;
-	[SerializeField] protected int halfHp;
-	public Transform self;
+	[SerializeField] protected int phase2;
+	protected bool atPhase2;
+	[SerializeField] protected int phase3;
+	protected bool atPhase3;
+	[Space] [SerializeField] protected int staggerCount=150;
+	[SerializeField] protected int hitCount;
+	[SerializeField] protected float recoverTime=1f;
+	[SerializeField] protected float recoverTimer;
+
+	[Space] public Transform self;
 	[SerializeField] protected Transform model;
 	[SerializeField] SpriteRenderer[] sprites;
 	[SerializeField] protected Animator anim;
@@ -108,8 +116,10 @@ public abstract class Enemy : MonoBehaviour
 	protected virtual void CallChildOnStart() { }
 	protected virtual void CallChildOnEarlyUpdate() { }
 	protected virtual void CallChildOnFixedUpdate() { }
-	protected virtual void CallChildOnHalfHp() { }
-	protected virtual void CallChildOnHurt() { }
+	protected virtual void CallChildOnPhase2() { }
+	protected virtual void CallChildOnPhase3() { }
+	protected virtual void CallChildOnHurt(int dmg=10) { }
+	protected virtual void CallChildOnHurtAfter() { }
 	protected virtual void CallChildOnDeath() { }
 	protected virtual void CallChildOnParry() { }
 
@@ -286,14 +296,22 @@ public abstract class Enemy : MonoBehaviour
 			rb.velocity = Vector2.zero;
 			rb.velocity = forceDir * force;
 		}
-		if (hp <= halfHp)
+		if (!atPhase3 && hp <= phase3)
 		{
-			CallChildOnHalfHp();
+			atPhase3 = true;
+			atPhase2 = true;
+			CallChildOnPhase3();
+		}
+		if (!atPhase2 && hp <= phase2)
+		{
+			atPhase2 = true;
+			CallChildOnPhase2();
 		}
 		foreach (SpriteRenderer sprite in sprites)
 			sprite.material = dmgMat;
 		if (hp <= 0)
 		{
+			rb.AddForce(Vector2.up * 5, ForceMode2D.Impulse);
 			Died();
 			yield break;
 		}
@@ -301,6 +319,7 @@ public abstract class Enemy : MonoBehaviour
 		if (isSmart && !attackingPlayer)
 			FacePlayer();
 
+		CallChildOnHurt(dmg);
 		yield return new WaitForSeconds(0.2f);
 		foreach (SpriteRenderer sprite in sprites)
 			sprite.material = defaultMat;
@@ -308,7 +327,7 @@ public abstract class Enemy : MonoBehaviour
 		beenHurt = false;
 		if (!cannotTakeKb && force != 0)
 			rb.velocity = new Vector2(0, rb.velocity.y);
-		CallChildOnHurt();
+		CallChildOnHurtAfter();
 	}
 
 	public IEnumerator FlashCo()
@@ -357,6 +376,11 @@ public abstract class Enemy : MonoBehaviour
 		anim.SetTrigger("spawn");
 		spawningIn = true;
 		col.enabled = false;
+	}
+
+	public void SHOW_MODEL()
+	{
+		model.gameObject.SetActive(true);
 	}
 
 	public void ACTIVATE_HITBOX()
