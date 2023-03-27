@@ -671,61 +671,10 @@ public class PlayerControls : MonoBehaviour
 		if (!isDead && !invincible && (other.CompareTag("Enemy") || other.CompareTag("EnemyAttack")) && hurtCo == null)
 			hurtCo = StartCoroutine( TakeDamageCo(other.transform) );
 		if (!beenHurt && !isDead && !invincible && other.CompareTag("EnemyStun") && stunLockCo == null)
+		{
+			
 			stunLockCo = StartCoroutine( StunLockCo(other.transform) );
-	}
-
-	IEnumerator StunLockCo(Transform lockPos)
-	{
-		if (isInvincible)
-		{
-			stunLockCo = null;
-			yield break;
 		}
-		anim.SetBool("isStunLock", true);
-		inStunLock = true;
-		hp = Mathf.Max(0, hp - 1);
-		ResetAllBools();
-		atkCo = null;
-		// beenHurt = true;
-		SetHp();
-		anim.SetBool("isSkillAttacking", false);
-		anim.SetBool("isGossamerStorm", false);
-		rb.gravityScale = 0;
-		rb.velocity = Vector2.zero;
-
-		transform.position = lockPos.position;
-
-		yield return new WaitForSeconds(0.1f);
-		rb.velocity = Vector2.zero;
-
-		// stop healing
-		if (bindCo != null) 
-		{
-			StopCoroutine(bindCo);
-			anim.SetBool("isBinding", false);
-			bindCo = null;
-			rb.gravityScale = 1;
-		}
-		// stop parry effect
-		if (parryCo != null)
-			StopCoroutine(parryCo);
-
-		// teleport to ledge if in animation
-		if (anim.GetBool("isLedgeGrabbing"))
-		{
-			GRAB_LEDGE();
-		}
-
-		yield return new WaitForSeconds(0.5f);
-		// beenHurt = false;
-		rb.gravityScale = 1;
-		inStunLock = false;
-
-		// yield return new WaitForSeconds(0.5f);
-		anim.SetBool("isStunLock", false);
-		// foreach (SpriteRenderer sprite in sprites)
-		// 	sprite.material = defaultMat;
-		stunLockCo = null;
 	}
 
 	IEnumerator TakeDamageCo(Transform opponent)
@@ -841,6 +790,68 @@ public class PlayerControls : MonoBehaviour
 		foreach (SpriteRenderer sprite in sprites)
 			sprite.material = defaultMat;
 		hurtCo = null;
+	}
+
+	IEnumerator StunLockCo(Transform lockPos)
+	{
+		if (isInvincible)
+		{
+			stunLockCo = null;
+			yield break;
+		}
+		anim.SetBool("isStunLock", true);
+		inStunLock = true;
+		hp = Mathf.Max(0, hp - 1);
+		ResetAllBools();
+		atkCo = null;
+		// beenHurt = true;
+		SetHp();
+		anim.SetBool("isSkillAttacking", false);
+		anim.SetBool("isGossamerStorm", false);
+		rb.gravityScale = 0;
+		rb.velocity = Vector2.zero;
+
+		transform.position = lockPos.position;
+
+		yield return new WaitForSeconds(0.1f);
+		rb.velocity = Vector2.zero;
+
+		// stop healing
+		if (bindCo != null) 
+		{
+			StopCoroutine(bindCo);
+			anim.SetBool("isBinding", false);
+			bindCo = null;
+			rb.gravityScale = 1;
+		}
+		// stop parry effect
+		if (parryCo != null)
+			StopCoroutine(parryCo);
+
+		// teleport to ledge if in animation
+		if (anim.GetBool("isLedgeGrabbing"))
+		{
+			GRAB_LEDGE();
+		}
+
+		yield return new WaitForSeconds(0.5f);
+		// beenHurt = false;
+		rb.gravityScale = 1;
+		inStunLock = false;
+
+		// yield return new WaitForSeconds(0.5f);
+		anim.SetBool("isStunLock", false);
+		// foreach (SpriteRenderer sprite in sprites)
+		// 	sprite.material = defaultMat;
+		stunLockCo = null;
+	}
+
+	void SetDestination(Vector3 destination, float time)
+	{
+		t = 0;
+		startPosition = transform.position;
+		timeToReachTarget = time;
+		target = destination; 
 	}
 
 	IEnumerator BindCo()

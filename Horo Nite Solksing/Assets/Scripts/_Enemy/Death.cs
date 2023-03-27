@@ -26,6 +26,11 @@ public class Death : Enemy
 	private Vector2 sickleDir;
 	private int[] closeAtks={0,1,3};
 	// private int[] distAtks={0,1}; 
+	[Space] [SerializeField] GameObject ultAtkObj;
+	[Space] [SerializeField] GameObject ultAtkDmgObj;
+	[SerializeField] Transform ultAtkEndPos;
+	private int ultAtkCounter;
+	private int ultAtkCount;
 
 
     public void ATTACK_PATTERN()
@@ -39,9 +44,21 @@ public class Death : Enemy
 			anim.SetBool("jumped", false);
 			anim.SetBool("sickled", false);
 			anim.SetTrigger("attack");
+
 			int rng = (anim.GetBool("atPhase2")) ? 
 				(distToTarget < 6f ? Random.Range(0,5) : Random.Range(0,3)) :
 				(distToTarget < 6f ? closeAtks[Random.Range(0, closeAtks.Length)] : Random.Range(0,2));
+			if (anim.GetBool("atPhase3"))
+			{
+				ultAtkCount++;
+				if (ultAtkCount >= ultAtkCounter)
+				{
+					ultAtkCount = 0;
+					ultAtkCounter = Random.Range(2,5);
+					anim.SetFloat("atkPattern", 100);
+					return;
+				}
+			}
 			if (setAtk != -1)
 				rng = setAtk;
 			if (rng == 0)
@@ -128,6 +145,7 @@ public class Death : Enemy
 		anim.SetBool("isStagger", true);
 		CinemachineShake.Instance.ShakeCam(15, 0.25f);
 		Time.timeScale = 0f;
+		if (ultAtkObj != null) ultAtkObj.SetActive(false);
 
 		yield return new WaitForSecondsRealtime(0.25f);
 		Time.timeScale = 1f;
@@ -139,6 +157,7 @@ public class Death : Enemy
 	IEnumerator DramaticFinish()
 	{
 		Time.timeScale = 0.25f;
+		if (ultAtkObj != null) ultAtkObj.SetActive(false);
 
 		yield return new WaitForSecondsRealtime(0.5f);
 		Time.timeScale = 1;
@@ -245,5 +264,36 @@ public class Death : Enemy
 		sickleR.material = defaultMat;
 		Time.timeScale = 1;
 		parryCo = null;
+	}
+
+	public void SHOW_ULT_ATK_AOE()
+	{
+		if (ultAtkObj != null)
+		{
+			ultAtkObj.SetActive(false);
+			ultAtkObj.SetActive(true);
+		}
+	}
+	public void SHOW_ULT_ATK_DMG()
+	{
+		if (ultAtkDmgObj != null)
+		{
+			ultAtkDmgObj.transform.localScale = model.localScale;
+			ultAtkDmgObj.SetActive(false);
+			ultAtkDmgObj.SetActive(true);
+		}
+	}
+
+	public void START_ULT_ATK()
+	{
+		model.gameObject.SetActive(false);
+	}
+	public void END_ULT_ATK()
+	{
+		model.gameObject.SetActive(true);
+		if (ultAtkEndPos != null)
+		{
+			transform.position = ultAtkEndPos.position;
+		}
 	}
 }
