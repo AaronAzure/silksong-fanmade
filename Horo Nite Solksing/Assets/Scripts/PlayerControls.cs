@@ -87,6 +87,7 @@ public class PlayerControls : MonoBehaviour
 	private Coroutine parryCo;
 	[SerializeField] int bindCost=9;
 	[SerializeField] int skillStabCost=2;
+	private bool usingSkill;
 	[SerializeField] Image spoolImg;
 	[SerializeField] Sprite fullSpoolSpr;
 	[SerializeField] Sprite emptySpoolSpr;
@@ -132,12 +133,19 @@ public class PlayerControls : MonoBehaviour
 	[Space] [Header("Debug")]
 	[SerializeField] [Range(1,10)] int silkMultiplier=1;
 	[SerializeField] bool invincible;
+	[SerializeField] [Range(-1,0)] float shawDir=-0.7f;
 	[SerializeField] string savedScene="Scene1";
 	[SerializeField] Vector2 savedPos;
 	[SerializeField] string deathScene;
 	[SerializeField] Vector2 deathPos;
 	// public static PlayerControls Instance;
 	private static GameObject singleton;
+
+	float t;
+    Vector3 startPosition;
+	private Transform stunLockPos;
+    float stunLockTime=0.5f;
+
 
 	void Awake()
 	{
@@ -251,6 +259,11 @@ public class PlayerControls : MonoBehaviour
 					jumpDashed = jumped = false;
 			}
 		}
+		else if (!isDead && inStunLock)
+		{
+			t += Time.fixedDeltaTime/stunLockTime;
+			transform.position = Vector3.Lerp(startPosition, stunLockPos.position, t);
+		}
 	}
 
 	void DashMechanic()
@@ -325,7 +338,7 @@ public class PlayerControls : MonoBehaviour
 			isJumping = false;
 		}
 		// Holding jump button
-		else if (isJumping && player.GetButton("B"))
+		else if (isJumping && !usingSkill && player.GetButton("B"))
 		{
 			if (jumpTimer < jumpMaxTimer)
 			{
@@ -447,7 +460,7 @@ public class PlayerControls : MonoBehaviour
 		else if (player.GetAxis("Move Vertical") > 0.8f)
 			atkCo = StartCoroutine( AttackCo(1) );
 		// shaw attack
-		else if (player.GetAxis("Move Vertical") < -0.8f)
+		else if (player.GetAxis("Move Vertical") < shawDir)
 			atkCo = StartCoroutine( AttackCo(2) );
 		// attack front
 		else
@@ -504,7 +517,7 @@ public class PlayerControls : MonoBehaviour
 		// if (atkCo != null) yield break;
 		// atkCo = null;
 		SetSilk(-skillStabCost);
-		// CinemachineShake.Instance.ShakeCam(20,0.5f);
+		usingSkill = true;
 
 		this.atkDir = atkDir;
 		CancelDash();
@@ -531,6 +544,7 @@ public class PlayerControls : MonoBehaviour
 
 			yield return new WaitForSeconds(0.25f);
 			anim.SetBool("isSkillAttacking", false);
+			usingSkill = false;
 			rb.gravityScale = 1;
 
 			// atk cooldown
@@ -556,6 +570,7 @@ public class PlayerControls : MonoBehaviour
 			anim.SetBool("isGossamerStorm", false);
 			rb.gravityScale = 1;
 			atkCo = null;
+			usingSkill = false;
 		}
 		// Continue Performing Gossamer Storm
 		else
@@ -670,11 +685,18 @@ public class PlayerControls : MonoBehaviour
 	{
 		if (!isDead && !invincible && (other.CompareTag("Enemy") || other.CompareTag("EnemyAttack")) && hurtCo == null)
 			hurtCo = StartCoroutine( TakeDamageCo(other.transform) );
-		if (!beenHurt && !isDead && !invincible && other.CompareTag("EnemyStun") && stunLockCo == null)
+	}
+
+	private void OnTriggerEnter2D(Collider2D other) 
+	{
+		if (!beenHurt && !isDead && !invincible && other.CompareTag("EnemyStun"))
 		{
-			
+			if (stunLockCo != null)
+				StopCoroutine( stunLockCo );
 			stunLockCo = StartCoroutine( StunLockCo(other.transform) );
-		}
+		}	
+		if (!isDead && !invincible && other.CompareTag("Death") && hurtCo == null)
+			hurtCo = StartCoroutine( DiedCo() );
 	}
 
 	IEnumerator TakeDamageCo(Transform opponent)
@@ -696,6 +718,7 @@ public class PlayerControls : MonoBehaviour
 		CinemachineShake.Instance.ShakeCam(15, 0.25f);
 		anim.SetBool("isSkillAttacking", false);
 		anim.SetBool("isGossamerStorm", false);
+		usingSkill = false;
 		// rb.gravityScale = 1;
 
 		// stop healing
@@ -722,7 +745,7 @@ public class PlayerControls : MonoBehaviour
 		// Died
 		if (hp <= 0)
 		{
-			CinemachineShake.Instance.ShakeCam(15, 5f);
+			CinemachineShake.Instance.ShakeCam(15, 5f, true);
 			MusicManager.Instance.PlayMusic(null);
 			isDead = true;
 			rb.velocity = Vector2.zero;
@@ -792,7 +815,7 @@ public class PlayerControls : MonoBehaviour
 		hurtCo = null;
 	}
 
-	IEnumerator StunLockCo(Transform lockPos)
+	IEnumerator StunLockCo(Transform stunLockPos)
 	{
 		if (isInvincible)
 		{
@@ -808,10 +831,12 @@ public class PlayerControls : MonoBehaviour
 		SetHp();
 		anim.SetBool("isSkillAttacking", false);
 		anim.SetBool("isGossamerStorm", false);
+		usingSkill = false;
 		rb.gravityScale = 0;
 		rb.velocity = Vector2.zero;
 
-		transform.position = lockPos.position;
+		// transform.position = stunLockPos.position;
+		SetStunLockDest(stunLockPos, 0.2f);
 
 		yield return new WaitForSeconds(0.1f);
 		rb.velocity = Vector2.zero;
@@ -835,23 +860,172 @@ public class PlayerControls : MonoBehaviour
 		}
 
 		yield return new WaitForSeconds(0.5f);
-		// beenHurt = false;
-		rb.gravityScale = 1;
-		inStunLock = false;
+		// Died
+		if (hp <= 0)
+		{
+			CinemachineShake.Instance.ShakeCam(15, 5f, true);
+			MusicManager.Instance.PlayMusic(null);
+			isDead = true;
+			rb.velocity = Vector2.zero;
+			rb.gravityScale = 0;
+			anim.SetBool("isDead", true);
+			deathScene = SceneManager.GetActiveScene().name;
+			deathPos = transform.position;
 
-		// yield return new WaitForSeconds(0.5f);
-		anim.SetBool("isStunLock", false);
-		// foreach (SpriteRenderer sprite in sprites)
-		// 	sprite.material = defaultMat;
-		stunLockCo = null;
+			blackScreenObj.SetActive(false);
+			yield return new WaitForSeconds(2);
+			transform.position = savedPos;
+			AsyncOperation loadingOperation = SceneManager.LoadSceneAsync(savedScene);
+			float loadTime = 0;
+			// wait for scene to load
+			while (!loadingOperation.isDone && loadTime < 5)
+			{
+				loadTime += Time.deltaTime;
+				yield return null;
+			}
+			blackScreenObj.SetActive(true);
+
+			if (cacoonObj != null && deathScene == SceneManager.GetActiveScene().name)
+			{
+				cacoonObj.SetActive(true);
+				cacoonObj.transform.position = deathPos;
+			}
+			inStunLock = isDead = false;
+			rb.gravityScale = 1;
+			stunLockCo = null;
+			anim.SetBool("isDead", false);
+			anim.SetBool("isHurt", false);
+			anim.SetBool("isStunLock", false);
+			beenHurt = false;
+			soulLeakPs.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+			FullRestore();
+			SetSilk(-silkMeter);
+			hurtCo = null;
+			yield break;
+		}
+		else
+		{
+			rb.gravityScale = 1;
+			inStunLock = false;
+
+			anim.SetBool("isStunLock", false);
+			stunLockCo = null;
+		}
 	}
 
-	void SetDestination(Vector3 destination, float time)
+	void SetStunLockDest(Transform dest, float time)
 	{
 		t = 0;
 		startPosition = transform.position;
-		timeToReachTarget = time;
-		target = destination; 
+		stunLockTime = time;
+		stunLockPos = dest; 
+	}
+
+	IEnumerator DiedCo()
+	{
+		MusicManager.Instance.PlayHurtSFX();
+
+		anim.SetBool("isHurt", true);
+		hp = 0;
+		ResetAllBools();
+		atkCo = null;
+		beenHurt = true;
+		SetHp();
+		rb.velocity = Vector2.zero;
+		CinemachineShake.Instance.ShakeCam(15, 0.25f);
+		anim.SetBool("isSkillAttacking", false);
+		anim.SetBool("isGossamerStorm", false);
+		usingSkill = false;
+		// rb.gravityScale = 1;
+
+		// stop healing
+		if (bindCo != null) 
+		{
+			StopCoroutine(bindCo);
+			anim.SetBool("isBinding", false);
+			bindCo = null;
+			rb.gravityScale = 1;
+		}
+		// stop stun lock
+		if (stunLockCo != null) 
+		{
+			StopCoroutine(stunLockCo);
+			anim.SetBool("isStunLock", false);
+			inStunLock = false;
+			stunLockCo = null;
+			rb.gravityScale = 1;
+		}
+		// stop parry effect
+		if (parryCo != null)
+			StopCoroutine(parryCo);
+
+		// Died
+		if (hp <= 0)
+		{
+			CinemachineShake.Instance.ShakeCam(15, 5f, true);
+			MusicManager.Instance.PlayMusic(null);
+			isDead = true;
+			rb.velocity = Vector2.zero;
+			rb.gravityScale = 0;
+			anim.SetBool("isDead", true);
+			deathScene = SceneManager.GetActiveScene().name;
+			deathPos = transform.position;
+
+			blackScreenObj.SetActive(false);
+			yield return new WaitForSeconds(2);
+			transform.position = savedPos;
+			AsyncOperation loadingOperation = SceneManager.LoadSceneAsync(savedScene);
+			float loadTime = 0;
+			// wait for scene to load
+			while (!loadingOperation.isDone && loadTime < 5)
+			{
+				loadTime += Time.deltaTime;
+				yield return null;
+			}
+			blackScreenObj.SetActive(true);
+
+			if (cacoonObj != null && deathScene == SceneManager.GetActiveScene().name)
+			{
+				cacoonObj.SetActive(true);
+				cacoonObj.transform.position = deathPos;
+			}
+			inStunLock = isDead = false;
+			rb.gravityScale = 1;
+			anim.SetBool("isDead", false);
+			anim.SetBool("isHurt", false);
+			beenHurt = false;
+			soulLeakPs.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+			FullRestore();
+			SetSilk(-silkMeter);
+			hurtCo = null;
+			yield break;
+		}
+
+		foreach (SpriteRenderer sprite in sprites)
+			sprite.material = dmgMat;
+		
+		SpawnExistingObjAtSelf(bloodBurstPs);
+
+		// Dramatic slow down
+		Time.timeScale = 0;
+
+		// teleport to ledge if in animation
+		if (anim.GetBool("isLedgeGrabbing"))
+		{
+			GRAB_LEDGE();
+		}
+
+		yield return new WaitForSecondsRealtime(0.25f);
+		anim.SetBool("isHurt", false);
+		Time.timeScale = 1;
+
+		yield return new WaitForSeconds(0.25f);
+		beenHurt = false;
+
+		yield return new WaitForSeconds(0.5f);
+		foreach (SpriteRenderer sprite in sprites)
+			sprite.material = defaultMat;
+		hurtCo = null;
 	}
 
 	IEnumerator BindCo()

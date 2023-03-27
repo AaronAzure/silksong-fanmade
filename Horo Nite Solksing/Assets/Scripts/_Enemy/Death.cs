@@ -76,15 +76,12 @@ public class Death : Enemy
 		CheckIsGrounded();
 		if (!isGrounded)
 			anim.SetFloat("jumpVelocity", rb.velocity.y);
-		if (!beenHurt)
+		if (tripleStrike)
 		{
-			if (tripleStrike)
-			{
-				rb.velocity = new Vector2(model.localScale.x * tripleStrikeForce, rb.velocity.y);
-			}
-			else if (!inAttackAnim)
-				rb.velocity = new Vector2(0, rb.velocity.y);
+			rb.velocity = new Vector2(model.localScale.x * tripleStrikeForce, rb.velocity.y);
 		}
+		else if (!beenHurt && !inAttackAnim)
+			rb.velocity = new Vector2(0, rb.velocity.y);
 		if (hitCount > 0 && recoverTimer < recoverTime)
 		{
 			recoverTimer += Time.fixedDeltaTime;
@@ -130,6 +127,8 @@ public class Death : Enemy
 		{
 			hitCount = 0;
 			rb.AddForce(Vector2.up * 4, ForceMode2D.Impulse);
+			anim.SetBool("jumped", false);
+			anim.SetBool("sickled", false);
 			StartCoroutine( StaggerCo() );
 		}
 	}
@@ -143,7 +142,7 @@ public class Death : Enemy
 	IEnumerator StaggerCo()
 	{
 		anim.SetBool("isStagger", true);
-		CinemachineShake.Instance.ShakeCam(15, 0.25f);
+		CinemachineShake.Instance.ShakeCam(2.5f, 0.25f);
 		Time.timeScale = 0f;
 		if (ultAtkObj != null) ultAtkObj.SetActive(false);
 

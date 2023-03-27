@@ -11,6 +11,7 @@ public class CinemachineShake : MonoBehaviour
 	private float shakeTimer;
 	private float shakeTotalTimer;
 	private float startingIntensity;
+	private bool forever;
 
 	private void Awake() {
 		Instance = this;
@@ -22,21 +23,21 @@ public class CinemachineShake : MonoBehaviour
 		bmcp = cm.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
     }
 
-	public void ShakeCam(float intensity, float duration)
+	public void ShakeCam(float intensity, float duration, bool forever=false)
 	{
 		if (bmcp != null)
 		{
 			bmcp.m_AmplitudeGain = startingIntensity = intensity;
 			shakeTimer = shakeTotalTimer = duration;
+			this.forever = forever;
 		}
 	}
 
 	void Update() 
 	{
-		if (shakeTimer > 0)
+		if (!forever && shakeTimer > 0)
 		{
 			shakeTimer -= Time.fixedDeltaTime;
-
 			bmcp.m_AmplitudeGain = 
 				Mathf.Lerp(startingIntensity, 0f, 1 - (shakeTimer/shakeTotalTimer));
 		}	
