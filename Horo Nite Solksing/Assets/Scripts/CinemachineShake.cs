@@ -23,11 +23,12 @@ public class CinemachineShake : MonoBehaviour
 		bmcp = cm.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
     }
 
-	public void ShakeCam(float intensity, float duration, bool forever=false)
+	public void ShakeCam(float intensity, float duration, float freq=0, bool forever=false)
 	{
 		if (bmcp != null)
 		{
 			bmcp.m_AmplitudeGain = startingIntensity = intensity;
+			bmcp.m_FrequencyGain = freq;
 			shakeTimer = shakeTotalTimer = duration;
 			this.forever = forever;
 		}

@@ -338,9 +338,9 @@ public class PlayerControls : MonoBehaviour
 			isJumping = false;
 		}
 		// Holding jump button
-		else if (isJumping && !usingSkill && player.GetButton("B"))
+		else if (isJumping && player.GetButton("B"))
 		{
-			if (jumpTimer < jumpMaxTimer)
+			if (!usingSkill && jumpTimer < jumpMaxTimer)
 			{
 				rb.velocity = new Vector2(rb.velocity.x, jumpForce);
 				jumpTimer += Time.deltaTime;
@@ -715,7 +715,8 @@ public class PlayerControls : MonoBehaviour
 		beenHurt = true;
 		SetHp();
 		rb.velocity = Vector2.zero;
-		CinemachineShake.Instance.ShakeCam(15, 0.25f);
+		if (hp != 0)
+			CinemachineShake.Instance.ShakeCam(15, 0.25f);
 		anim.SetBool("isSkillAttacking", false);
 		anim.SetBool("isGossamerStorm", false);
 		usingSkill = false;
@@ -745,7 +746,7 @@ public class PlayerControls : MonoBehaviour
 		// Died
 		if (hp <= 0)
 		{
-			CinemachineShake.Instance.ShakeCam(15, 5f, true);
+			CinemachineShake.Instance.ShakeCam(3f, 5f, 1, true);
 			MusicManager.Instance.PlayMusic(null);
 			isDead = true;
 			rb.velocity = Vector2.zero;
@@ -863,7 +864,7 @@ public class PlayerControls : MonoBehaviour
 		// Died
 		if (hp <= 0)
 		{
-			CinemachineShake.Instance.ShakeCam(15, 5f, true);
+			CinemachineShake.Instance.ShakeCam(3f, 5f, 1, true);
 			MusicManager.Instance.PlayMusic(null);
 			isDead = true;
 			rb.velocity = Vector2.zero;
@@ -962,7 +963,7 @@ public class PlayerControls : MonoBehaviour
 		// Died
 		if (hp <= 0)
 		{
-			CinemachineShake.Instance.ShakeCam(15, 5f, true);
+			CinemachineShake.Instance.ShakeCam(3f, 5f, 1, true);
 			MusicManager.Instance.PlayMusic(null);
 			isDead = true;
 			rb.velocity = Vector2.zero;
