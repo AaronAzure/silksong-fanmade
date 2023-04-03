@@ -133,6 +133,7 @@ public class PlayerControls : MonoBehaviour
 	[Space] [Header("Debug")]
 	[SerializeField] [Range(1,10)] int silkMultiplier=1;
 	[SerializeField] bool invincible;
+	[SerializeField] bool canParry=true;
 	[SerializeField] [Range(-1,0)] float shawDir=-0.7f;
 	[SerializeField] string savedScene="Scene1";
 	[SerializeField] Vector2 savedPos;
@@ -1129,6 +1130,7 @@ public class PlayerControls : MonoBehaviour
 
 	public void Parry()
 	{
+		if (!canParry) return;
 		if (parryCo != null) StopCoroutine( ParryCo() );
 		Time.timeScale = 0;
 		parryCo = StartCoroutine( ParryCo() );

@@ -17868,7 +17868,7 @@ MonoBehaviour:
   hp: 0
   atkDmg: 10
   gossamerDmg: 3
-  stabDmg: 25
+  stabDmg: 30
   silkMeter: 0
   silks:
   - {fileID: 7776183612584911070}
@@ -17935,7 +17935,7 @@ MonoBehaviour:
   atkCooldownDuration: 0.2
   slashObj: {fileID: 8166649577717489486}
   bindCost: 9
-  skillStabCost: 2
+  skillStabCost: 3
   spoolImg: {fileID: 6101135028124194855}
   fullSpoolSpr: {fileID: -1926292919776319807, guid: 23bdc677177e5428a8cd436daf864096, type: 3}
   emptySpoolSpr: {fileID: -8992121563501934311, guid: 23bdc677177e5428a8cd436daf864096, type: 3}
@@ -28555,7 +28555,7 @@ GameObject:
   - component: {fileID: 6311182817771271028}
   - component: {fileID: 6311182817771271029}
   - component: {fileID: 6311182817771271030}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Silk Explosion (PS)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -38772,7 +38772,7 @@ GameObject:
   - component: {fileID: 7081136998610373724}
   - component: {fileID: 6970035268261102015}
   - component: {fileID: 336768689893466995}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Silk Explosion (PS) (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -55821,6 +55821,10 @@ PrefabInstance:
     - target: {fileID: 8239582908247128724, guid: 04eca17d114fd4eefb6504526a234fb3, type: 3}
       propertyPath: m_Name
       value: Bind (PS)
+      objectReference: {fileID: 0}
+    - target: {fileID: 8239582908247128724, guid: 04eca17d114fd4eefb6504526a234fb3, type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 8239582908247128724, guid: 04eca17d114fd4eefb6504526a234fb3, type: 3}
       propertyPath: m_IsActive
