@@ -8,6 +8,9 @@ public class EnemySickle : MonoBehaviour
 	[SerializeField] Rigidbody2D rb;
 	[HideInInspector] public Transform returnPos;
 	[SerializeField] float speed=15;
+	[SerializeField] Animator anim;
+	[SerializeField] SpriteRenderer sr;
+	[SerializeField] GameObject parriedObj;
 	private bool hitWall;
 	private bool playerHit;
 	[HideInInspector] public Death death;
@@ -31,6 +34,9 @@ public class EnemySickle : MonoBehaviour
 	{
 		if (!playerHit && other.CompareTag("Finish"))
 		{
+			if (anim != null) anim.enabled = false;
+			if (sr != null) sr.sprite = null;
+			if (parriedObj != null) parriedObj.SetActive(true);
 			hurtBox.enabled = false;
 			playerHit = true;
 			hitWall = false;

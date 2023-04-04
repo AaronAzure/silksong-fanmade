@@ -24,6 +24,7 @@ public class Death : Enemy
 	private int nSickleOut;
 	private int nSickleRetrieved;
 	private Vector2 sickleDir;
+	[SerializeField] float sickleUp=0.6f;
 	private int[] closeAtks={0,1,3};
 	// private int[] distAtks={0,1}; 
 	[Space] [SerializeField] GameObject ultAtkObj;
@@ -216,7 +217,7 @@ public class Death : Enemy
 
 	public void GET_SICKLE_DIR(int x)
 	{
-		sickleDir = (target.transform.position + new Vector3(0,0.5f) - sickleAtkPos[x].position).normalized;
+		sickleDir = (target.transform.position + new Vector3(0,sickleUp) - sickleAtkPos[x].position).normalized;
 	}
 
 	public void THROW_SICKLE(int x)

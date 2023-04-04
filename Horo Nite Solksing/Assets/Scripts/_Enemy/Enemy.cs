@@ -482,8 +482,6 @@ public abstract class Enemy : MonoBehaviour
 			currentAction = CurrentAction.none;
 		}
 
-		Debug.Log("flying around");
-
 		if (beenHurt)
 		{
 

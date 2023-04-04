@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Rewired;
+using ED.SC;
+// using SmartConsole;
 
 public class PlayerControls : MonoBehaviour
 {
@@ -133,6 +135,7 @@ public class PlayerControls : MonoBehaviour
 	[Space] [Header("Debug")]
 	[SerializeField] [Range(1,10)] int silkMultiplier=1;
 	[SerializeField] bool invincible;
+	[SerializeField] bool infiniteSilk;
 	[SerializeField] bool canParry=true;
 	[SerializeField] [Range(-1,0)] float shawDir=-0.7f;
 	[SerializeField] string savedScene="Scene1";
@@ -209,7 +212,7 @@ public class PlayerControls : MonoBehaviour
 				SkillAttack();
 
 			// bind (heal)
-			else if (player.GetButtonDown("A") && silkMeter >= bindCost && bindCo == null)
+			else if (player.GetButtonDown("A") && (infiniteSilk || silkMeter >= bindCost) && bindCo == null)
 				bindCo = StartCoroutine( BindCo() );
 
 			// jump
@@ -507,9 +510,11 @@ public class PlayerControls : MonoBehaviour
 	
 	void SkillAttack()
 	{
-		if (silkMeter >= skillStabCost && player.GetAxis("Move Vertical") > 0.9f)
+		// Gossamer Storm
+		if (player.GetAxis("Move Vertical") > 0.9f && (infiniteSilk || silkMeter >= skillStabCost))
 			atkCo = StartCoroutine( SkillAttackCo(1) );
-		else if (silkMeter >= skillStabCost)
+		// Stabby stabby strike
+		else if ((infiniteSilk || silkMeter >= skillStabCost))
 			atkCo = StartCoroutine( SkillAttackCo() );
 	}
 
@@ -517,7 +522,7 @@ public class PlayerControls : MonoBehaviour
 	{
 		// if (atkCo != null) yield break;
 		// atkCo = null;
-		SetSilk(-skillStabCost);
+		if (!infiniteSilk) SetSilk(-skillStabCost);
 		usingSkill = true;
 
 		this.atkDir = atkDir;
@@ -566,7 +571,7 @@ public class PlayerControls : MonoBehaviour
 	public void CancelGossamerStorm()
 	{
 		// done
-		if (!player.GetButton("X") || silkMeter <= 0)
+		if (!player.GetButton("X") || (!infiniteSilk && silkMeter <= 0))
 		{
 			anim.SetBool("isGossamerStorm", false);
 			rb.gravityScale = 1;
@@ -574,7 +579,7 @@ public class PlayerControls : MonoBehaviour
 			usingSkill = false;
 		}
 		// Continue Performing Gossamer Storm
-		else
+		else if (!infiniteSilk) 
 		{
 			SetSilk(-1);
 		}
@@ -1038,7 +1043,7 @@ public class PlayerControls : MonoBehaviour
 			yield break;
 		} 
 		anim.SetBool("isBinding", true);
-		SetSilk(-bindCost);
+		if (!infiniteSilk) SetSilk(-bindCost);
 		rb.gravityScale = 0;
 		rb.velocity = Vector2.zero;
 		activeMoveSpeed = moveSpeed;
@@ -1144,5 +1149,16 @@ public class PlayerControls : MonoBehaviour
 		yield return new WaitForSecondsRealtime(0.25f);
 		Time.timeScale = 1;
 		parryCo = null;
+	}
+
+
+	[Command("toggle_invincibility", "toggle_invincibility", MonoTargetType.All)] public void toggle_invincibility()
+	{
+		invincible = !invincible;
+	}
+
+	[Command("toggle_infinite_silk", "toggle_infinite_silk", MonoTargetType.All)] public void toggle_infinite_silk()
+	{
+		infiniteSilk = !infiniteSilk;
 	}
 }

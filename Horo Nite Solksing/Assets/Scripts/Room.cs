@@ -9,6 +9,7 @@ public class Room : MonoBehaviour
 	[SerializeField] GameObject[] walls;
 	private bool startBossFight;
 	[SerializeField] int nDefeated;
+	[SerializeField] GameObject ui;
 
 	private void Start() 
 	{
@@ -41,6 +42,8 @@ public class Room : MonoBehaviour
 		{
 			startBossFight = true;
 			Debug.Log("Player Entered Room");
+			if (ui != null) ui.SetActive(true);
+			
 			foreach (Enemy enemy in enemies)
 			{
 				enemy.RoomEnter();	
