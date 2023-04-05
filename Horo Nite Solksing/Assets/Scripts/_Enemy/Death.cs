@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Death : Enemy
 {
+	public static Death Instance;
 	[Space] [Header("Death")]
 	[SerializeField] bool inAttackAnim;
 	[SerializeField] bool tripleStrike;
@@ -32,7 +33,18 @@ public class Death : Enemy
 	[SerializeField] Transform ultAtkEndPos;
 	private int ultAtkCounter;
 	private int ultAtkCount;
+	private bool old;
 
+
+	public void Awake()
+	{
+		Instance = this;
+	}
+
+	public void ToggleOldVer()
+	{
+		old = !old;
+	}
 
     public void ATTACK_PATTERN()
 	{
@@ -46,19 +58,27 @@ public class Death : Enemy
 			anim.SetBool("sickled", false);
 			anim.SetTrigger("attack");
 
-			int rng = (anim.GetBool("atPhase2")) ? 
-				(distToTarget < 6f ? Random.Range(0,5) : Random.Range(0,3)) :
-				(distToTarget < 6f ? closeAtks[Random.Range(0, closeAtks.Length)] : Random.Range(0,2));
-			if (anim.GetBool("atPhase3"))
+			int rng=0;
+			if (!old)
 			{
-				ultAtkCount++;
-				if (ultAtkCount >= ultAtkCounter)
+				rng = (anim.GetBool("atPhase2")) ? 
+					(distToTarget < 6f ? Random.Range(0,5) : Random.Range(0,3)) :
+					(distToTarget < 6f ? closeAtks[Random.Range(0, closeAtks.Length)] : Random.Range(0,2));
+				if (anim.GetBool("atPhase3"))
 				{
-					ultAtkCount = 0;
-					ultAtkCounter = Random.Range(2,5);
-					anim.SetFloat("atkPattern", 100);
-					return;
+					ultAtkCount++;
+					if (ultAtkCount >= ultAtkCounter)
+					{
+						ultAtkCount = 0;
+						ultAtkCounter = Random.Range(2,5);
+						anim.SetFloat("atkPattern", 100);
+						return;
+					}
 				}
+			} 
+			else
+			{
+				rng = (distToTarget < 6f ? closeAtks[Random.Range(0, closeAtks.Length)] : Random.Range(0,2));
 			}
 			if (setAtk != -1)
 				rng = setAtk;

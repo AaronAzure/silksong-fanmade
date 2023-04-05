@@ -208,7 +208,7 @@ public class PlayerControls : MonoBehaviour
 		{
 			if (player.GetButtonDown("Y") && atkCo == null)
 				Attack();
-			else if (player.GetButtonDown("X") && !anim.GetBool("isAttacking"))
+			else if (player.GetButtonDown("X"))
 				SkillAttack();
 
 			// bind (heal)
@@ -522,6 +522,7 @@ public class PlayerControls : MonoBehaviour
 	{
 		// if (atkCo != null) yield break;
 		// atkCo = null;
+		anim.SetBool("isAttacking", false);
 		if (!infiniteSilk) SetSilk(-skillStabCost);
 		usingSkill = true;
 
@@ -701,7 +702,7 @@ public class PlayerControls : MonoBehaviour
 				StopCoroutine( stunLockCo );
 			stunLockCo = StartCoroutine( StunLockCo(other.transform) );
 		}	
-		if (!isDead && !invincible && other.CompareTag("Death") && hurtCo == null)
+		if (!isDead && other.CompareTag("Death") && hurtCo == null)
 			hurtCo = StartCoroutine( DiedCo() );
 	}
 
@@ -1160,5 +1161,11 @@ public class PlayerControls : MonoBehaviour
 	[Command("toggle_infinite_silk", "toggle_infinite_silk", MonoTargetType.All)] public void toggle_infinite_silk()
 	{
 		infiniteSilk = !infiniteSilk;
+	}
+
+	[Command("toggle_old_death", "death", MonoTargetType.All)] public void toggle_old_death()
+	{
+		if (Death.Instance != null)
+			Death.Instance.ToggleOldVer();
 	}
 }
