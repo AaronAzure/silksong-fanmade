@@ -5,7 +5,7 @@ using UnityEngine;
 public class Otto : Enemy
 {
 	private float closeDistTimer;
-	private float closeDistTotal=2;
+	[SerializeField] float closeDistTotal=2;
 	[SerializeField] bool inAttackAnim; // assigned by animation
 	[SerializeField] float throwForce=8;
 	[SerializeField] EnemyProjectile bellObj;

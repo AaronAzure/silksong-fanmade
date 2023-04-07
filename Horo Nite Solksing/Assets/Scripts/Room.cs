@@ -7,6 +7,7 @@ public class Room : MonoBehaviour
 	[SerializeField] Enemy[] enemies;
 	[SerializeField] GameObject roomCam;
 	[SerializeField] GameObject[] walls;
+	[SerializeField] Animator[] anims;
 	private bool startBossFight;
 	[SerializeField] int nDefeated;
 	[SerializeField] GameObject ui;
@@ -29,11 +30,23 @@ public class Room : MonoBehaviour
 		nDefeated++;
 		if (nDefeated >= enemies.Length)
 		{
-			foreach (GameObject wall in walls)
-				wall.SetActive(false);
-			roomCam.SetActive(false);
-			MusicManager.Instance.PlayMusic(MusicManager.Instance.prevMusic);
+			StartCoroutine( RoomClearedCo() );
 		}
+	}
+
+	private bool done;
+	IEnumerator RoomClearedCo()
+	{
+		if (done) yield break;
+
+		done = true;
+		MusicManager.Instance.PlayMusic(MusicManager.Instance.prevMusic);
+		yield return new WaitForSeconds(1);
+		// foreach (GameObject wall in walls)
+		// 	wall.SetActive(false);
+		foreach (Animator anim in anims)
+			anim.SetTrigger("open");
+		roomCam.SetActive(false);
 	}
 
     private void OnTriggerEnter2D(Collider2D other) 

@@ -15,6 +15,8 @@ public class EnemySickle : MonoBehaviour
 	private bool playerHit;
 	[HideInInspector] public Death death;
 	public int nSickle;
+	[SerializeField] GameObject parriedVfx;
+	[SerializeField] float offset=15;
 
 
     void FixedUpdate() 
@@ -37,6 +39,18 @@ public class EnemySickle : MonoBehaviour
 			if (anim != null) anim.enabled = false;
 			if (sr != null) sr.sprite = null;
 			if (parriedObj != null) parriedObj.SetActive(true);
+			if (parriedVfx != null)
+			{
+				Vector2 temp = (other.transform.position - transform.position).normalized;
+				float angleZ = 
+					Mathf.Atan2(temp.y, temp.x) * Mathf.Rad2Deg;
+				Instantiate(
+					parriedVfx, 
+					this.transform.position, 
+					Quaternion.Euler(0,0,angleZ + offset * temp.x)
+				);
+				MusicManager.Instance.PlayParry2SFX();
+			}
 			hurtBox.enabled = false;
 			playerHit = true;
 			hitWall = false;

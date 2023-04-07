@@ -89,6 +89,7 @@ public class PlayerControls : MonoBehaviour
 	private Coroutine parryCo;
 	[SerializeField] int bindCost=9;
 	[SerializeField] int skillStabCost=2;
+	[SerializeField] int skillGossamerCost=2;
 	private bool usingSkill;
 	[SerializeField] Image spoolImg;
 	[SerializeField] Sprite fullSpoolSpr;
@@ -312,7 +313,7 @@ public class PlayerControls : MonoBehaviour
 				if (!isGrounded || !player.GetButton("ZR")) 
 					isDashing = false;
 				activeMoveSpeed = (isDashing) ? dashSpeed : moveSpeed;
-				anim.SetFloat("moveSPeed", activeMoveSpeed);
+				anim.SetFloat("moveSpeed", activeMoveSpeed);
 				dashCooldownCounter = dashCooldownDuration;
 			}
 		}
@@ -523,7 +524,6 @@ public class PlayerControls : MonoBehaviour
 		// if (atkCo != null) yield break;
 		// atkCo = null;
 		anim.SetBool("isAttacking", false);
-		if (!infiniteSilk) SetSilk(-skillStabCost);
 		usingSkill = true;
 
 		this.atkDir = atkDir;
@@ -535,6 +535,7 @@ public class PlayerControls : MonoBehaviour
 		// Gossamer Storm
 		if (atkDir == 1)
 		{
+			if (!infiniteSilk) SetSilk(-skillGossamerCost);
 			anim.SetBool("isGossamerStorm", true);
 
 			yield return new WaitForSeconds(0.25f);
@@ -543,6 +544,7 @@ public class PlayerControls : MonoBehaviour
 		}
 		else
 		{
+			if (!infiniteSilk) SetSilk(-skillStabCost);
 			anim.SetBool("isSkillAttacking", true);
 			adimaSound.Play();
 
@@ -1167,5 +1169,10 @@ public class PlayerControls : MonoBehaviour
 	{
 		if (Death.Instance != null)
 			Death.Instance.ToggleOldVer();
+	}
+
+	[Command("hide_cocoon", "hide_cocoon", MonoTargetType.All)] public void hide_cocoon()
+	{
+		cacoonObj.SetActive(false);
 	}
 }

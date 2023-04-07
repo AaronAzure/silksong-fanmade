@@ -11,9 +11,9 @@ GameObject:
   - component: {fileID: 634083520579559947}
   - component: {fileID: 1114819777621237327}
   - component: {fileID: 877222829974826160}
-  - component: {fileID: -940568193527211324}
+  - component: {fileID: 8181362682483034465}
   m_Layer: 0
-  m_Name: Strike (ps)
+  m_Name: Strike (ps) mini
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -747,7 +747,7 @@ ParticleSystem:
     sphericalDirectionAmount: 0
     randomPositionAmount: 0
     radius:
-      value: 1.5
+      value: 0.89
       mode: 0
       spread: 0
       speed:
@@ -1026,7 +1026,7 @@ ParticleSystem:
           m_PreInfinity: 2
           m_PostInfinity: 2
           m_RotationOrder: 4
-      cycleCount: 3
+      cycleCount: 1
       repeatInterval: 0.025
       probability: 1
   SizeModule:
@@ -4862,7 +4862,7 @@ ParticleSystemRenderer:
   m_MaxParticleSize: 0.5
   m_CameraVelocityScale: 0
   m_VelocityScale: 0
-  m_LengthScale: 1
+  m_LengthScale: 0.5
   m_SortingFudge: 0
   m_NormalDirection: 1
   m_ShadowBias: 0
@@ -4881,7 +4881,7 @@ ParticleSystemRenderer:
   m_Mesh2: {fileID: 0}
   m_Mesh3: {fileID: 0}
   m_MaskInteraction: 0
---- !u!210 &-940568193527211324
+--- !u!210 &8181362682483034465
 SortingGroup:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

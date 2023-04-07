@@ -11,6 +11,8 @@ public class EnemyProjectile : MonoBehaviour
 	[SerializeField] float hitBackForce=5;
 	private bool isGrounded;
 	private bool thrown;
+	[SerializeField] bool canBreak;
+	[SerializeField] GameObject breakVfx;
 
 	private void Start() 
 	{
@@ -40,7 +42,14 @@ public class EnemyProjectile : MonoBehaviour
 	private void OnCollisionEnter2D(Collision2D other)
 	{
 		if (thrown && other.gameObject.CompareTag("Ground"))
+		{
 			isGrounded = true;
+			if (canBreak)
+			{
+				breakVfx.transform.parent = null;
+				Destroy(gameObject);
+			}
+		}
 	}
 
 	// private void OnCollisionExit2D(Collision2D other) 
@@ -56,6 +65,11 @@ public class EnemyProjectile : MonoBehaviour
 
 		if (canHitback && other.CompareTag("Finish"))
 		{
+			if (canBreak)
+			{
+				breakVfx.transform.parent = null;
+				Destroy(gameObject);
+			}
 			int x = (other.transform.position.x - transform.position.x > 0) ? -1 : 1;
 			rb.AddForce(
 				new Vector2(x * hitBackForce, 1),

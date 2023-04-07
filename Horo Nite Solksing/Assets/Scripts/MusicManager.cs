@@ -11,6 +11,7 @@ public class MusicManager : MonoBehaviour
 	public AudioSource bossMusic;
 	// [SerializeField] float bossMusicVol;
 	[SerializeField] AudioSource parrySfx;
+	[SerializeField] AudioSource parry2Sfx;
 	[SerializeField] AudioSource hurtSfx;
 	[SerializeField] AudioSource hornetAtkSfx;
 	[SerializeField] AudioSource hornetAtk2Sfx;
@@ -55,6 +56,11 @@ public class MusicManager : MonoBehaviour
 	{
 		if (parrySfx != null)
 			parrySfx.Play();
+	}
+    public void PlayParry2SFX()
+	{
+		if (parry2Sfx != null)
+			parry2Sfx.Play();
 	}
     public void PlayHurtSFX()
 	{

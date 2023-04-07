@@ -398,7 +398,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hp: 50
-  halfHp: 0
+  phase2: 0
+  phase3: 0
+  staggerCount: 150
+  hitCount: 0
+  recoverTime: 1
+  recoverTimer: 0
   self: {fileID: 1376537067151301452}
   model: {fileID: 1376537066910156643}
   sprites:
@@ -898,15 +903,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -4923877830106284974, guid: 30a7e2c40c9f849948185120cf5faa64, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0
+      value: 0.65
       objectReference: {fileID: 0}
     - target: {fileID: -4923877830106284974, guid: 30a7e2c40c9f849948185120cf5faa64, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -4923877830106284974, guid: 30a7e2c40c9f849948185120cf5faa64, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 1
+      value: 0.65
       objectReference: {fileID: 0}
     - target: {fileID: -4923877830106284974, guid: 30a7e2c40c9f849948185120cf5faa64, type: 3}
       propertyPath: m_LocalPosition.x
