@@ -1171,8 +1171,21 @@ public class PlayerControls : MonoBehaviour
 			Death.Instance.ToggleOldVer();
 	}
 
-	[Command("hide_cocoon", "hide_cocoon", MonoTargetType.All)] public void hide_cocoon()
+	[Command("restart", "restart", MonoTargetType.All)] public void restart()
 	{
+		transform.position = savedPos;
+		SceneManager.LoadScene(savedScene);
+		blackScreenObj.SetActive(true);
+		cacoonObj.SetActive(false);
+		inStunLock = isDead = false;
+		rb.gravityScale = 1;
+		anim.SetBool("isDead", false);
+		anim.SetBool("isHurt", false);
+		beenHurt = false;
+		soulLeakPs.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+		FullRestore();
+		SetSilk(-silkMeter);
+		hurtCo = null;
 		cacoonObj.SetActive(false);
 	}
 }
