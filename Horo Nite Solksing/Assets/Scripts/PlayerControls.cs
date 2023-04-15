@@ -55,6 +55,7 @@ public class PlayerControls : MonoBehaviour
 	private bool ledgeGrab;
 	private bool noControl;
 	private bool inStunLock;
+	[SerializeField] bool justParried;
 	[SerializeField] bool isInvincible;
 	[SerializeField] bool hasLedge;
 	[SerializeField] bool hasWall;
@@ -692,13 +693,13 @@ public class PlayerControls : MonoBehaviour
 
 	private void OnTriggerStay2D(Collider2D other) 
 	{
-		if (!isDead && !invincible && (other.CompareTag("Enemy") || other.CompareTag("EnemyAttack")) && hurtCo == null)
+		if (!isDead && !invincible && !justParried && (other.CompareTag("Enemy") || other.CompareTag("EnemyAttack")) && hurtCo == null)
 			hurtCo = StartCoroutine( TakeDamageCo(other.transform) );
 	}
 
 	private void OnTriggerEnter2D(Collider2D other) 
 	{
-		if (!beenHurt && !isDead && !invincible && other.CompareTag("EnemyStun"))
+		if (!beenHurt && !isDead && !invincible && !justParried && other.CompareTag("EnemyStun"))
 		{
 			if (stunLockCo != null)
 				StopCoroutine( stunLockCo );
@@ -783,6 +784,7 @@ public class PlayerControls : MonoBehaviour
 				cacoonObj.transform.position = deathPos;
 			}
 			inStunLock = isDead = false;
+			justParried = false;
 			rb.gravityScale = 1;
 			anim.SetBool("isDead", false);
 			anim.SetBool("isHurt", false);
@@ -901,6 +903,7 @@ public class PlayerControls : MonoBehaviour
 				cacoonObj.transform.position = deathPos;
 			}
 			inStunLock = isDead = false;
+			justParried = false;
 			rb.gravityScale = 1;
 			stunLockCo = null;
 			anim.SetBool("isDead", false);
@@ -1004,6 +1007,7 @@ public class PlayerControls : MonoBehaviour
 			anim.SetBool("isDead", false);
 			anim.SetBool("isHurt", false);
 			beenHurt = false;
+			justParried = false;
 			soulLeakPs.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
 			FullRestore();
 			SetSilk(-silkMeter);
@@ -1148,10 +1152,14 @@ public class PlayerControls : MonoBehaviour
 	{
 		// Time.timeScale = 0;
 		MusicManager.Instance.PlayParrySFX();
+		justParried = true;
 
 		yield return new WaitForSecondsRealtime(0.25f);
 		Time.timeScale = 1;
 		parryCo = null;
+
+		yield return new WaitForSecondsRealtime(0.25f);
+		justParried = false;
 	}
 
 
