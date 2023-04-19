@@ -161,7 +161,7 @@ public abstract class Enemy : MonoBehaviour
 		{
 			CheckIsGrounded();
 
-			if (!isGrounded)
+			if (!isGrounded && anim != null)
 				anim.SetFloat("jumpVelocity", rb.velocity.y);
 		}
 
@@ -260,7 +260,7 @@ public abstract class Enemy : MonoBehaviour
 	protected void CheckIsGrounded()
 	{
 		isGrounded = Physics2D.OverlapBox(groundCheck.position, groundCheckSize, 0, whatIsGround);
-		anim.SetBool("isGrounded", isGrounded);
+		if (anim != null) anim.SetBool("isGrounded", isGrounded);
 	}
 
 	protected virtual void IdleAction() {  }
@@ -373,7 +373,7 @@ public abstract class Enemy : MonoBehaviour
 
 	public void SpawnIn()
 	{
-		anim.SetTrigger("spawn");
+		if (anim != null) anim.SetTrigger("spawn");
 		spawningIn = true;
 		col.enabled = false;
 	}
@@ -437,29 +437,29 @@ public abstract class Enemy : MonoBehaviour
 
 		if (beenHurt)
 		{
-			anim.SetBool("isMoving", false);
+			if (anim != null) anim.SetBool("isMoving", false);
 		}
 		else if (currentAction == CurrentAction.left)
 		{
 			rb.velocity = new Vector2(-moveSpeed, rb.velocity.y);
-			anim.SetBool("isMoving", true);
+			if (anim != null) anim.SetBool("isMoving", true);
 			model.localScale = new Vector3(-1,1,1);
 
 		}
 		else if (currentAction == CurrentAction.none)
 		{
 			rb.velocity = new Vector2(0, rb.velocity.y);
-			anim.SetBool("isMoving", false);
+			if (anim != null) anim.SetBool("isMoving", false);
 
 		}
 		else if (currentAction == CurrentAction.right)
 		{
 			rb.velocity = new Vector2(moveSpeed, rb.velocity.y);
-			anim.SetBool("isMoving", true);
+			if (anim != null) anim.SetBool("isMoving", true);
 			model.localScale = new Vector3(1,1,1);
 
 		}
-		if (!isFlying)
+		if (!isFlying && anim != null)
 			anim.SetFloat("moveSpeed", rb.velocity.x);
 	}
 
@@ -514,9 +514,13 @@ public abstract class Enemy : MonoBehaviour
 				rb.velocity.y 
 			);
 		}
-		if (!isFlying)
-			anim.SetFloat("moveSpeed", rb.velocity.x);
-		anim.SetBool("isMoving", true);
+		
+		if (anim != null) 
+		{
+			if (!isFlying)
+				anim.SetFloat("moveSpeed", rb.velocity.x);
+			anim.SetBool("isMoving", true);
+		}
 	}
 
 	protected void MoveInPrevDirection()
