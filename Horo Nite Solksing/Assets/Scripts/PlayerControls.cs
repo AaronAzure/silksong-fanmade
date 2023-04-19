@@ -789,7 +789,7 @@ public class PlayerControls : MonoBehaviour
 			anim.SetBool("isDead", false);
 			anim.SetBool("isHurt", false);
 			beenHurt = false;
-			soulLeakPs.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+			if (soulLeakPs != null) soulLeakPs.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
 			FullRestore();
 			SetSilk(-silkMeter);
 			hurtCo = null;
@@ -910,7 +910,7 @@ public class PlayerControls : MonoBehaviour
 			anim.SetBool("isHurt", false);
 			anim.SetBool("isStunLock", false);
 			beenHurt = false;
-			soulLeakPs.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+			if (soulLeakPs != null) soulLeakPs.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
 			FullRestore();
 			SetSilk(-silkMeter);
 			hurtCo = null;
@@ -1008,7 +1008,7 @@ public class PlayerControls : MonoBehaviour
 			anim.SetBool("isHurt", false);
 			beenHurt = false;
 			justParried = false;
-			soulLeakPs.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+			if (soulLeakPs != null) soulLeakPs.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
 			FullRestore();
 			SetSilk(-silkMeter);
 			hurtCo = null;
@@ -1095,7 +1095,7 @@ public class PlayerControls : MonoBehaviour
 				hpMasks[i].SetActive(false);
 		}
 
-		if (!healed && hp != 1)
+		if (!healed && hp != 1 && soulLeakShortPs != null)
 		{
 			soulLeakShortPs.Stop(true, ParticleSystemStopBehavior.StopEmitting);
 			soulLeakShortPs.Play();
@@ -1103,12 +1103,12 @@ public class PlayerControls : MonoBehaviour
 		if (hp == 1)
 		{
 			animeLinesAnim.SetBool("show",true);
-			soulLeakPs.Play();
+			if (soulLeakPs != null) soulLeakPs.Play();
 		}
 		else
 		{
 			animeLinesAnim.SetBool("show",false);
-			soulLeakPs.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+			if (soulLeakPs != null) soulLeakPs.Stop(true, ParticleSystemStopBehavior.StopEmitting);
 		}
 	}
 	
@@ -1190,7 +1190,7 @@ public class PlayerControls : MonoBehaviour
 		anim.SetBool("isDead", false);
 		anim.SetBool("isHurt", false);
 		beenHurt = false;
-		soulLeakPs.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+		if (soulLeakPs != null) soulLeakPs.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
 		FullRestore();
 		SetSilk(-silkMeter);
 		hurtCo = null;

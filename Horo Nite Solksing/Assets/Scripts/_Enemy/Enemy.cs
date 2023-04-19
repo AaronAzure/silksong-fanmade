@@ -165,7 +165,7 @@ public abstract class Enemy : MonoBehaviour
 				anim.SetFloat("jumpVelocity", rb.velocity.y);
 		}
 
-		// if (alert != null) alert.SetActive( attackingPlayer );
+		if (alert != null) alert.SetActive( attackingPlayer );
 		CallChildOnFixedUpdate();
     }
 

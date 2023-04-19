@@ -79,7 +79,7 @@ SpriteRenderer:
   m_Size: {x: 1.28, y: 1.28}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &3709359323836851940
@@ -228,7 +228,7 @@ SpriteRenderer:
   m_SortingLayerID: -1355153031
   m_SortingLayer: 1
   m_SortingOrder: 10
-  m_Sprite: {fileID: -1281458313541595967, guid: 6ab818320db164a8fa6693b1a1bdf067, type: 3}
+  m_Sprite: {fileID: -6162264530793335620, guid: 6ab818320db164a8fa6693b1a1bdf067, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -249,7 +249,7 @@ Animator:
   m_GameObject: {fileID: 3791511545548214714}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: b78cb2620f30748719e77b54707a0e4c, type: 2}
+  m_Controller: {fileID: 9100000, guid: 187699ce94b8a47e6a7127c6f91ea3e5, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -304,19 +304,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 3791511545548214714}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b460a9612c7fc4286bbaab5cccf9e95b, type: 3}
+  m_Script: {fileID: 11500000, guid: c489bbebe31964d2998d75e1b0ef1f40, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hurtBox: {fileID: 2860198670470753282}
-  rb: {fileID: 7165911005282439824}
+  hurtBox: {fileID: 0}
+  rb: {fileID: 0}
   returnPos: {fileID: 0}
   speed: 15
-  anim: {fileID: 7128231569430858829}
-  sr: {fileID: 8971240510285073885}
-  parriedObj: {fileID: 6161353302612495373}
+  anim: {fileID: 0}
+  sr: {fileID: 0}
+  parriedObj: {fileID: 0}
   death: {fileID: 0}
   nSickle: 0
-  parriedVfx: {fileID: 8239582908247128724, guid: 80e13f2912fbe4330b8fb25d6a52ca3a, type: 3}
+  parriedVfx: {fileID: 0}
   offset: 15
 --- !u!1 &6161353302612495373
 GameObject:
@@ -449,6 +449,6 @@ SpriteRenderer:
   m_Size: {x: 1.28, y: 1.28}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0

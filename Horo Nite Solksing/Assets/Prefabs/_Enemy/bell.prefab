@@ -4939,7 +4939,7 @@ SpriteRenderer:
   m_SortingLayerID: -1355153031
   m_SortingLayer: 1
   m_SortingOrder: 5
-  m_Sprite: {fileID: -7302904758865842196, guid: 54f2bdc7b0a0841759064ea76de8e286, type: 3}
+  m_Sprite: {fileID: 1469121230958928979, guid: 54f2bdc7b0a0841759064ea76de8e286, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -9878,6 +9878,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2210021685484824914}
   - component: {fileID: 5601684470283580311}
+  - component: {fileID: 4140289997621110383}
   m_Layer: 0
   m_Name: HITBOX
   m_TagString: Enemy
@@ -9915,3 +9916,24 @@ CircleCollider2D:
   m_Offset: {x: 0, y: -0.025}
   serializedVersion: 2
   m_Radius: 0.15
+--- !u!50 &4140289997621110383
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6019662057255136550}
+  m_BodyType: 1
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_Interpolate: 1
+  m_SleepingMode: 1
+  m_CollisionDetection: 1
+  m_Constraints: 0
