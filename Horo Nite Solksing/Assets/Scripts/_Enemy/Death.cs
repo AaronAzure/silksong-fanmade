@@ -101,7 +101,7 @@ public class Death : Enemy
 		{
 			rb.velocity = new Vector2(model.localScale.x * tripleStrikeForce, rb.velocity.y);
 		}
-		else if (!beenHurt && !inAttackAnim)
+		else if (!receivingKb && !inAttackAnim)
 			rb.velocity = new Vector2(0, rb.velocity.y);
 		if (hitCount > 0 && recoverTimer < recoverTime)
 		{

@@ -145,7 +145,7 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] string deathScene;
 	[SerializeField] Vector2 deathPos;
 	// public static PlayerControls Instance;
-	private static GameObject singleton;
+	private int nKilled=0;
 
 	float t;
     Vector3 startPosition;
@@ -155,14 +155,13 @@ public class PlayerControls : MonoBehaviour
 
 	void Awake()
 	{
-		if (singleton == null)
-			singleton = gameObject;
+		if (Instance == null)
+			Instance = this;
 		else
 			Destroy(gameObject);
 		DontDestroyOnLoad(gameObject);
 
 		self = transform;
-		
 	}
 
 
@@ -1160,6 +1159,12 @@ public class PlayerControls : MonoBehaviour
 
 		yield return new WaitForSecondsRealtime(0.25f);
 		justParried = false;
+	}
+
+
+	public int IncreaseKills()
+	{
+		return ++nKilled;
 	}
 
 

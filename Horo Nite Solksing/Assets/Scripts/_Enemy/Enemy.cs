@@ -47,6 +47,7 @@ public abstract class Enemy : MonoBehaviour
 	[SerializeField] bool isFlying;
 	[SerializeField] protected bool idleActionOnly;
 	protected bool beenHurt;
+	protected bool receivingKb;
 	[SerializeField] Transform groundCheck;
 	[SerializeField] Vector2 groundCheckSize;
 
@@ -165,7 +166,7 @@ public abstract class Enemy : MonoBehaviour
 				anim.SetFloat("jumpVelocity", rb.velocity.y);
 		}
 
-		if (alert != null) alert.SetActive( attackingPlayer );
+		// if (alert != null) alert.SetActive( attackingPlayer );
 		CallChildOnFixedUpdate();
     }
 
@@ -293,6 +294,7 @@ public abstract class Enemy : MonoBehaviour
 		Instantiate(bloodEffectObj, transform.position, Quaternion.Euler(0,0,angleZ+offset*forceDir.x));
 		if (!cannotTakeKb && force != 0)
 		{
+			receivingKb = true;
 			rb.velocity = Vector2.zero;
 			rb.velocity = forceDir * force;
 		}
@@ -325,6 +327,7 @@ public abstract class Enemy : MonoBehaviour
 			sprite.material = defaultMat;
 
 		beenHurt = false;
+		receivingKb = false;
 		if (!cannotTakeKb && force != 0)
 			rb.velocity = new Vector2(0, rb.velocity.y);
 		CallChildOnHurtAfter();
@@ -359,10 +362,10 @@ public abstract class Enemy : MonoBehaviour
 		rb.velocity = Vector2.zero;
 		rb.gravityScale = 1;
 		this.enabled = false;
-		if (alert != null) alert.SetActive( false );
+		// if (alert != null) alert.SetActive( false );
 		if (anim != null)
 			anim.SetBool("isDead", true);
-		sortGroup.sortingOrder = -1;
+		sortGroup.sortingOrder = -PlayerControls.Instance.IncreaseKills();
 
 		yield return new WaitForSeconds(0.2f);
 		foreach (SpriteRenderer sprite in sprites)
@@ -435,7 +438,7 @@ public abstract class Enemy : MonoBehaviour
 			currentAction = CurrentAction.none;
 		}
 
-		if (beenHurt)
+		if (receivingKb)
 		{
 			if (anim != null) anim.SetBool("isMoving", false);
 		}
@@ -482,7 +485,7 @@ public abstract class Enemy : MonoBehaviour
 			currentAction = CurrentAction.none;
 		}
 
-		if (beenHurt)
+		if (receivingKb)
 		{
 
 		}
@@ -506,7 +509,7 @@ public abstract class Enemy : MonoBehaviour
 	{
 		int playerDir = (target.self.position.x - self.position.x > 0) ? 1 : -1;
 		FacePlayer( playerDir );
-		if (!beenHurt)
+		if (!receivingKb)
 		{
 			rb.AddForce(new Vector2(moveSpeed * playerDir * 5, 0), ForceMode2D.Force);
 			rb.velocity = new Vector2(
@@ -525,7 +528,7 @@ public abstract class Enemy : MonoBehaviour
 
 	protected void MoveInPrevDirection()
 	{
-		if (!beenHurt)
+		if (!receivingKb)
 		{
 			rb.AddForce(new Vector2(moveSpeed * moveDir * 5, 0), ForceMode2D.Force);
 			rb.velocity = new Vector2(

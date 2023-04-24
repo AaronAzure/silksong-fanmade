@@ -35,7 +35,7 @@ public class Kevin : Enemy
 			else if (closeDistTimer > 0)
 				closeDistTimer -= Time.fixedDeltaTime;
 		}
-		else if (!beenHurt)
+		else if (!receivingKb)
 		{
 			if (!lungeForward || !CheckCliff())
 				rb.velocity = new Vector2(0, rb.velocity.y);

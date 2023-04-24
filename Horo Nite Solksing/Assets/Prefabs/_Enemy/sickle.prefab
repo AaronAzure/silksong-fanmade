@@ -71,15 +71,15 @@ SpriteRenderer:
   m_SortingLayerID: -1355153031
   m_SortingLayer: 1
   m_SortingOrder: 10
-  m_Sprite: {fileID: -4431538012726754382, guid: ad14945f5e7d244a4b3cae7ff0f50596, type: 3}
+  m_Sprite: {fileID: -7512152389158528300, guid: ad14945f5e7d244a4b3cae7ff0f50596, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1.28, y: 1.28}
+  m_Size: {x: 0.82, y: 0.65}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 0
+  m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &3709359323836851940
@@ -307,16 +307,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c489bbebe31964d2998d75e1b0ef1f40, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hurtBox: {fileID: 0}
-  rb: {fileID: 0}
+  hurtBox: {fileID: 2860198670470753282}
+  rb: {fileID: 7165911005282439824}
   returnPos: {fileID: 0}
   speed: 15
-  anim: {fileID: 0}
-  sr: {fileID: 0}
-  parriedObj: {fileID: 0}
+  anim: {fileID: 7128231569430858829}
+  sr: {fileID: 8971240510285073885}
+  parriedObj: {fileID: 6161353302612495373}
   death: {fileID: 0}
   nSickle: 0
-  parriedVfx: {fileID: 0}
+  parriedVfx: {fileID: 8239582908247128724, guid: c20a70a8004b444e29f7efb9291192dd, type: 3}
   offset: 15
 --- !u!1 &6161353302612495373
 GameObject:
@@ -361,7 +361,7 @@ Animator:
   m_GameObject: {fileID: 6161353302612495373}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 4a6af6b3840b94a2980018fa87872b07, type: 2}
+  m_Controller: {fileID: 9100000, guid: 49f5cf1be794a486ca4a14ce97ba0da2, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -441,14 +441,14 @@ SpriteRenderer:
   m_SortingLayerID: -1355153031
   m_SortingLayer: 1
   m_SortingOrder: 10
-  m_Sprite: {fileID: -4431538012726754382, guid: ad14945f5e7d244a4b3cae7ff0f50596, type: 3}
+  m_Sprite: {fileID: -7512152389158528300, guid: ad14945f5e7d244a4b3cae7ff0f50596, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1.28, y: 1.28}
+  m_Size: {x: 0.82, y: 0.65}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 0
+  m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0

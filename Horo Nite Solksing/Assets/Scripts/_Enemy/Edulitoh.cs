@@ -53,7 +53,7 @@ public class Edulitoh : Enemy
 			else if (closeDistTimer > 0)
 				closeDistTimer -= Time.fixedDeltaTime;
 		}
-		else if (!beenHurt)
+		else if (!receivingKb)
 		{
 			if (!lungeForward)
 				rb.velocity = new Vector2(0, 0);
