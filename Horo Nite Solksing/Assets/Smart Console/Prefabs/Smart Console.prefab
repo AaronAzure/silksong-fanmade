@@ -361,7 +361,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.1764706, g: 0.1764706, b: 0.1764706, a: 0.6}
+  m_Color: {r: 0.1764706, g: 0.1764706, b: 0.1764706, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1534,7 +1534,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Console: {fileID: 4206203007619743086}
   m_ShowApplicationLogs: 0
-  m_OpenAtStart: 0
   m_OpenUnlockCursor: 0
   m_CloseLockCursor: 0
 --- !u!114 &4709077777290933465
@@ -1550,11 +1549,86 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   InputField: {fileID: 4206203007976034151}
-  m_ToggleKeyCode: 27
-  m_AutocompleteKeyCode: 9
-  m_CopyNextLogMessageKeyCode: 273
-  m_CopyPreviousLogMessageKeyCode: 274
-  m_SelectParameterKeyCode: 304
+  m_ToggleAction:
+    m_Name: Toggle
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: edc067b3-07d6-4271-9e46-4290d00a1a8b
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 1b12f6cd-304a-416f-abbc-cd54fa977b75
+      m_Path: <Keyboard>/escape
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Toggle
+      m_Flags: 0
+  m_AutocompleteAction:
+    m_Name: Autocomplete
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: e1d5932e-bf76-49a0-ba48-6ed2327da454
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 3d199b2d-cf11-431e-a64d-84b2c4846c42
+      m_Path: <Keyboard>/tab
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Autocomplete
+      m_Flags: 0
+  m_CopyNextLogMessageAction:
+    m_Name: Copy Next Log Message
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: e1a15156-2584-4cd8-960f-9c45f1f730d8
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 606f0b67-f7d2-49bc-bc14-00e71d9dd5d0
+      m_Path: <Keyboard>/upArrow
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Copy Next Log Message
+      m_Flags: 0
+  m_CopyPreviousLogMessageAction:
+    m_Name: Copy Previous Log Message
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 64e28926-78b7-4102-a52a-d9baeefcccca
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 2f0dd9d1-1eea-4f00-bde9-9533258d1637
+      m_Path: <Keyboard>/downArrow
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Copy Previous Log Message
+      m_Flags: 0
+  m_SelectParameterAction:
+    m_Name: Select Parameter
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: e24520d6-8e4d-4374-9276-37b10a1f1a9e
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 29e8b362-8989-48d3-8d68-9de582a47c2a
+      m_Path: <Keyboard>/shift
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Select Parameter
+      m_Flags: 0
 --- !u!1 &4206203008474737559
 GameObject:
   m_ObjectHideFlags: 0
@@ -1923,7 +1997,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.1764706, g: 0.1764706, b: 0.1764706, a: 0.8}
+  m_Color: {r: 0.1764706, g: 0.1764706, b: 0.1764706, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -2021,7 +2095,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.1764706, g: 0.1764706, b: 0.1764706, a: 0.6}
+  m_Color: {r: 0.1764706, g: 0.1764706, b: 0.1764706, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

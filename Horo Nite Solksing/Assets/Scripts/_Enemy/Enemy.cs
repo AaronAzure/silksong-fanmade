@@ -268,7 +268,7 @@ public abstract class Enemy : MonoBehaviour
 
 	protected virtual void AttackingAction() { }
 
-	public void TakeDamage(int dmg, Transform opponent, Vector2 forceDir, float force)
+	public void TakeDamage(int dmg, Transform opponent, Vector2 forceDir, float force, bool canShake=true)
 	{
 		if (inParryState && FacingPlayer())
 		{
@@ -278,11 +278,11 @@ public abstract class Enemy : MonoBehaviour
 		{
 			if (hp > 0 && hurtCo != null)
 				StopCoroutine(hurtCo);
-			hurtCo = StartCoroutine( TakeDamageCo(dmg, opponent, forceDir, force) );
+			hurtCo = StartCoroutine( TakeDamageCo(dmg, opponent, forceDir, force, canShake) );
 		}
 	}
 
-	IEnumerator TakeDamageCo(int dmg, Transform opponent, Vector2 forceDir, float force)
+	IEnumerator TakeDamageCo(int dmg, Transform opponent, Vector2 forceDir, float force, bool canShake)
 	{
 		hp -= dmg;
 		beenHurt = true;
@@ -314,7 +314,7 @@ public abstract class Enemy : MonoBehaviour
 		if (hp <= 0)
 		{
 			rb.AddForce(Vector2.up * 5, ForceMode2D.Impulse);
-			Died();
+			Died(canShake);
 			yield break;
 		}
 
@@ -343,9 +343,9 @@ public abstract class Enemy : MonoBehaviour
 			sprite.material = defaultMat;
 	}
 
-	void Died()
+	void Died(bool shake)
 	{
-		CinemachineShake.Instance.ShakeCam(2.5f, 0.5f);
+		if (shake) CinemachineShake.Instance.ShakeCam(2.5f, 0.5f);
 		StopAllCoroutines();
 		StartCoroutine( DiedCo() );
 		CallChildOnDeath();

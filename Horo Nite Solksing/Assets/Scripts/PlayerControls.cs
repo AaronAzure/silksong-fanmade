@@ -42,6 +42,7 @@ public class PlayerControls : MonoBehaviour
 	private float dashDir;
 	private float moveDir;
 	private float atkDir;
+	private bool isTool1=true;
 	// private float moveY;
 	private bool jumped;
 	private bool jumpDashed;
@@ -54,6 +55,7 @@ public class PlayerControls : MonoBehaviour
 	private bool canLedgeGrab;
 	private bool ledgeGrab;
 	private bool noControl;
+	private bool isResting;
 	private bool inStunLock;
 	[SerializeField] bool justParried;
 	[SerializeField] bool isInvincible;
@@ -134,6 +136,23 @@ public class PlayerControls : MonoBehaviour
 	private bool isDead=false;
 
 
+	[Space] [Header("In-Game Related")]
+	[SerializeField] Bench bench;
+
+
+	[Space] [Header("Tools")]
+	[SerializeField] Transform toolSummonPos;
+	[SerializeField] Tool pinTool;
+	[SerializeField] Tool tool1;
+	[SerializeField] Tool tool2;
+	private int nToolUses1;
+	private int nToolUses2;
+	private float nToolSlowUses1;
+	private float nToolSlowUses2;
+	[SerializeField] Image toolUses1;
+	[SerializeField] Image toolUses2;
+
+
 	[Space] [Header("Debug")]
 	[SerializeField] [Range(1,10)] int silkMultiplier=1;
 	[SerializeField] bool invincible;
@@ -148,6 +167,8 @@ public class PlayerControls : MonoBehaviour
 	private int nKilled=0;
 
 	float t;
+	float t1;
+	float t2;
     Vector3 startPosition;
 	private Transform stunLockPos;
     float stunLockTime=0.5f;
@@ -185,7 +206,7 @@ public class PlayerControls : MonoBehaviour
 	bool CanControl()
 	{
 		return (!isLedgeGrabbing && !beenHurt && !noControl && !isBinding &&
-			!inAnimation && !isDead && !inStunLock);
+			!inAnimation && !isDead && !inStunLock && !isResting);
 	}
 
 	private void OnDrawGizmosSelected() 
@@ -216,6 +237,26 @@ public class PlayerControls : MonoBehaviour
 			else if (player.GetButtonDown("A") && (infiniteSilk || silkMeter >= bindCost) && bindCo == null)
 				bindCo = StartCoroutine( BindCo() );
 
+			// tools
+			else if (player.GetButtonDown("R") && atkCo == null)
+			{
+				int tool = (player.GetAxis("Move Vertical") < -0.7f ? 1 : 0);
+				if (tool == 0 && nToolUses1 > 0)
+					atkCo = StartCoroutine( UseTool(0) );
+				else if (tool == 1 && nToolUses2 > 0)
+					atkCo = StartCoroutine( UseTool(1) );
+			}
+
+			else if (bench != null && player.GetAxis("Move Vertical") > 0.7f)
+			{
+				isResting = true;
+				rb.gravityScale = 0;
+				rb.velocity = Vector2.zero;
+				anim.SetBool("isResting", true);
+				startPosition = transform.position;
+				FullRestore();
+			}
+
 			// jump
 			JumpMechanic();
 
@@ -227,6 +268,14 @@ public class PlayerControls : MonoBehaviour
 			// Ledge Grab
 			if (canLedgeGrab && !isWallJumping && !isLedgeGrabbing && !ledgeGrab)
 				LedgeGrab();
+		}
+		else if (isResting && player.GetAxis("Move Vertical") < -0.7f)
+		{
+			t = 0;
+			isResting = false;
+			rb.gravityScale = 1;
+			rb.velocity = Vector2.zero;
+			anim.SetBool("isResting", false);
 		}
 	}
 
@@ -268,6 +317,38 @@ public class PlayerControls : MonoBehaviour
 		{
 			t += Time.fixedDeltaTime/stunLockTime;
 			transform.position = Vector3.Lerp(startPosition, stunLockPos.position, t);
+		}
+		else if (!isDead && isResting && t < 1)
+		{
+			anim.SetFloat("restTime", t);
+			t += Time.fixedDeltaTime/stunLockTime;
+			transform.position = Vector3.Lerp(startPosition, bench.restPos.position, t);
+		}
+		if (toolUses1 != null)
+		{
+			if (nToolSlowUses1 != nToolUses1)
+			{
+				nToolSlowUses1 = Mathf.Lerp(nToolSlowUses1, nToolUses1, t1);
+				t1 += 0.5f * Time.fixedDeltaTime;
+				toolUses1.fillAmount = nToolSlowUses1/tool1.totaluses;
+			}
+			else
+			{
+				t1 = 0;
+			}
+		}
+		if (toolUses2 != null)
+		{
+			if (nToolSlowUses2 != nToolUses2)
+			{
+				nToolSlowUses2 = Mathf.Lerp(nToolSlowUses2, nToolUses2, t2);
+				t2 += 0.5f * Time.fixedDeltaTime;
+				toolUses2.fillAmount = nToolSlowUses2/tool2.totaluses;
+			}
+			else
+			{
+				t2 = 0;
+			}
 		}
 	}
 
@@ -485,6 +566,8 @@ public class PlayerControls : MonoBehaviour
 			anim.SetFloat("atkDir", atkDir);
 			anim.SetTrigger("attack");
 			anim.SetBool("isAttacking", true);
+
+			// shaw attack
 			if (atkDir == 2)
 			{
 				shawSound.Play();
@@ -494,6 +577,7 @@ public class PlayerControls : MonoBehaviour
 				yield return new WaitForSeconds(0.1f);
 				rb.gravityScale = 1;
 			}
+			// normal slash
 			else
 			{
 				MusicManager.Instance.PlayHornetAtkSfx(atk1);
@@ -588,6 +672,40 @@ public class PlayerControls : MonoBehaviour
 		}
 	}
 
+	IEnumerator UseTool(int tool=0)
+	{
+		if (atkCo != null) yield break;
+		isTool1 = (tool == 0);
+		if (isTool1) nToolUses1--;
+		else nToolUses2--;
+
+		CancelDash();
+		atkDir = 4;
+
+		anim.SetFloat("atkDir", atkDir);
+		anim.SetTrigger("attack");
+		anim.SetBool("isAttacking", true);
+		MusicManager.Instance.PlayHornetAtkSfx(atk1);
+
+		yield return new WaitForSeconds(0.25f);
+		anim.SetBool("isAttacking", false);
+
+		// atk cooldown
+		yield return new WaitForSeconds(atkCooldownDuration);
+		atkCo = null;
+	}
+
+	public void USE_TOOL()
+	{
+		var tool = Instantiate( 
+			isTool1 || tool2 == null ? tool1 : tool2, 
+			toolSummonPos.position, 
+			Quaternion.identity
+		);
+		tool.toRight = model.localScale.x > 0 ? true : false;
+	}
+
+
 	void Jump()
 	{
 		// jumped while dashing
@@ -667,6 +785,17 @@ public class PlayerControls : MonoBehaviour
 	{
 		hp = maxHp;
 		SetHp(true);
+
+		if (toolUses1 != null)
+		{
+			nToolUses1 = tool1.totaluses;
+			// toolUses1.fillAmount = 1;
+		}
+		if (toolUses2 != null)
+		{
+			nToolUses2 = tool2.totaluses;
+			// toolUses2.fillAmount = 1;
+		}
 	}
 
 	public void ShawRetreat()
@@ -705,7 +834,22 @@ public class PlayerControls : MonoBehaviour
 			stunLockCo = StartCoroutine( StunLockCo(other.transform) );
 		}	
 		if (!isDead && other.CompareTag("Death") && hurtCo == null)
+		{
 			hurtCo = StartCoroutine( DiedCo() );
+		}
+		if (other.CompareTag("Bench"))
+		{
+			bench = other.GetComponent<Bench>();
+			t = 0;
+		}
+	}
+
+	private void OnTriggerExit2D(Collider2D other) 
+	{
+		if (other.CompareTag("Bench"))
+		{
+			bench = null;
+		}
 	}
 
 	IEnumerator TakeDamageCo(Transform opponent)
@@ -716,6 +860,7 @@ public class PlayerControls : MonoBehaviour
 			yield break;
 		}
 		MusicManager.Instance.PlayHurtSFX();
+		MusicManager.Instance.SoftenBgMusic();
 
 		anim.SetBool("isHurt", true);
 		hp = Mathf.Max(0, hp - 1);
@@ -747,6 +892,15 @@ public class PlayerControls : MonoBehaviour
 			inStunLock = false;
 			stunLockCo = null;
 			rb.gravityScale = 1;
+		}
+		// stop stun lock
+		if (isResting) 
+		{
+			t = 0;
+			isResting = false;
+			rb.gravityScale = 1;
+			rb.velocity = Vector2.zero;
+			anim.SetBool("isResting", false);
 		}
 		// stop parry effect
 		if (parryCo != null)

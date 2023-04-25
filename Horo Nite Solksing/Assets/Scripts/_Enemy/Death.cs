@@ -150,6 +150,9 @@ public class Death : Enemy
 			rb.AddForce(Vector2.up * 4, ForceMode2D.Impulse);
 			anim.SetBool("jumped", false);
 			anim.SetBool("sickled", false);
+			ultAtkObj.SetActive(false);
+			ultAtkDmgObj.SetActive(false);
+			model.gameObject.SetActive(true);
 			StartCoroutine( StaggerCo() );
 		}
 	}

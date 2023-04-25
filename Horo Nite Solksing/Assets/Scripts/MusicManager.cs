@@ -22,6 +22,8 @@ public class MusicManager : MonoBehaviour
 
 	private float timer;
 	private float incre;
+	private float origVolume;
+	private Coroutine softenCo;
 	[SerializeField] float duration=0.5f;
 
 	void Awake()
@@ -67,6 +69,16 @@ public class MusicManager : MonoBehaviour
 		if (hurtSfx != null)
 			hurtSfx.Play();
 	}
+    public void SoftenBgMusic()
+	{
+		if (softenCo != null)
+		{
+			StopCoroutine(softenCo);
+			if (currentMusic != null)
+				currentMusic.volume = origVolume;
+		}
+		softenCo = StartCoroutine(SoftenMusicCo());
+	}
     public void PlayHornetAtkSfx(bool atk1)
 	{
 		if (atk1 && hornetAtkSfx != null)
@@ -90,5 +102,21 @@ public class MusicManager : MonoBehaviour
 			yield return new WaitForSeconds(0.05f);
 		}
 		currentMusic = a;
+	}
+
+	IEnumerator SoftenMusicCo()
+	{
+		if (currentMusic == null) yield break;
+
+		origVolume = currentMusic.volume;
+		currentMusic.volume = origVolume / 2f;
+
+		yield return new WaitForSeconds(1);
+		while (currentMusic != null && currentMusic.volume < origVolume)
+		{
+			currentMusic.volume += 0.05f;
+			yield return new WaitForSeconds(0.05f);
+		}
+		softenCo = null;
 	}
 }
