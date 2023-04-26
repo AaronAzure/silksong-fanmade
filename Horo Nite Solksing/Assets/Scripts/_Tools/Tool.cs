@@ -6,35 +6,44 @@ public abstract class Tool : MonoBehaviour
 {
 	// [SerializeField] protected int uses=4;
 	[SerializeField] public int totaluses=4;
+	[SerializeField] public Sprite icon;
 
 	[Space] [SerializeField] protected int dmg;
 	public bool toRight=true;
 	[SerializeField] protected Vector2 dir;
+	[HideInInspector] public float velocityMultiplier=1;
 	[SerializeField] protected float force;
 	[SerializeField] protected Vector2 kbDir;
 	[SerializeField] protected Rigidbody2D rb;
-	[SerializeField] GameObject strikePs;
+	[SerializeField] public bool isMultiple;
+	[SerializeField] public int nCopies=4;
+	[Space] [SerializeField] GameObject strikePs;
 	[SerializeField] float offset=15;
 
 	[Space] [SerializeField] bool destroyOnWallHit;
 	[Space] [SerializeField] bool destroyOnEnemyHit;
+	[HideInInspector] public bool justThrown;
+	[SerializeField] bool noStart;
 
 	private void Start() 
 	{
-		if (!toRight)
+		if (!noStart)
 		{
-			rb.velocity = new Vector2(-dir.x, dir.y);
-			kbDir = new Vector2(-kbDir.x, kbDir.y);
-			gameObject.transform.localScale = new Vector3(
-				-transform.localScale.x,
-				transform.localScale.y
-			);
+			if (!toRight)
+			{
+				rb.velocity = new Vector2(-dir.x, dir.y) * velocityMultiplier;
+				kbDir = new Vector2(-kbDir.x, kbDir.y);
+				gameObject.transform.localScale = new Vector3(
+					-transform.localScale.x,
+					transform.localScale.y
+				);
+			}
+			else
+			{
+				rb.velocity = dir * velocityMultiplier;
+			}
+			CallChildOnStart();
 		}
-		else
-		{
-			rb.velocity = dir;
-		}
-		CallChildOnStart();
 	}
 
 	private void OnTriggerEnter2D(Collider2D other) 

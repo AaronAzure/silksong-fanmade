@@ -4,15 +4,12 @@ using UnityEngine;
 
 public class PauseMenu : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    public void SET_TIME_SCALE(int timeScale)
+	{
+		Time.timeScale = timeScale;
+		if (timeScale == 1 && PlayerControls.Instance != null)
+		{
+			PlayerControls.Instance.Unpause();
+		}
+	}
 }

@@ -365,7 +365,7 @@ public abstract class Enemy : MonoBehaviour
 		// if (alert != null) alert.SetActive( false );
 		if (anim != null)
 			anim.SetBool("isDead", true);
-		sortGroup.sortingOrder = -PlayerControls.Instance.IncreaseKills();
+		sortGroup.sortingOrder = -1000 + PlayerControls.Instance.IncreaseKills();
 
 		yield return new WaitForSeconds(0.2f);
 		foreach (SpriteRenderer sprite in sprites)

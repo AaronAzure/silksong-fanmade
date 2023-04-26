@@ -14,7 +14,6 @@ public class Pimpillo : Tool
 	}
 	protected override void CallChildOnHit()
 	{
-		CinemachineShake.Instance.ShakeCam(10, 0.75f, 2);
 		if (trailPs != null)
 		{
 			trailPs.transform.parent = null;

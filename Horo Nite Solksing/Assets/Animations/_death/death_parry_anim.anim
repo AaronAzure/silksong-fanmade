@@ -1025,8 +1025,8 @@ AnimationClip:
         inWeight: 0
         outWeight: 0
       - serializedVersion: 3
-        time: 0.25
-        value: 11
+        time: 0.15
+        value: 21
         inSlope: Infinity
         outSlope: Infinity
         tangentMode: 103
@@ -1197,6 +1197,34 @@ AnimationClip:
     path: Model/death/Elbow L
     classID: 212
     script: {fileID: 0}
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 14
+        inSlope: Infinity
+        outSlope: Infinity
+        tangentMode: 103
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 0.15
+        value: 24
+        inSlope: Infinity
+        outSlope: Infinity
+        tangentMode: 103
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_SortingOrder
+    path: Model/death/sickle L
+    classID: 212
+    script: {fileID: 0}
   m_PPtrCurves: []
   m_SampleRate: 60
   m_WrapMode: 0
@@ -1333,6 +1361,13 @@ AnimationClip:
       isPPtrCurve: 0
     - serializedVersion: 2
       path: 3944566014
+      attribute: 3762991556
+      script: {fileID: 0}
+      typeID: 212
+      customType: 26
+      isPPtrCurve: 0
+    - serializedVersion: 2
+      path: 3770784583
       attribute: 3762991556
       script: {fileID: 0}
       typeID: 212
@@ -2315,8 +2350,8 @@ AnimationClip:
         inWeight: 0
         outWeight: 0
       - serializedVersion: 3
-        time: 0.25
-        value: 11
+        time: 0.15
+        value: 21
         inSlope: Infinity
         outSlope: Infinity
         tangentMode: 103
@@ -4877,6 +4912,34 @@ AnimationClip:
     attribute: localEulerAnglesRaw.z
     path: Model/death/bone_1/bone_2/bone_8/bone_9/bone_10
     classID: 4
+    script: {fileID: 0}
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 14
+        inSlope: Infinity
+        outSlope: Infinity
+        tangentMode: 103
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 0.15
+        value: 24
+        inSlope: Infinity
+        outSlope: Infinity
+        tangentMode: 103
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_SortingOrder
+    path: Model/death/sickle L
+    classID: 212
     script: {fileID: 0}
   m_EulerEditorCurves:
   - curve:

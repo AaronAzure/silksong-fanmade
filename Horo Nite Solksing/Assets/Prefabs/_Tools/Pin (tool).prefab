@@ -98,16 +98,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   totaluses: 12
+  icon: {fileID: 21300000, guid: 1f01837e54231473b881dca598076882, type: 3}
   dmg: 10
   toRight: 1
   dir: {x: 20, y: 0}
+  velocityMultiplier: 1
   force: 0
   kbDir: {x: 0, y: 0}
   rb: {fileID: -723624383632158439}
+  isMultiple: 0
+  nCopies: 4
   strikePs: {fileID: 8239582908247128724, guid: c20a70a8004b444e29f7efb9291192dd, type: 3}
   offset: 15
   destroyOnWallHit: 1
   destroyOnEnemyHit: 0
+  justThrown: 0
+  noStart: 0
 --- !u!50 &-723624383632158439
 Rigidbody2D:
   serializedVersion: 4

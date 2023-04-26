@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Rewired;
@@ -50,6 +51,7 @@ public class PlayerControls : MonoBehaviour
 	private bool isJumping;
 	private bool isWallJumping;
 	private bool isGrounded;
+	private bool isPaused;
 	private bool isWallSliding;
 	private float jumpTimer;
 	private bool canLedgeGrab;
@@ -142,7 +144,7 @@ public class PlayerControls : MonoBehaviour
 
 	[Space] [Header("Tools")]
 	[SerializeField] Transform toolSummonPos;
-	[SerializeField] Tool pinTool;
+	[SerializeField] Tool[] tools;
 	[SerializeField] Tool tool1;
 	[SerializeField] Tool tool2;
 	private int nToolUses1;
@@ -151,6 +153,15 @@ public class PlayerControls : MonoBehaviour
 	private float nToolSlowUses2;
 	[SerializeField] Image toolUses1;
 	[SerializeField] Image toolUses2;
+
+
+	[Space] [Header("Ui")]
+	[SerializeField] GameObject pauseMenu;
+	[SerializeField] Animator pauseAnim;
+	[SerializeField] Image[] toolIcons;
+	[SerializeField] Image[] toolsEquipped;
+	[SerializeField] Sprite emptySpr;
+	int nEquipped;
 
 
 	[Space] [Header("Debug")]
@@ -163,6 +174,7 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] Vector2 savedPos;
 	[SerializeField] string deathScene;
 	[SerializeField] Vector2 deathPos;
+	[SerializeField] Rewired.Integration.UnityUI.RewiredStandaloneInputModule rinput;
 	// public static PlayerControls Instance;
 	private int nKilled=0;
 
@@ -183,6 +195,7 @@ public class PlayerControls : MonoBehaviour
 		DontDestroyOnLoad(gameObject);
 
 		self = transform;
+		tools = new Tool[2];
 	}
 
 
@@ -201,12 +214,19 @@ public class PlayerControls : MonoBehaviour
 		DontDestroyOnLoad(cacoonObj);
 		FullRestore();
 		Screen.SetResolution((int) (16f/9f * Screen.height), Screen.height, true);
+		if (pauseMenu != null) pauseMenu.SetActive(false);
+		// if (rinput != null) rinput.RewiredInputManager
 	}
 
 	bool CanControl()
 	{
 		return (!isLedgeGrabbing && !beenHurt && !noControl && !isBinding &&
-			!inAnimation && !isDead && !inStunLock && !isResting);
+			!inAnimation && !isDead && !inStunLock && !isResting && !isPaused);
+	}
+
+	public void Unpause()
+	{
+		isPaused = false;
 	}
 
 	private void OnDrawGizmosSelected() 
@@ -226,7 +246,17 @@ public class PlayerControls : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
-		if (CanControl() && !inShawAtk )
+		if (!isPaused &&pauseAnim != null && player.GetButtonDown("Start"))
+		{
+			isPaused = true;
+			pauseMenu.SetActive(true);
+			pauseAnim.SetTrigger("open");
+		}
+		else if (isPaused && player.GetButtonDown("B"))
+		{
+			pauseAnim.SetTrigger("close");
+		}
+		else if (CanControl() && !inShawAtk)
 		{
 			if (player.GetButtonDown("Y") && atkCo == null)
 				Attack();
@@ -247,6 +277,7 @@ public class PlayerControls : MonoBehaviour
 					atkCo = StartCoroutine( UseTool(1) );
 			}
 
+			// rest on bench
 			else if (bench != null && player.GetAxis("Move Vertical") > 0.7f)
 			{
 				isResting = true;
@@ -703,8 +734,66 @@ public class PlayerControls : MonoBehaviour
 			Quaternion.identity
 		);
 		tool.toRight = model.localScale.x > 0 ? true : false;
+		if (tool.isMultiple)
+		{
+			for (int i=1; i<tool.nCopies ; i++)
+			{
+				var toolCopy = Instantiate( 
+					isTool1 || tool2 == null ? tool1 : tool2, 
+					toolSummonPos.position, 
+					Quaternion.identity
+				);
+				toolCopy.velocityMultiplier = Random.Range(0.5f,1.5f);
+				toolCopy.toRight = model.localScale.x > 0 ? true : false;
+			}
+		}
 	}
 
+	public void EquipTool(Tool tool)
+	{
+		// bool unequip = false;
+		Assert.AreEqual(2, toolsEquipped.Length, $"> toolsEquipped.Length = {toolsEquipped.Length}");
+		Assert.AreEqual(2, tools.Length, $"> tools.Length = {tools.Length}");
+		if (toolsEquipped != null)
+		{
+			for (int i=0 ; i<tools.Length ; i++)
+			{
+				if (tools[i] == tool)
+				{
+					toolsEquipped[i].sprite = emptySpr;
+					toolIcons[i].sprite = emptySpr;
+					tools[i] = null;
+					if (i == 0)
+						tool1 = null;
+					else if (i == 1)
+						tool2 = null;
+					nEquipped--;
+					FullRestore();
+					return;
+				}
+			}
+
+			if (nEquipped >= toolsEquipped.Length)
+				return;
+
+			for (int i=0 ; i<tools.Length ; i++)
+			{
+				if (tools[i] == null)
+				{
+					toolsEquipped[i].sprite = tool.icon;
+					toolIcons[i].sprite = tool.icon;
+					tools[i] = tool;
+					if (i == 0)
+						tool1 = tool;
+					else if (i == 1)
+						tool2 = tool;
+					nEquipped++;
+					FullRestore();
+					return;
+				}
+			}
+		}
+	}
 
 	void Jump()
 	{
@@ -786,15 +875,13 @@ public class PlayerControls : MonoBehaviour
 		hp = maxHp;
 		SetHp(true);
 
-		if (toolUses1 != null)
+		if (tool1 != null && toolUses1 != null)
 		{
 			nToolUses1 = tool1.totaluses;
-			// toolUses1.fillAmount = 1;
 		}
-		if (toolUses2 != null)
+		if (tool2 != null && toolUses2 != null)
 		{
 			nToolUses2 = tool2.totaluses;
-			// toolUses2.fillAmount = 1;
 		}
 	}
 
@@ -912,6 +999,7 @@ public class PlayerControls : MonoBehaviour
 			CinemachineShake.Instance.ShakeCam(3f, 5f, 1, true);
 			MusicManager.Instance.PlayMusic(null);
 			isDead = true;
+			nKilled = 0;
 			rb.velocity = Vector2.zero;
 			rb.gravityScale = 0;
 			anim.SetBool("isDead", true);
@@ -1031,6 +1119,7 @@ public class PlayerControls : MonoBehaviour
 			CinemachineShake.Instance.ShakeCam(3f, 5f, 1, true);
 			MusicManager.Instance.PlayMusic(null);
 			isDead = true;
+			nKilled = 0;
 			rb.velocity = Vector2.zero;
 			rb.gravityScale = 0;
 			anim.SetBool("isDead", true);
@@ -1131,6 +1220,7 @@ public class PlayerControls : MonoBehaviour
 			CinemachineShake.Instance.ShakeCam(3f, 5f, 1, true);
 			MusicManager.Instance.PlayMusic(null);
 			isDead = true;
+			nKilled = 0;
 			rb.velocity = Vector2.zero;
 			rb.gravityScale = 0;
 			anim.SetBool("isDead", true);
