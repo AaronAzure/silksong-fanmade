@@ -268,9 +268,10 @@ public abstract class Enemy : MonoBehaviour
 
 	protected virtual void AttackingAction() { }
 
-	public void TakeDamage(int dmg, Transform opponent, Vector2 forceDir, float force, bool canShake=true)
+	public void TakeDamage(int dmg, Transform opponent, Vector2 forceDir, 
+		float force, bool canShake=true, bool canParry=true)
 	{
-		if (inParryState && FacingPlayer())
+		if (inParryState && canParry && FacingPlayer())
 		{
 			CallChildOnParry();
 		}

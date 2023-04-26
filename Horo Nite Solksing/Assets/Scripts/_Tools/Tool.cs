@@ -17,8 +17,8 @@ public abstract class Tool : MonoBehaviour
 	[SerializeField] protected Rigidbody2D rb;
 	[SerializeField] public bool isMultiple;
 	[SerializeField] public int nCopies=4;
-	[Space] [SerializeField] GameObject strikePs;
-	[SerializeField] float offset=15;
+	[Space] [SerializeField] protected GameObject strikePs;
+	[SerializeField] protected float offset=15;
 
 	[Space] [SerializeField] bool destroyOnWallHit;
 	[Space] [SerializeField] bool destroyOnEnemyHit;

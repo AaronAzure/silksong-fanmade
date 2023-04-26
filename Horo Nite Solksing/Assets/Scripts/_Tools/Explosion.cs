@@ -41,6 +41,7 @@ public class Explosion : Tool
 				transform, 
 				kbDir, 
 				force,
+				false,
 				false
 			);
 		}

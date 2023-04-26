@@ -84,10 +84,12 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] float dashCooldownCounter;
 	[SerializeField] float shawForce=7.5f;
 	[SerializeField] float atkCooldownDuration=0.4f;
+	[SerializeField] float toolCooldownDuration=0.2f;
 
 	[Space] [SerializeField] GameObject slashObj;
 	private bool atk1;
 	private Coroutine atkCo;
+	private Coroutine toolCo;
 	private Coroutine hurtCo;
 	private Coroutine stunLockCo;
 	private Coroutine bindCo;
@@ -268,13 +270,13 @@ public class PlayerControls : MonoBehaviour
 				bindCo = StartCoroutine( BindCo() );
 
 			// tools
-			else if (player.GetButtonDown("R") && atkCo == null)
+			else if (player.GetButtonDown("R") && toolCo == null)
 			{
 				int tool = (player.GetAxis("Move Vertical") < -0.7f ? 1 : 0);
 				if (tool == 0 && nToolUses1 > 0)
-					atkCo = StartCoroutine( UseTool(0) );
+					toolCo = StartCoroutine( UseTool(0) );
 				else if (tool == 1 && nToolUses2 > 0)
-					atkCo = StartCoroutine( UseTool(1) );
+					toolCo = StartCoroutine( UseTool(1) );
 			}
 
 			// rest on bench
@@ -490,7 +492,8 @@ public class PlayerControls : MonoBehaviour
 
 	void CalcMove()
 	{
-		moveX = player.GetAxis("Move Horizontal");
+		float temp = player.GetAxis("Move Horizontal");
+		moveX = (temp < 0.2f && temp > -0.2f) ? 0 : temp;
 	}
 
 	void Move()
@@ -671,8 +674,6 @@ public class PlayerControls : MonoBehaviour
 			usingSkill = false;
 			rb.gravityScale = 1;
 
-			// atk cooldown
-			// yield return new WaitForSeconds(atkCooldownDuration/2);
 			atkCo = null;
 		}
 	}
@@ -705,7 +706,7 @@ public class PlayerControls : MonoBehaviour
 
 	IEnumerator UseTool(int tool=0)
 	{
-		if (atkCo != null) yield break;
+		if (toolCo != null) yield break;
 		isTool1 = (tool == 0);
 		if (isTool1) nToolUses1--;
 		else nToolUses2--;
@@ -722,8 +723,8 @@ public class PlayerControls : MonoBehaviour
 		anim.SetBool("isAttacking", false);
 
 		// atk cooldown
-		yield return new WaitForSeconds(atkCooldownDuration);
-		atkCo = null;
+		yield return new WaitForSeconds(toolCooldownDuration);
+		toolCo = null;
 	}
 
 	public void USE_TOOL()
@@ -952,7 +953,7 @@ public class PlayerControls : MonoBehaviour
 		anim.SetBool("isHurt", true);
 		hp = Mathf.Max(0, hp - 1);
 		ResetAllBools();
-		atkCo = null;
+		atkCo = toolCo = null;
 		beenHurt = true;
 		SetHp();
 		rb.velocity = Vector2.zero;
@@ -1079,7 +1080,7 @@ public class PlayerControls : MonoBehaviour
 		inStunLock = true;
 		hp = Mathf.Max(0, hp - 1);
 		ResetAllBools();
-		atkCo = null;
+		atkCo = toolCo = null;
 		// beenHurt = true;
 		SetHp();
 		anim.SetBool("isSkillAttacking", false);
@@ -1183,7 +1184,7 @@ public class PlayerControls : MonoBehaviour
 		anim.SetBool("isHurt", true);
 		hp = 0;
 		ResetAllBools();
-		atkCo = null;
+		atkCo = toolCo = null;
 		beenHurt = true;
 		SetHp();
 		rb.velocity = Vector2.zero;

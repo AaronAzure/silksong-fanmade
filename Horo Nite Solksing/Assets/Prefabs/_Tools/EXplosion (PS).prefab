@@ -83,16 +83,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   totaluses: 6
+  icon: {fileID: 0}
   dmg: 35
   toRight: 1
   dir: {x: 0, y: 0}
+  velocityMultiplier: 1
   force: 6
   kbDir: {x: 0.5, y: 1}
   rb: {fileID: 7366231504683964476}
+  isMultiple: 0
+  nCopies: 4
   strikePs: {fileID: 0}
   offset: 15
   destroyOnWallHit: 0
   destroyOnEnemyHit: 0
+  justThrown: 0
+  noStart: 0
   duration: 0.1
   col: {fileID: 6600418900668682554}
 --- !u!1 &1208764353293556703
@@ -126,6 +132,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 3385294689782540307}
+  - {fileID: 6155702141245889150}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -151,8 +158,8 @@ ParticleSystem:
   useRigidbodyForVelocity: 1
   startDelay:
     serializedVersion: 2
-    minMaxState: 0
-    scalar: 0
+    minMaxState: 3
+    scalar: 0.1
     minScalar: 0
     maxCurve:
       serializedVersion: 2
@@ -212,8 +219,8 @@ ParticleSystem:
     startLifetime:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 0.25
-      minScalar: 0.1
+      scalar: 0.3
+      minScalar: 0.2
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -1072,7 +1079,7 @@ ParticleSystem:
       countCurve:
         serializedVersion: 2
         minMaxState: 0
-        scalar: 20
+        scalar: 10
         minScalar: 30
         maxCurve:
           serializedVersion: 2
@@ -1130,7 +1137,7 @@ ParticleSystem:
       countCurve:
         serializedVersion: 2
         minMaxState: 0
-        scalar: 20
+        scalar: 10
         minScalar: 30
         maxCurve:
           serializedVersion: 2
@@ -1542,7 +1549,7 @@ ParticleSystem:
         ctime6: 0
         ctime7: 0
         atime0: 39321
-        atime1: 62258
+        atime1: 65535
         atime2: 0
         atime3: 0
         atime4: 0
@@ -5037,3 +5044,104 @@ SortingGroup:
   m_SortingLayerID: -1355153031
   m_SortingLayer: 1
   m_SortingOrder: 5
+--- !u!1 &8688155982429244910
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6155702141245889150}
+  - component: {fileID: 6652396671459899359}
+  - component: {fileID: 7285689935984484306}
+  - component: {fileID: 944707350780968295}
+  m_Layer: 0
+  m_Name: HITBOX (1)
+  m_TagString: EnemyAttack
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6155702141245889150
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8688155982429244910}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: -5, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 7627975085030723991}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!58 &6652396671459899359
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8688155982429244910}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 5}
+  serializedVersion: 2
+  m_Radius: 2
+--- !u!50 &7285689935984484306
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8688155982429244910}
+  m_BodyType: 1
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 1
+  m_Constraints: 4
+--- !u!114 &944707350780968295
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8688155982429244910}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82234bdf4d5c34a5babd28f6fc7d0186, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  totaluses: 6
+  icon: {fileID: 0}
+  dmg: 35
+  toRight: 1
+  dir: {x: 0, y: 0}
+  velocityMultiplier: 1
+  force: 6
+  kbDir: {x: 0.5, y: 1}
+  rb: {fileID: 7285689935984484306}
+  isMultiple: 0
+  nCopies: 4
+  strikePs: {fileID: 0}
+  offset: 15
+  destroyOnWallHit: 0
+  destroyOnEnemyHit: 0
+  justThrown: 0
+  noStart: 0
+  duration: 0.1
+  col: {fileID: 6652396671459899359}
