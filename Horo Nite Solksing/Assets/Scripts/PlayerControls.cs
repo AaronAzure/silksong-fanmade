@@ -153,8 +153,8 @@ public class PlayerControls : MonoBehaviour
 	private int nToolUses2;
 	private float nToolSlowUses1;
 	private float nToolSlowUses2;
-	[SerializeField] Image toolUses1;
-	[SerializeField] Image toolUses2;
+	[SerializeField] Image toolUses1; // progress bar
+	[SerializeField] Image toolUses2; // progress bar
 
 
 	[Space] [Header("Ui")]
@@ -248,15 +248,16 @@ public class PlayerControls : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
-		if (!isPaused &&pauseAnim != null && player.GetButtonDown("Start"))
+		if (!isPaused && pauseAnim != null && player.GetButtonDown("Start"))
 		{
 			isPaused = true;
 			pauseMenu.SetActive(true);
 			pauseAnim.SetTrigger("open");
 		}
-		else if (isPaused && player.GetButtonDown("B"))
+		else if (isPaused)
 		{
-			pauseAnim.SetTrigger("close");
+			if (player.GetButtonDown("B"))
+				pauseAnim.SetTrigger("close");
 		}
 		else if (CanControl() && !inShawAtk)
 		{
@@ -493,7 +494,7 @@ public class PlayerControls : MonoBehaviour
 	void CalcMove()
 	{
 		float temp = player.GetAxis("Move Horizontal");
-		moveX = (temp < 0.2f && temp > -0.2f) ? 0 : temp;
+		moveX = (temp < 0.3f && temp > -0.3f) ? 0 : temp;
 	}
 
 	void Move()

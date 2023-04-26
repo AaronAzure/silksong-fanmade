@@ -21,9 +21,11 @@ public abstract class Tool : MonoBehaviour
 	[SerializeField] protected float offset=15;
 
 	[Space] [SerializeField] bool destroyOnWallHit;
-	[Space] [SerializeField] bool destroyOnEnemyHit;
+	[SerializeField] bool destroyOnEnemyHit;
 	[HideInInspector] public bool justThrown;
-	[SerializeField] bool noStart;
+	[Space] [SerializeField] bool noStart;
+	[SerializeField] protected float destroyAfter;
+	[SerializeField] protected Coroutine destroyAfterCo;
 
 	private void Start() 
 	{
@@ -43,6 +45,9 @@ public abstract class Tool : MonoBehaviour
 				rb.velocity = dir * velocityMultiplier;
 			}
 			CallChildOnStart();
+
+			if (destroyAfter > 0)
+				destroyAfterCo = StartCoroutine( DestroyAfterCo() );
 		}
 	}
 
@@ -92,4 +97,15 @@ public abstract class Tool : MonoBehaviour
 		Destroy(gameObject);
 	}
 	protected virtual void CallChildOnStart() {}
+
+	protected virtual IEnumerator DestroyAfterCo()
+	{
+		yield return new WaitForSeconds(destroyAfter);
+		Destroy(gameObject);
+	}
+
+	public void DESTROY() 
+	{
+		Destroy(gameObject);
+	}
 }
