@@ -214,7 +214,7 @@ public class PlayerControls : MonoBehaviour
 		bloodBurstPs.transform.parent = null;
 		cacoonObj.transform.parent = null;
 		DontDestroyOnLoad(cacoonObj);
-		FullRestore();
+		FullRestore(); // starting
 		Screen.SetResolution((int) (16f/9f * Screen.height), Screen.height, true);
 		if (pauseMenu != null) pauseMenu.SetActive(false);
 		// if (rinput != null) rinput.RewiredInputManager
@@ -288,7 +288,7 @@ public class PlayerControls : MonoBehaviour
 				rb.velocity = Vector2.zero;
 				anim.SetBool("isResting", true);
 				startPosition = transform.position;
-				FullRestore();
+				FullRestore(); // rest
 			}
 
 			// jump
@@ -770,7 +770,7 @@ public class PlayerControls : MonoBehaviour
 					else if (i == 1)
 						tool2 = null;
 					nEquipped--;
-					FullRestore();
+					FullRestore();	// uneuipped
 					return;
 				}
 			}
@@ -790,7 +790,7 @@ public class PlayerControls : MonoBehaviour
 					else if (i == 1)
 						tool2 = tool;
 					nEquipped++;
-					FullRestore();
+					FullRestore();	// equipped
 					return;
 				}
 			}
@@ -912,6 +912,8 @@ public class PlayerControls : MonoBehaviour
 	{
 		if (!isDead && !invincible && !justParried && (other.CompareTag("Enemy") || other.CompareTag("EnemyAttack")) && hurtCo == null)
 			hurtCo = StartCoroutine( TakeDamageCo(other.transform) );
+		if (!isDead && !invincible && !justParried && other.CompareTag("EnemyStrongAttack") && hurtCo == null)
+			hurtCo = StartCoroutine( TakeDamageCo(other.transform, 2) );
 	}
 
 	private void OnTriggerEnter2D(Collider2D other) 
@@ -941,7 +943,7 @@ public class PlayerControls : MonoBehaviour
 		}
 	}
 
-	IEnumerator TakeDamageCo(Transform opponent)
+	IEnumerator TakeDamageCo(Transform opponent, int dmg=1)
 	{
 		if (isInvincible)
 		{
@@ -952,7 +954,7 @@ public class PlayerControls : MonoBehaviour
 		MusicManager.Instance.SoftenBgMusic();
 
 		anim.SetBool("isHurt", true);
-		hp = Mathf.Max(0, hp - 1);
+		hp = Mathf.Max(0, hp - dmg);
 		ResetAllBools();
 		atkCo = toolCo = null;
 		beenHurt = true;
@@ -1033,7 +1035,7 @@ public class PlayerControls : MonoBehaviour
 			anim.SetBool("isHurt", false);
 			beenHurt = false;
 			if (soulLeakPs != null) soulLeakPs.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-			FullRestore();
+			FullRestore();	// respawn
 			SetSilk(-silkMeter);
 			hurtCo = null;
 			yield break;
@@ -1155,7 +1157,7 @@ public class PlayerControls : MonoBehaviour
 			anim.SetBool("isStunLock", false);
 			beenHurt = false;
 			if (soulLeakPs != null) soulLeakPs.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-			FullRestore();
+			FullRestore(); // respawn
 			SetSilk(-silkMeter);
 			hurtCo = null;
 			yield break;
@@ -1254,7 +1256,7 @@ public class PlayerControls : MonoBehaviour
 			beenHurt = false;
 			justParried = false;
 			if (soulLeakPs != null) soulLeakPs.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-			FullRestore();
+			FullRestore();	// respawn
 			SetSilk(-silkMeter);
 			hurtCo = null;
 			yield break;

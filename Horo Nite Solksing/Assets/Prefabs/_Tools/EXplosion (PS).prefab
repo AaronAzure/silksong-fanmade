@@ -99,6 +99,7 @@ MonoBehaviour:
   destroyOnEnemyHit: 0
   justThrown: 0
   noStart: 0
+  destroyAfter: 0
   duration: 0.1
   col: {fileID: 6600418900668682554}
 --- !u!1 &1208764353293556703
@@ -5055,10 +5056,10 @@ GameObject:
   - component: {fileID: 6155702141245889150}
   - component: {fileID: 6652396671459899359}
   - component: {fileID: 7285689935984484306}
-  - component: {fileID: 944707350780968295}
+  - component: {fileID: 6812078362109391853}
   m_Layer: 0
   m_Name: HITBOX (1)
-  m_TagString: EnemyAttack
+  m_TagString: EnemyStrongAttack
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5114,7 +5115,7 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
---- !u!114 &944707350780968295
+--- !u!114 &6812078362109391853
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -5123,25 +5124,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 8688155982429244910}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 82234bdf4d5c34a5babd28f6fc7d0186, type: 3}
+  m_Script: {fileID: 11500000, guid: fa58e6df1c14d446f888a1e060a70e77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  totaluses: 6
-  icon: {fileID: 0}
-  dmg: 35
-  toRight: 1
-  dir: {x: 0, y: 0}
-  velocityMultiplier: 1
-  force: 6
-  kbDir: {x: 0.5, y: 1}
-  rb: {fileID: 7285689935984484306}
-  isMultiple: 0
-  nCopies: 4
-  strikePs: {fileID: 0}
-  offset: 15
-  destroyOnWallHit: 0
-  destroyOnEnemyHit: 0
-  justThrown: 0
-  noStart: 0
-  duration: 0.1
   col: {fileID: 6652396671459899359}
+  timer: 0.1

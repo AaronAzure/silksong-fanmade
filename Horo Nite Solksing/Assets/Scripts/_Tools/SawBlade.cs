@@ -11,10 +11,16 @@ public class SawBlade : Tool
 	private bool isMoving;
 	private bool isColliding;
 	private int moveDir=1;
+	[SerializeField] Transform wallDetect;
 
 
 	protected override void CallChildOnEnemyHit(Collider2D other)
 	{
+	}
+
+	private void OnDrawGizmosSelected() 
+	{
+
 	}
 	
 

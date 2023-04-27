@@ -14,6 +14,7 @@ public class UiSelectable : MonoBehaviour, ISelectHandler
 	public void SET_TOOL()
 	{
 		Assert.IsNotNull(PlayerControls.Instance, "PlayerControls.Instance == null");
+		Debug.Log($"equipping tool {tool.name}", gameObject);
 
 		if (tool != null && PlayerControls.Instance != null)
 		{

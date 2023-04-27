@@ -5964,7 +5964,6 @@ GameObject:
   - component: {fileID: 607476847960774332}
   - component: {fileID: 1636612596853572855}
   - component: {fileID: 3419110879872053342}
-  - component: {fileID: 5130167212060504907}
   m_Layer: 0
   m_Name: cross_slashes (2)
   m_TagString: EnemyAttack
@@ -6075,19 +6074,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 0
---- !u!114 &5130167212060504907
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2157920586570232611}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 83be9010ecc1b45a1986b949b92a6968, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  col: {fileID: 1636612596853572855}
 --- !u!1 &2573067609145796574
 GameObject:
   m_ObjectHideFlags: 0
@@ -12469,14 +12455,14 @@ SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 5860117642773795990, guid: ad14945f5e7d244a4b3cae7ff0f50596, type: 3}
   m_PrefabInstance: {fileID: 5109825771381025014}
   m_PrefabAsset: {fileID: 0}
---- !u!212 &1716897278998707347 stripped
-SpriteRenderer:
-  m_CorrespondingSourceObject: {fileID: -3370351075478465435, guid: ad14945f5e7d244a4b3cae7ff0f50596, type: 3}
-  m_PrefabInstance: {fileID: 5109825771381025014}
-  m_PrefabAsset: {fileID: 0}
 --- !u!212 &2367695587715838015 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: -1859421630719944503, guid: ad14945f5e7d244a4b3cae7ff0f50596, type: 3}
+  m_PrefabInstance: {fileID: 5109825771381025014}
+  m_PrefabAsset: {fileID: 0}
+--- !u!212 &1716897278998707347 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: -3370351075478465435, guid: ad14945f5e7d244a4b3cae7ff0f50596, type: 3}
   m_PrefabInstance: {fileID: 5109825771381025014}
   m_PrefabAsset: {fileID: 0}
 --- !u!212 &6339525801539715221 stripped

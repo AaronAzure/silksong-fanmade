@@ -268,9 +268,16 @@ public abstract class Enemy : MonoBehaviour
 
 	protected virtual void AttackingAction() { }
 
+	private GameObject prevAtk;
 	public void TakeDamage(int dmg, Transform opponent, Vector2 forceDir, 
-		float force, bool canShake=true, bool canParry=true)
+		float force, bool canShake=true, bool canParry=true, GameObject currAtk=null)
 	{
+		if (currAtk != null)
+		{
+			if (prevAtk != null && prevAtk == currAtk)
+				return;
+			prevAtk = currAtk;
+		}
 		if (inParryState && canParry && FacingPlayer())
 		{
 			CallChildOnParry();

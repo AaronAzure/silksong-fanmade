@@ -42,7 +42,8 @@ public class Explosion : Tool
 				kbDir, 
 				force,
 				false,
-				false
+				false,
+				gameObject
 			);
 		}
 	}

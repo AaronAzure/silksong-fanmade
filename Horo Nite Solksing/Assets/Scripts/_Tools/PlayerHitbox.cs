@@ -15,32 +15,35 @@ public class PlayerHitbox : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other) 
 	{
-		Enemy target = other.GetComponent<Enemy>();
-		Vector2 temp = (other.transform.position - transform.position).normalized;
-		float angleZ = 
-			Mathf.Atan2(Mathf.Abs(temp.y), temp.x) * Mathf.Rad2Deg;
-
-		if (target != null) 
+		if (other.CompareTag("Enemy"))
 		{
-			if (!target.inParryState && strikePs != null)
+			Enemy target = other.GetComponent<Enemy>();
+			Vector2 temp = (other.transform.position - transform.position).normalized;
+			float angleZ = 
+				Mathf.Atan2(Mathf.Abs(temp.y), temp.x) * Mathf.Rad2Deg;
+
+			if (target != null) 
 			{
-				Instantiate(
-					strikePs, 
-					other.transform.position, 
-					Quaternion.Euler(0,0,angleZ + offset * temp.x)
+				if (!target.inParryState && strikePs != null)
+				{
+					Instantiate(
+						strikePs, 
+						other.transform.position, 
+						Quaternion.Euler(0,0,angleZ + offset * temp.x)
+					);
+				}
+				
+				target.TakeDamage(
+					dmg, 
+					transform, kbDir, 
+					kbForce,
+					overrideShake,
+					canParry
 				);
-			}
-			
-			target.TakeDamage(
-				dmg, 
-				transform, kbDir, 
-				kbForce,
-				overrideShake,
-				canParry
-			);
-			if (isSawBlade && sawBlade != null)
-			{
-				sawBlade.HitEnemy();
+				if (isSawBlade && sawBlade != null)
+				{
+					sawBlade.HitEnemy();
+				}
 			}
 		}
 	}
