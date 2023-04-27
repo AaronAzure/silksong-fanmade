@@ -959,7 +959,7 @@ public class PlayerControls : MonoBehaviour
 		}	
 		if (!isDead && other.CompareTag("Death") && hurtCo == null)
 		{
-			hurtCo = StartCoroutine( DiedCo() );
+			hurtCo = StartCoroutine( InstantDeathCo() );
 		}
 		if (other.CompareTag("Bench"))
 		{
@@ -1033,44 +1033,7 @@ public class PlayerControls : MonoBehaviour
 		// Died
 		if (hp <= 0)
 		{
-			CinemachineShake.Instance.ShakeCam(3f, 5f, 1, true);
-			MusicManager.Instance.PlayMusic(null);
-			isDead = true;
-			nKilled = 0;
-			rb.velocity = Vector2.zero;
-			rb.gravityScale = 0;
-			anim.SetBool("isDead", true);
-			deathScene = SceneManager.GetActiveScene().name;
-			deathPos = transform.position;
-
-			blackScreenObj.SetActive(false);
-			yield return new WaitForSeconds(3);
-			AsyncOperation loadingOperation = SceneManager.LoadSceneAsync(savedScene);
-			float loadTime = 0;
-			// wait for scene to load
-			while (!loadingOperation.isDone && loadTime < 5)
-			{
-				loadTime += Time.deltaTime;
-				yield return null;
-			}
-			blackScreenObj.SetActive(true);
-			transform.position = savedPos;
-
-			if (cacoonObj != null && deathScene == SceneManager.GetActiveScene().name)
-			{
-				cacoonObj.SetActive(true);
-				cacoonObj.transform.position = deathPos;
-			}
-			inStunLock = isDead = false;
-			justParried = false;
-			rb.gravityScale = 1;
-			anim.SetBool("isDead", false);
-			anim.SetBool("isHurt", false);
-			beenHurt = false;
-			if (soulLeakPs != null) soulLeakPs.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-			FullRestore();	// respawn
-			SetSilk(-silkMeter);
-			hurtCo = null;
+			yield return DiedCo();
 			yield break;
 		}
 
@@ -1153,46 +1116,7 @@ public class PlayerControls : MonoBehaviour
 		// Died
 		if (hp <= 0)
 		{
-			CinemachineShake.Instance.ShakeCam(3f, 5f, 1, true);
-			MusicManager.Instance.PlayMusic(null);
-			isDead = true;
-			nKilled = 0;
-			rb.velocity = Vector2.zero;
-			rb.gravityScale = 0;
-			anim.SetBool("isDead", true);
-			deathScene = SceneManager.GetActiveScene().name;
-			deathPos = transform.position;
-
-			blackScreenObj.SetActive(false);
-			yield return new WaitForSeconds(3);
-			AsyncOperation loadingOperation = SceneManager.LoadSceneAsync(savedScene);
-			float loadTime = 0;
-			// wait for scene to load
-			while (!loadingOperation.isDone && loadTime < 5)
-			{
-				loadTime += Time.deltaTime;
-				yield return null;
-			}
-			blackScreenObj.SetActive(true);
-			transform.position = savedPos;
-
-			if (cacoonObj != null && deathScene == SceneManager.GetActiveScene().name)
-			{
-				cacoonObj.SetActive(true);
-				cacoonObj.transform.position = deathPos;
-			}
-			inStunLock = isDead = false;
-			justParried = false;
-			rb.gravityScale = 1;
-			stunLockCo = null;
-			anim.SetBool("isDead", false);
-			anim.SetBool("isHurt", false);
-			anim.SetBool("isStunLock", false);
-			beenHurt = false;
-			if (soulLeakPs != null) soulLeakPs.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-			FullRestore(); // respawn
-			SetSilk(-silkMeter);
-			hurtCo = null;
+			yield return DiedCo();
 			yield break;
 		}
 		else
@@ -1213,8 +1137,9 @@ public class PlayerControls : MonoBehaviour
 		stunLockPos = dest; 
 	}
 
-	IEnumerator DiedCo()
+	IEnumerator InstantDeathCo()
 	{
+		
 		MusicManager.Instance.PlayHurtSFX();
 
 		anim.SetBool("isHurt", true);
@@ -1254,71 +1179,50 @@ public class PlayerControls : MonoBehaviour
 		// Died
 		if (hp <= 0)
 		{
-			CinemachineShake.Instance.ShakeCam(3f, 5f, 1, true);
-			MusicManager.Instance.PlayMusic(null);
-			isDead = true;
-			nKilled = 0;
-			rb.velocity = Vector2.zero;
-			rb.gravityScale = 0;
-			anim.SetBool("isDead", true);
-			deathScene = SceneManager.GetActiveScene().name;
-			deathPos = transform.position;
-
-			blackScreenObj.SetActive(false);
-			yield return new WaitForSeconds(3);
-			AsyncOperation loadingOperation = SceneManager.LoadSceneAsync(savedScene);
-			float loadTime = 0;
-			// wait for scene to load
-			while (!loadingOperation.isDone && loadTime < 5)
-			{
-				loadTime += Time.deltaTime;
-				yield return null;
-			}
-			blackScreenObj.SetActive(true);
-			transform.position = savedPos;
-
-			if (cacoonObj != null && deathScene == SceneManager.GetActiveScene().name)
-			{
-				cacoonObj.SetActive(true);
-				cacoonObj.transform.position = deathPos;
-			}
-			inStunLock = isDead = false;
-			rb.gravityScale = 1;
-			anim.SetBool("isDead", false);
-			anim.SetBool("isHurt", false);
-			beenHurt = false;
-			justParried = false;
-			if (soulLeakPs != null) soulLeakPs.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-			FullRestore();	// respawn
-			SetSilk(-silkMeter);
-			hurtCo = null;
+			yield return DiedCo();
 			yield break;
 		}
+	}
 
-		foreach (SpriteRenderer sprite in sprites)
-			sprite.material = dmgMat;
-		
-		SpawnExistingObjAtSelf(bloodBurstPs);
+	IEnumerator DiedCo()
+	{
+		CinemachineShake.Instance.ShakeCam(3f, 5f, 1, true);
+		MusicManager.Instance.PlayMusic(null);
+		isDead = true;
+		nKilled = 0;
+		rb.velocity = Vector2.zero;
+		rb.gravityScale = 0;
+		anim.SetBool("isDead", true);
+		deathScene = SceneManager.GetActiveScene().name;
+		deathPos = transform.position;
 
-		// Dramatic slow down
-		Time.timeScale = 0;
-
-		// teleport to ledge if in animation
-		if (anim.GetBool("isLedgeGrabbing"))
+		blackScreenObj.SetActive(false);
+		yield return new WaitForSeconds(3);
+		transform.position = savedPos;
+		AsyncOperation loadingOperation = SceneManager.LoadSceneAsync(savedScene);
+		float loadTime = 0;
+		// wait for scene to load
+		while (!loadingOperation.isDone && loadTime < 5)
 		{
-			GRAB_LEDGE();
+			loadTime += Time.deltaTime;
+			yield return null;
 		}
+		blackScreenObj.SetActive(true);
 
-		yield return new WaitForSecondsRealtime(0.25f);
+		if (cacoonObj != null && deathScene == SceneManager.GetActiveScene().name)
+		{
+			cacoonObj.SetActive(true);
+			cacoonObj.transform.position = deathPos;
+		}
+		inStunLock = isDead = false;
+		justParried = false;
+		rb.gravityScale = 1;
+		anim.SetBool("isDead", false);
 		anim.SetBool("isHurt", false);
-		Time.timeScale = 1;
-
-		yield return new WaitForSeconds(0.25f);
 		beenHurt = false;
-
-		yield return new WaitForSeconds(0.5f);
-		foreach (SpriteRenderer sprite in sprites)
-			sprite.material = defaultMat;
+		if (soulLeakPs != null) soulLeakPs.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+		FullRestore();	// respawn
+		SetSilk(-silkMeter);
 		hurtCo = null;
 	}
 
