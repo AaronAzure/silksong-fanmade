@@ -31,8 +31,4 @@ public class Caltrops : Tool
 			);
 		}
 	}
-	public void DESTROY()
-	{
-		Destroy(gameObject);
-	}
 }

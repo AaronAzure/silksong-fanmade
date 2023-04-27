@@ -358,7 +358,7 @@ public class PlayerControls : MonoBehaviour
 			t += Time.fixedDeltaTime/stunLockTime;
 			transform.position = Vector3.Lerp(startPosition, bench.restPos.position, t);
 		}
-		if (toolUses1 != null)
+		if (toolUses1 != null && tool1 != null)
 		{
 			if (nToolSlowUses1 != nToolUses1)
 			{
@@ -371,7 +371,7 @@ public class PlayerControls : MonoBehaviour
 				t1 = 0;
 			}
 		}
-		if (toolUses2 != null)
+		if (toolUses2 != null && tool2 != null)
 		{
 			if (nToolSlowUses2 != nToolUses2)
 			{
