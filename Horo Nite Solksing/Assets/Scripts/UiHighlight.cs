@@ -9,12 +9,13 @@ public class UiHighlight : MonoBehaviour
 {
 	[SerializeField] RectTransform rect;
 	[SerializeField] float speed;
-	[SerializeField] Vector3 offset;
-	public RectTransform selected;
-	// [HideInInspector] public RectTransform selected;
-	[Space] [SerializeField] bool lerp;
+	public RectTransform selected; // target
+	[Space] 
 	[SerializeField] Animator anim;
-	// private Vector3 startPos;
+	[SerializeField] float lerpDuration=0.5f;
+	bool isMoving;
+	Vector3 startPos;
+	float timeElapsed;
 
 
 	public void Select()
@@ -23,11 +24,18 @@ public class UiHighlight : MonoBehaviour
 			anim.SetTrigger("select");
 	}
 
+	public void MoveToButton()
+	{
+		timeElapsed = 0;
+		startPos = rect.position;
+		isMoving = true;
+	}
+
 	Vector3 GetCurrentSelectedButton()
 	{
 		if (selected == null)
-			return transform.position;
-		return selected.localPosition + offset;
+			return rect.position;
+		return selected.position;
 	}
 
 	// Update is called once per frame
@@ -35,10 +43,13 @@ public class UiHighlight : MonoBehaviour
 	{
 		if (rect != null)
 		{
-			if (lerp)
-				rect.localPosition = Vector3.MoveTowards(rect.localPosition, GetCurrentSelectedButton(), speed);
-			else
-				rect.localPosition = GetCurrentSelectedButton();
+			if (isMoving)
+			{
+    			timeElapsed += Time.unscaledDeltaTime;
+				rect.position = Vector3.Lerp(startPos, selected.position, timeElapsed / lerpDuration);
+				if (timeElapsed > lerpDuration)
+					isMoving = false;
+			}
 		}
 	}
 }

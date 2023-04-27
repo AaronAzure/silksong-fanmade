@@ -14,7 +14,6 @@ public class UiSelectable : MonoBehaviour, ISelectHandler
 	public void SET_TOOL()
 	{
 		Assert.IsNotNull(PlayerControls.Instance, "PlayerControls.Instance == null");
-		Debug.Log($"equipping tool {tool.name}", gameObject);
 
 		if (tool != null && PlayerControls.Instance != null)
 		{
@@ -22,9 +21,23 @@ public class UiSelectable : MonoBehaviour, ISelectHandler
 			if (master != null) master.Select();
 		}
 	}
+	public void SET_CREST(int n)
+	{
+		Assert.IsNotNull(PlayerControls.Instance, "PlayerControls.Instance == null");
+
+		if (PlayerControls.Instance != null)
+		{
+			PlayerControls.Instance.EquipCrest(n);
+			if (master != null) master.Select();
+		}
+	}
 
 	public void OnSelect(BaseEventData eventData)
 	{
-		if (master != null && self != null) master.selected = self;
+		if (master != null && self != null) 
+		{
+			master.selected = self;
+			master.MoveToButton();
+		}
 	}
 }

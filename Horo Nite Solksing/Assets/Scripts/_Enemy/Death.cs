@@ -53,7 +53,7 @@ public class Death : Enemy
 		{
 			jumpedAgain = true;
 			float distToTarget = Vector2.Distance(target.transform.position, self.position);
-			Debug.Log(distToTarget);
+			// Debug.Log(distToTarget);
 			anim.SetBool("jumped", false);
 			anim.SetBool("sickled", false);
 			anim.SetTrigger("attack");

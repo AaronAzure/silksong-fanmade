@@ -163,7 +163,25 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] Image[] toolIcons;
 	[SerializeField] Image[] toolsEquipped;
 	[SerializeField] Sprite emptySpr;
-	int nEquipped;
+	[SerializeField] CanvasGroup pauseMenuUi;
+	private int nEquipped;
+
+
+
+	[System.Serializable] public class Crest 
+	{
+		public GameObject[] objs;
+
+		public void ToggleCrest(bool value)
+		{
+			foreach (GameObject obj in objs) obj.SetActive(value);
+		}
+	}
+
+	[Space] [Header("Crests")]
+	[SerializeField] Crest[] crests;
+	[SerializeField] Image[] crestIcons;
+	private int crestNum;
 
 
 	[Space] [Header("Debug")]
@@ -254,7 +272,7 @@ public class PlayerControls : MonoBehaviour
 			pauseMenu.SetActive(true);
 			pauseAnim.SetTrigger("open");
 		}
-		else if (isPaused)
+		else if (isPaused && pauseMenuUi.interactable)
 		{
 			if (player.GetButtonDown("B"))
 				pauseAnim.SetTrigger("close");
@@ -281,7 +299,7 @@ public class PlayerControls : MonoBehaviour
 			}
 
 			// rest on bench
-			else if (bench != null && player.GetAxis("Move Vertical") > 0.7f)
+			else if (bench != null && isGrounded && player.GetAxis("Move Vertical") > 0.7f)
 			{
 				isResting = true;
 				rb.gravityScale = 0;
@@ -572,7 +590,6 @@ public class PlayerControls : MonoBehaviour
 		canLedgeGrab = (!hasLedge && hasWall && !isGrounded);
 	}
 
-
 	void Attack()
 	{
 		if (isDashing)
@@ -796,6 +813,22 @@ public class PlayerControls : MonoBehaviour
 			}
 		}
 	}
+	public void EquipCrest(int n)
+	{
+		// no change
+		if (crestNum == n) return;
+
+		if (crestNum < crests.Length)
+		{
+			crests[crestNum].ToggleCrest(false);
+			if (crestNum < crestIcons.Length) 
+				crestIcons[crestNum].color = new Color(1,1,1,0.4f);
+
+			crestNum = n;
+			crests[crestNum].ToggleCrest(true);
+			crestIcons[crestNum].color = new Color(1,1,1,1);
+		}
+	}
 
 	void Jump()
 	{
@@ -1011,8 +1044,7 @@ public class PlayerControls : MonoBehaviour
 			deathPos = transform.position;
 
 			blackScreenObj.SetActive(false);
-			yield return new WaitForSeconds(2);
-			transform.position = savedPos;
+			yield return new WaitForSeconds(3);
 			AsyncOperation loadingOperation = SceneManager.LoadSceneAsync(savedScene);
 			float loadTime = 0;
 			// wait for scene to load
@@ -1022,6 +1054,7 @@ public class PlayerControls : MonoBehaviour
 				yield return null;
 			}
 			blackScreenObj.SetActive(true);
+			transform.position = savedPos;
 
 			if (cacoonObj != null && deathScene == SceneManager.GetActiveScene().name)
 			{
@@ -1131,8 +1164,7 @@ public class PlayerControls : MonoBehaviour
 			deathPos = transform.position;
 
 			blackScreenObj.SetActive(false);
-			yield return new WaitForSeconds(2);
-			transform.position = savedPos;
+			yield return new WaitForSeconds(3);
 			AsyncOperation loadingOperation = SceneManager.LoadSceneAsync(savedScene);
 			float loadTime = 0;
 			// wait for scene to load
@@ -1142,6 +1174,7 @@ public class PlayerControls : MonoBehaviour
 				yield return null;
 			}
 			blackScreenObj.SetActive(true);
+			transform.position = savedPos;
 
 			if (cacoonObj != null && deathScene == SceneManager.GetActiveScene().name)
 			{
@@ -1232,8 +1265,7 @@ public class PlayerControls : MonoBehaviour
 			deathPos = transform.position;
 
 			blackScreenObj.SetActive(false);
-			yield return new WaitForSeconds(2);
-			transform.position = savedPos;
+			yield return new WaitForSeconds(3);
 			AsyncOperation loadingOperation = SceneManager.LoadSceneAsync(savedScene);
 			float loadTime = 0;
 			// wait for scene to load
@@ -1243,6 +1275,7 @@ public class PlayerControls : MonoBehaviour
 				yield return null;
 			}
 			blackScreenObj.SetActive(true);
+			transform.position = savedPos;
 
 			if (cacoonObj != null && deathScene == SceneManager.GetActiveScene().name)
 			{
