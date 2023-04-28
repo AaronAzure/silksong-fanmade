@@ -86,7 +86,11 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] float dashCounter;
 	[SerializeField] float dashCooldownCounter;
 	[SerializeField] float shawForce=7.5f;
-	[SerializeField] float atkCooldownDuration=0.4f;
+	[SerializeField] float nShaw;
+	[SerializeField] float shawLimit=3;
+	[SerializeField] float risingRecoilForce=5f;
+	[SerializeField] float quickAtkCooldownDuration=0.1f;
+	[SerializeField] float atkCooldownDuration=0.2f;
 	[SerializeField] float toolCooldownDuration=0.2f;
 
 	[Space] [SerializeField] GameObject slashObj;
@@ -580,6 +584,8 @@ public class PlayerControls : MonoBehaviour
 	void CheckIsGrounded()
 	{
 		isGrounded = Physics2D.OverlapBox(groundCheck.position, groundCheckSize, 0, whatIsGround);
+		if (isGrounded && nShaw != 0)
+			nShaw = 0;
 		if (!inAtkState) 
 			anim.SetBool("isGrounded", isGrounded);
 		if (isGrounded && anim.GetBool("isAirDash")) 
@@ -614,7 +620,7 @@ public class PlayerControls : MonoBehaviour
 		else if (player.GetAxis("Move Vertical") > 0.7f)
 			atkCo = StartCoroutine( AttackCo(1) );
 		// shaw attack
-		else if (player.GetAxis("Move Vertical") < shawDir)
+		else if (player.GetAxis("Move Vertical") < shawDir && nShaw < shawLimit)
 			atkCo = StartCoroutine( AttackCo(2) );
 		// attack front
 		else
@@ -630,8 +636,12 @@ public class PlayerControls : MonoBehaviour
 			atkDir = 0;
 		this.atkDir = atkDir;
 
+		// not rising attack
 		if (crestNum <= 1 && atkDir != 1)
 			CancelDash();
+		// not rising attack
+		else if (!isGrounded)
+			anim.SetFloat("crestNum",0);
 		
 		if (isDashing && crestNum > 1 && isGrounded)
 			atkDir = 1;
@@ -645,11 +655,12 @@ public class PlayerControls : MonoBehaviour
 			if (crestNum > 1 && atkDir == 1)
 			{
 				yield return new WaitForSeconds(0.167f);
-
+				
 			}
 			// shaw attack
 			if (atkDir == 2)
 			{
+				nShaw++;
 				shawSound.Play();
 				jumpDashed = false;
 				rb.velocity = Vector2.zero;
@@ -666,10 +677,14 @@ public class PlayerControls : MonoBehaviour
 
 			yield return new WaitForSeconds(atkDir != 2 ? 0.25f : 0.4f);
 			anim.SetBool("isAttacking", false);
+			if (crestNum > 1 && atkDir == 1)
+				anim.SetFloat("crestNum", crestNum);
 		}
 
 		// atk cooldown
-		yield return new WaitForSeconds(atkCooldownDuration);
+		yield return new WaitForSeconds(
+			(crestNum > 1 && atkDir == 1) ? quickAtkCooldownDuration : atkCooldownDuration
+		);
 		atkCo = null;
 	}
 	
@@ -964,6 +979,14 @@ public class PlayerControls : MonoBehaviour
 		rb.velocity = Vector2.zero;
 
 		rb.AddForce( new Vector2(-moveDir * shawForce, shawForce), ForceMode2D.Impulse);
+		StartCoroutine( RegainControlCo(0.1f) );
+	}
+	public void RisingAtkRetreat()
+	{
+		// anim.SetBool("isAttacking", false);
+		rb.velocity = new Vector2(0, rb.velocity.y);
+
+		rb.AddForce( new Vector2(-moveDir * risingRecoilForce, 0), ForceMode2D.Impulse);
 		StartCoroutine( RegainControlCo(0.1f) );
 	}
 

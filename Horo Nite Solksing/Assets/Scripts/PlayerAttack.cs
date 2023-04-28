@@ -6,6 +6,7 @@ public class PlayerAttack : MonoBehaviour
 	[SerializeField] Vector2 forceDir;
 	[SerializeField] float force=5;
 	[SerializeField] bool isShawAttack;
+	[SerializeField] bool isRisingAttack;
 	[SerializeField] bool isStabAttack;
 	[SerializeField] bool isGossamerStorm;
 	[SerializeField] GameObject strikePs;
@@ -26,6 +27,8 @@ public class PlayerAttack : MonoBehaviour
 			
 			if (isShawAttack)
 				p.ShawRetreat();
+			if (isRisingAttack)
+				p.RisingAtkRetreat();
 		}
 		if (other.CompareTag("Enemy"))
 		{
@@ -54,6 +57,8 @@ public class PlayerAttack : MonoBehaviour
 				);
 				if (isShawAttack)
 					p.ShawRetreat();
+				if (isRisingAttack)
+					p.RisingAtkRetreat();
 
 				// simple attack
 				if (!isStabAttack && !isGossamerStorm)
