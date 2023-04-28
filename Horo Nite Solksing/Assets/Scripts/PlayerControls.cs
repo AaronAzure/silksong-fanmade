@@ -142,6 +142,7 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] bool performingGossamerStorm;
 	[SerializeField] bool cantRotate;
 	private bool cantRotate2;
+	[SerializeField] bool inAirDash;
 	[SerializeField] bool inAtkState;
 	[SerializeField] bool inShawAtk;
 	[SerializeField] bool isBinding;
@@ -295,34 +296,37 @@ public class PlayerControls : MonoBehaviour
 		}
 		else if (CanControl() && !inShawAtk)
 		{
-			if (player.GetButtonDown("Y") && atkCo == null)
-				Attack();
-			else if (player.GetButtonDown("X"))
-				SkillAttack();
-
-			// bind (heal)
-			else if (player.GetButtonDown("A") && (infiniteSilk || silkMeter >= GetBindCost()) && bindCo == null)
-				bindCo = StartCoroutine( BindCo() );
-
-			// tools
-			else if (player.GetButtonDown("R") && toolCo == null)
+			if (!inAirDash)
 			{
-				int tool = (player.GetAxis("Move Vertical") < -0.7f ? 1 : 0);
-				if (tool == 0 && nToolUses1 > 0)
-					toolCo = StartCoroutine( UseTool(0) );
-				else if (tool == 1 && nToolUses2 > 0)
-					toolCo = StartCoroutine( UseTool(1) );
-			}
+				if (player.GetButtonDown("Y") && atkCo == null)
+					Attack();
+				else if (player.GetButtonDown("X"))
+					SkillAttack();
 
-			// rest on bench
-			else if (bench != null && isGrounded && player.GetAxis("Move Vertical") > 0.7f)
-			{
-				isResting = true;
-				rb.gravityScale = 0;
-				rb.velocity = Vector2.zero;
-				anim.SetBool("isResting", true);
-				startPosition = transform.position;
-				FullRestore(); // rest
+				// bind (heal)
+				else if (player.GetButtonDown("A") && (infiniteSilk || silkMeter >= GetBindCost()) && bindCo == null)
+					bindCo = StartCoroutine( BindCo() );
+
+				// tools
+				else if (player.GetButtonDown("R") && toolCo == null)
+				{
+					int tool = (player.GetAxis("Move Vertical") < -0.7f ? 1 : 0);
+					if (tool == 0 && nToolUses1 > 0)
+						toolCo = StartCoroutine( UseTool(0) );
+					else if (tool == 1 && nToolUses2 > 0)
+						toolCo = StartCoroutine( UseTool(1) );
+				}
+
+				// rest on bench
+				else if (bench != null && isGrounded && player.GetAxis("Move Vertical") > 0.7f)
+				{
+					isResting = true;
+					rb.gravityScale = 0;
+					rb.velocity = Vector2.zero;
+					anim.SetBool("isResting", true);
+					startPosition = transform.position;
+					FullRestore(); // rest
+				}
 			}
 
 			// jump
@@ -375,7 +379,10 @@ public class PlayerControls : MonoBehaviour
 				// Dash
 				CalcDash();
 
-				Move();
+				if (!inAirDash)
+					Move();
+				else
+					rb.velocity = new Vector2(model.localScale.x * dashSpeed * 0.75f, rb.velocity.y);
 				CheckIsGrounded();
 				CheckIsWalled();
 				if (jumpDashed && jumped && (isGrounded || isWallSliding || canLedgeGrab))
@@ -1379,7 +1386,7 @@ public class PlayerControls : MonoBehaviour
 
 	IEnumerator DiedCo()
 	{
-		CinemachineShake.Instance.ShakeCam(3f, 5f, 1, true);
+		CinemachineShake.Instance.ShakeCam(10f, 5f, 1, true);
 		MusicManager.Instance.PlayMusic(null);
 		isDead = true;
 		nKilled = 0;

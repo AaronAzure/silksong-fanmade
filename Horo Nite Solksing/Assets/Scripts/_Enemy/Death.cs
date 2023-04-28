@@ -291,7 +291,7 @@ public class Death : Enemy
 
 	public void SHOW_ULT_ATK_AOE()
 	{
-		if (ultAtkObj != null)
+		if (!anim.GetBool("isStagger") && ultAtkObj != null)
 		{
 			ultAtkObj.SetActive(false);
 			ultAtkObj.SetActive(true);
@@ -299,7 +299,7 @@ public class Death : Enemy
 	}
 	public void SHOW_ULT_ATK_DMG()
 	{
-		if (ultAtkDmgObj != null)
+		if (!anim.GetBool("isStagger") && ultAtkDmgObj != null)
 		{
 			ultAtkDmgObj.transform.localScale = model.localScale;
 			ultAtkDmgObj.SetActive(false);
@@ -309,7 +309,8 @@ public class Death : Enemy
 
 	public void START_ULT_ATK()
 	{
-		model.gameObject.SetActive(false);
+		if (!anim.GetBool("isStagger"))
+			model.gameObject.SetActive(false);
 	}
 	public void END_ULT_ATK()
 	{

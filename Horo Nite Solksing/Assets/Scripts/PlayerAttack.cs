@@ -51,6 +51,13 @@ public class PlayerAttack : MonoBehaviour
 				}
 				
 				int dmg = !isStabAttack ? (!isGossamerStorm ? p.atkDmg[p.crestNum] : p.gossamerDmg) : p.stabDmg;
+
+				// stronger special
+				if ((isStabAttack || isGossamerStorm) && p.crestNum == 1)
+					dmg = Mathf.RoundToInt(dmg * 1.25f);
+				// weaker special
+				else if ((isStabAttack || isGossamerStorm) && p.crestNum == 2)
+					dmg = (int) (dmg * 0.75f);
 				target.TakeDamage(
 					dmg, 
 					isGossamerStorm ? transform : null,
