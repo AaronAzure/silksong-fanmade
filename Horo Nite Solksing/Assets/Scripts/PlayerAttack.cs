@@ -5,7 +5,9 @@ public class PlayerAttack : MonoBehaviour
 	[SerializeField] PlayerControls p;
 	[SerializeField] Vector2 forceDir;
 	[SerializeField] float force=5;
+	[SerializeField] bool hasRecoil;
 	[SerializeField] bool isShawAttack;
+	[SerializeField] bool isDashAttack;
 	[SerializeField] bool isRisingAttack;
 	[SerializeField] bool isStabAttack;
 	[SerializeField] bool isGossamerStorm;
@@ -26,8 +28,8 @@ public class PlayerAttack : MonoBehaviour
 			}
 			
 			if (isShawAttack)
-				p.ShawRetreat();
-			if (isRisingAttack)
+				p.ShawRetreat(isDashAttack);
+			else if (isRisingAttack)
 				p.RisingAtkRetreat();
 		}
 		if (other.CompareTag("Enemy"))
@@ -56,14 +58,18 @@ public class PlayerAttack : MonoBehaviour
 					force
 				);
 				if (isShawAttack)
-					p.ShawRetreat();
-				if (isRisingAttack)
+					p.ShawRetreat(isDashAttack);
+				else if (isRisingAttack)
 					p.RisingAtkRetreat();
+				else if (hasRecoil && !p.justParried)
+					p.Recoil();
 
 				// simple attack
 				if (!isStabAttack && !isGossamerStorm)
 					p.SetSilk(1);
 			}
 		}
+		else if (other.CompareTag("Ground") && hasRecoil && !p.justParried)
+			p.Recoil();
 	}
 }

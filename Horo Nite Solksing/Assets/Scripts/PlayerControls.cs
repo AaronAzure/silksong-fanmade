@@ -51,7 +51,8 @@ public class PlayerControls : MonoBehaviour
 	private bool isDashing;
 	private bool isJumping;
 	private bool isWallJumping;
-	private bool isGrounded;
+	[SerializeField] bool isGrounded;
+	private bool isPogoing;
 	private bool isPaused;
 	private bool isWallSliding;
 	private float jumpTimer;
@@ -60,7 +61,7 @@ public class PlayerControls : MonoBehaviour
 	private bool noControl;
 	private bool isResting;
 	private bool inStunLock;
-	[SerializeField] bool justParried;
+	public bool justParried {get; private set;}
 	[SerializeField] bool isInvincible;
 	[SerializeField] bool hasLedge;
 	[SerializeField] bool hasWall;
@@ -88,6 +89,7 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] float shawForce=7.5f;
 	[SerializeField] float nShaw;
 	[SerializeField] float shawLimit=3;
+	[SerializeField] float recoilForce=7.5f;
 	[SerializeField] float risingRecoilForce=5f;
 	[SerializeField] float quickAtkCooldownDuration=0.1f;
 	[SerializeField] float atkCooldownDuration=0.2f;
@@ -139,6 +141,7 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] bool inAnimation;
 	[SerializeField] bool performingGossamerStorm;
 	[SerializeField] bool cantRotate;
+	private bool cantRotate2;
 	[SerializeField] bool inAtkState;
 	[SerializeField] bool inShawAtk;
 	[SerializeField] bool isBinding;
@@ -146,6 +149,7 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] bool dashStrike;
 	[SerializeField] bool beenHurt;
 	[SerializeField] bool risingAtk;
+	private bool holdingRiseButton;
 	private bool isDead=false;
 
 
@@ -179,6 +183,7 @@ public class PlayerControls : MonoBehaviour
 
 	[System.Serializable] public class Crest 
 	{
+		public string title;
 		public GameObject[] objs;
 
 		public void ToggleCrest(bool value)
@@ -191,6 +196,8 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] Crest[] crests;
 	[SerializeField] Image[] crestIcons;
 	public int crestNum;
+	[SerializeField] GameObject shawEffectObj;
+	[SerializeField] GameObject hunterSpinObj;
 
 
 	[Space] [Header("Debug")]
@@ -357,6 +364,7 @@ public class PlayerControls : MonoBehaviour
 				{
 					atkCo = null;
 					anim.SetBool("isAttacking", false);
+					hunterSpinObj.SetActive(false);
 				}
 			}
 			else
@@ -545,7 +553,7 @@ public class PlayerControls : MonoBehaviour
 		else
 			anim.SetBool("isDashing", false);
 
-		if (!cantRotate)
+		if (!cantRotate && !cantRotate2)
 		{
 			// right
 			if (moveX > 0) 
@@ -555,7 +563,6 @@ public class PlayerControls : MonoBehaviour
 				model.localScale = new Vector3(-1, 1, 1);
 			moveDir = model.localScale.x;
 		}
-
 			
 		// Controlled movement
 		if (!isDashing)
@@ -581,11 +588,26 @@ public class PlayerControls : MonoBehaviour
 		}
 	}
 
+	void Flip()
+	{
+		// right
+		if (moveX < 0) 
+			model.localScale = new Vector3(1, 1, 1);
+		// left
+		else if (moveX > 0) 
+			model.localScale = new Vector3(-1, 1, 1);
+	}
+
 	void CheckIsGrounded()
 	{
 		isGrounded = Physics2D.OverlapBox(groundCheck.position, groundCheckSize, 0, whatIsGround);
 		if (isGrounded && nShaw != 0)
 			nShaw = 0;
+		if (isGrounded && isPogoing)
+		{
+			isPogoing = false;
+			anim.SetFloat("pogoing", 0);
+		}
 		if (!inAtkState) 
 			anim.SetBool("isGrounded", isGrounded);
 		if (isGrounded && anim.GetBool("isAirDash")) 
@@ -639,15 +661,20 @@ public class PlayerControls : MonoBehaviour
 		// not rising attack
 		if (crestNum <= 1 && atkDir != 1)
 			CancelDash();
-		// not rising attack
-		else if (!isGrounded)
-			anim.SetFloat("crestNum",0);
+		// rising attack (aerial)
+		else 
+		{
+			if (crestNum > 1 && atkDir == 1 && !isGrounded)
+				anim.SetFloat("crestNum",0);
+		}
 		
 		if (isDashing && crestNum > 1 && isGrounded)
 			atkDir = 1;
 
 		if (slashObj != null)
 		{
+			if (isWallSliding)
+				Flip();
 			anim.SetFloat("atkDir", atkDir);
 			anim.SetTrigger("attack");
 			anim.SetBool("isAttacking", true);
@@ -660,13 +687,21 @@ public class PlayerControls : MonoBehaviour
 			// shaw attack
 			if (atkDir == 2)
 			{
-				nShaw++;
 				shawSound.Play();
-				jumpDashed = false;
-				rb.velocity = Vector2.zero;
-				rb.gravityScale = 0;
-				yield return new WaitForSeconds(0.1f);
-				rb.gravityScale = 1;
+				if (crestNum != 1)
+				{
+					nShaw++;
+					if (nShaw >= shawLimit)
+					{
+						anim.SetFloat("pogoing", 1);
+						isPogoing = true;
+					}
+					jumpDashed = false;
+					rb.velocity = Vector2.zero;
+					rb.gravityScale = 0;
+					yield return new WaitForSeconds(0.1f);
+					rb.gravityScale = 1;
+				}
 			}
 			// normal slash
 			else
@@ -675,10 +710,12 @@ public class PlayerControls : MonoBehaviour
 				atk1 = !atk1;
 			}
 
-			yield return new WaitForSeconds(atkDir != 2 ? 0.25f : 0.4f);
+			if (crestNum == 1)
+				yield return new WaitForSeconds(0.25f);
+			else
+				yield return new WaitForSeconds(atkDir != 2 ? 0.25f : 0.4f);
 			anim.SetBool("isAttacking", false);
-			if (crestNum > 1 && atkDir == 1)
-				anim.SetFloat("crestNum", crestNum);
+			anim.SetFloat("crestNum", crestNum);
 		}
 
 		// atk cooldown
@@ -868,10 +905,11 @@ public class PlayerControls : MonoBehaviour
 				crestIcons[crestNum].color = new Color(1,1,1,0.4f);
 
 			crestNum = n;
+			anim.SetFloat("bindSpeed", n > 1 ? 0.5f : 1);
 			crests[crestNum].ToggleCrest(true);
 			crestIcons[crestNum].color = new Color(1,1,1,1);
 		}
-		anim.SetFloat("crestNum", crestNum > 1 ? 1 : 0);
+		anim.SetFloat("crestNum", crestNum);
 	}
 
 	void Jump()
@@ -973,12 +1011,69 @@ public class PlayerControls : MonoBehaviour
 		}
 	}
 
-	public void ShawRetreat()
+	public void ShawRetreat(bool dashStrike=false)
 	{
-		anim.SetBool("isAttacking", false);
+		switch (crestNum)
+		{
+			case 0:
+				anim.SetBool("isAttacking", false);
+				rb.velocity = Vector2.zero;
+				rb.AddForce( new Vector2(-moveDir * shawForce, shawForce), ForceMode2D.Impulse);
+				StartCoroutine( RegainControlCo(0.1f) );
+				break;
+			case 1:
+				if (dashStrike)
+				{
+					anim.SetBool("isAttacking", false);
+					rb.velocity = Vector2.zero;
+					rb.AddForce( new Vector2(-moveDir * shawForce, shawForce), ForceMode2D.Impulse);
+					StartCoroutine( RegainControlCo(0.1f) );
+				}
+				else
+				{
+					rb.velocity = new Vector2(rb.velocity.x , 0);
+					rb.AddForce( new Vector2(0, shawForce), ForceMode2D.Impulse);
+				}
+				// StartCoroutine( RegainControlCo(0.1f) );
+				break;
+			case 2:
+				if (!hunterSpinObj.activeSelf)
+					StartCoroutine( HUNTER_SPIN_ON() );
+				anim.SetBool("isAttacking", false);
+				rb.velocity = Vector2.zero;
+				anim.SetFloat("pogoing", 1);
+				isPogoing = true;
+				rb.AddForce( new Vector2(0, shawForce), ForceMode2D.Impulse);
+				// StartCoroutine( RegainControlCo(0.1f, false, true) );
+				StartCoroutine( SwoopCo(0.2f) );
+				// StartCoroutine( PogoCo(0.25f) );
+				break;
+			case 3:
+				anim.SetBool("isAttacking", false);
+				rb.velocity = Vector2.zero;
+				anim.SetFloat("pogoing", 1);
+				isPogoing = true;
+				rb.AddForce( new Vector2(0, shawForce), ForceMode2D.Impulse);
+				// StartCoroutine( RegainControlCo(0.1f, false, true) );
+				StartCoroutine( SwoopCo(0.2f) );
+				// StartCoroutine( PogoCo(0.25f) );
+				shawEffectObj.SetActive(true);
+				break;
+		}
+		// if (crestNum <= 1)
+		// {
+		// 	rb.AddForce( new Vector2(-moveDir * shawForce, shawForce), ForceMode2D.Impulse);
+		// 	StartCoroutine( RegainControlCo(0.1f) );
+		// }
+		// else
+		// {
+		// }
+	}
+	public void Recoil()
+	{
 		rb.velocity = Vector2.zero;
 
-		rb.AddForce( new Vector2(-moveDir * shawForce, shawForce), ForceMode2D.Impulse);
+		rb.AddForce( new Vector2(-moveDir * recoilForce, 0), ForceMode2D.Impulse);
 		StartCoroutine( RegainControlCo(0.1f) );
 	}
 	public void RisingAtkRetreat()
@@ -990,16 +1085,51 @@ public class PlayerControls : MonoBehaviour
 		StartCoroutine( RegainControlCo(0.1f) );
 	}
 
-	IEnumerator RegainControlCo(float duration, bool invincibility=false)
+	IEnumerator RegainControlCo(float duration, bool noControl=true, bool invincibility=false)
 	{
 		if (invincibility) 
 			isInvincible = true;
-		noControl = true;
+		if (noControl)
+			this.noControl = true;
 
 		yield return new WaitForSeconds(duration);
 		if (invincibility) 
 			isInvincible = false;
+		if (noControl)
+			this.noControl = false;
+	}
+	IEnumerator SwoopCo(float duration)
+	{
+		isInvincible = true;
+		cantRotate2 = true;
+
+		yield return new WaitForSeconds(duration);
+		isInvincible = false;
+		cantRotate2 = false;
+		shawEffectObj.SetActive(false);
+	}
+	IEnumerator PogoCo(float duration)
+	{
+		isInvincible = true;
+		noControl = true;
+		
+		yield return new WaitForSeconds(0.05f);
+		rb.velocity = new Vector2(rb.velocity.x, 0);
+
+		yield return new WaitForSeconds(0.05f);
+		rb.velocity = new Vector2(rb.velocity.x, 0);
+		rb.AddForce( new Vector2(0, shawForce), ForceMode2D.Impulse);
 		noControl = false;
+
+		yield return new WaitForSeconds(duration);
+		isInvincible = false;
+	}
+
+	public IEnumerator HUNTER_SPIN_ON()
+	{
+		if (hunterSpinObj != null) hunterSpinObj.SetActive(true);
+		yield return new WaitForSeconds(0.3f);
+		if (hunterSpinObj != null) hunterSpinObj.SetActive(false);
 	}
 
 	private void OnTriggerStay2D(Collider2D other) 
@@ -1046,6 +1176,7 @@ public class PlayerControls : MonoBehaviour
 		}
 		MusicManager.Instance.PlayHurtSFX();
 		MusicManager.Instance.SoftenBgMusic();
+		if (hunterSpinObj != null) hunterSpinObj.SetActive(false);
 
 		anim.SetBool("isHurt", true);
 		ResetAllBools();
@@ -1058,6 +1189,7 @@ public class PlayerControls : MonoBehaviour
 			CinemachineShake.Instance.ShakeCam(15, 0.25f);
 		anim.SetBool("isSkillAttacking", false);
 		anim.SetBool("isGossamerStorm", false);
+		anim.SetBool("isBinding", false);
 		usingSkill = false;
 		// rb.gravityScale = 1;
 
@@ -1065,7 +1197,6 @@ public class PlayerControls : MonoBehaviour
 		if (bindCo != null) 
 		{
 			StopCoroutine(bindCo);
-			anim.SetBool("isBinding", false);
 			bindCo = null;
 			rb.gravityScale = 1;
 		}
@@ -1136,6 +1267,7 @@ public class PlayerControls : MonoBehaviour
 			stunLockCo = null;
 			yield break;
 		}
+		if (hunterSpinObj != null) hunterSpinObj.SetActive(false);
 		anim.SetBool("isStunLock", true);
 		inStunLock = true;
 		ResetAllBools();
@@ -1145,21 +1277,15 @@ public class PlayerControls : MonoBehaviour
 		SetHp();
 		anim.SetBool("isSkillAttacking", false);
 		anim.SetBool("isGossamerStorm", false);
+		anim.SetBool("isBinding", false);
 		usingSkill = false;
 		rb.gravityScale = 0;
-		rb.velocity = Vector2.zero;
-
-		// transform.position = stunLockPos.position;
-		SetStunLockDest(stunLockPos, 0.2f);
-
-		yield return new WaitForSeconds(0.1f);
 		rb.velocity = Vector2.zero;
 
 		// stop healing
 		if (bindCo != null) 
 		{
 			StopCoroutine(bindCo);
-			anim.SetBool("isBinding", false);
 			bindCo = null;
 			rb.gravityScale = 1;
 		}
@@ -1172,6 +1298,12 @@ public class PlayerControls : MonoBehaviour
 		{
 			GRAB_LEDGE();
 		}
+
+		// transform.position = stunLockPos.position;
+		SetStunLockDest(stunLockPos, 0.2f);
+
+		yield return new WaitForSeconds(0.1f);
+		rb.velocity = Vector2.zero;
 
 		yield return new WaitForSeconds(0.5f);
 		// Died
@@ -1213,6 +1345,7 @@ public class PlayerControls : MonoBehaviour
 		CinemachineShake.Instance.ShakeCam(15, 0.25f);
 		anim.SetBool("isSkillAttacking", false);
 		anim.SetBool("isGossamerStorm", false);
+		anim.SetBool("isBinding", false);
 		usingSkill = false;
 		// rb.gravityScale = 1;
 
@@ -1220,7 +1353,6 @@ public class PlayerControls : MonoBehaviour
 		if (bindCo != null) 
 		{
 			StopCoroutine(bindCo);
-			anim.SetBool("isBinding", false);
 			bindCo = null;
 			rb.gravityScale = 1;
 		}
@@ -1317,7 +1449,7 @@ public class PlayerControls : MonoBehaviour
 		SpawnExistingObjAtSelf(healingPs);
 		gitGudSound.Play();
 
-		yield return new WaitForSeconds(0.333f);
+		yield return new WaitForSeconds(0.333f / anim.GetFloat("bindSpeed"));
 		if (bindCo == null)
 			yield break;
 		rb.gravityScale = 1;
