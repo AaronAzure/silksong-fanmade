@@ -64,6 +64,8 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] bool isInvincible;
 	[SerializeField] bool hasLedge;
 	[SerializeField] bool hasWall;
+	[SerializeField] bool receivingKb;
+
 	[SerializeField] Transform ledgeCheckPos;
 	[SerializeField] Transform wallCheckPos;
 	[SerializeField] float ledgeGrabDist=0.3f;
@@ -139,6 +141,7 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] bool downwardStrike;
 	[SerializeField] bool dashStrike;
 	[SerializeField] bool beenHurt;
+	[SerializeField] bool risingAtk;
 	private bool isDead=false;
 
 
@@ -359,7 +362,7 @@ public class PlayerControls : MonoBehaviour
 
 				// Dash
 				CalcDash();
-				
+
 				Move();
 				CheckIsGrounded();
 				CheckIsWalled();
@@ -445,7 +448,7 @@ public class PlayerControls : MonoBehaviour
 
 			if (dashCounter <= 0)
 			{
-				if (!isGrounded || !player.GetButton("ZR")) 
+				if (!isGrounded || !player.GetButton("ZR") || risingAtk) 
 					isDashing = false;
 				activeMoveSpeed = (isDashing) ? dashSpeed : moveSpeed;
 				anim.SetFloat("moveSpeed", activeMoveSpeed);
@@ -458,6 +461,12 @@ public class PlayerControls : MonoBehaviour
 		}
 	}
 
+	public void CANCEL_DASH()
+	{
+		anim.SetBool("isDashing", false);
+		jumpDashed = false;
+		CancelDash();
+	}
 	void CancelDash()
 	{
 		dashCounter = 0;
@@ -527,7 +536,10 @@ public class PlayerControls : MonoBehaviour
 		float moveY = player.GetAxis("Move Vertical");
 		float x = (isGrounded && moveY > 0.8f) ? 0 : moveX;
 		anim.SetBool("isWalking", x != 0);
-		anim.SetBool("isDashing", isDashing);
+		if (!risingAtk)
+			anim.SetBool("isDashing", isDashing);
+		else
+			anim.SetBool("isDashing", false);
 
 		if (!cantRotate)
 		{
@@ -555,11 +567,11 @@ public class PlayerControls : MonoBehaviour
 		{
 			bool facingRight = (model.localScale.x > 0);
 			rb.AddForce(
-				new Vector2((facingRight ? 1 : -1) * activeMoveSpeed * 5, 0), 
+				new Vector2((facingRight ? 1 : -1) * activeMoveSpeed * 5 * (risingAtk ? 0.5f : 1), 0), 
 				ForceMode2D.Force
 			);
 			rb.velocity = new Vector2(
-				Mathf.Clamp(rb.velocity.x, -dashSpeed, dashSpeed), 
+				Mathf.Clamp(rb.velocity.x, -dashSpeed * (risingAtk ? 0.5f : 1), dashSpeed * (risingAtk ? 0.5f : 1)), 
 				rb.velocity.y
 			);
 		}
@@ -620,6 +632,9 @@ public class PlayerControls : MonoBehaviour
 
 		if (crestNum <= 1 && atkDir != 1)
 			CancelDash();
+		
+		if (isDashing && crestNum > 1 && isGrounded)
+			atkDir = 1;
 
 		if (slashObj != null)
 		{
@@ -627,6 +642,11 @@ public class PlayerControls : MonoBehaviour
 			anim.SetTrigger("attack");
 			anim.SetBool("isAttacking", true);
 
+			if (crestNum > 1 && atkDir == 1)
+			{
+				yield return new WaitForSeconds(0.167f);
+
+			}
 			// shaw attack
 			if (atkDir == 2)
 			{
@@ -862,6 +882,7 @@ public class PlayerControls : MonoBehaviour
 		if (isGrounded)
 		{
 			rb.velocity = new Vector2(rb.velocity.x, risingForce);
+			jumpDashed = false;
 		}
 	}
 
@@ -1243,6 +1264,13 @@ public class PlayerControls : MonoBehaviour
 		hurtCo = null;
 	}
 
+	private Coroutine kbCo;
+	IEnumerator ReceiveKnockbackCo()
+	{
+		yield return new WaitForSeconds(0.1f);
+		kbCo = null;
+	}
+
 	private int GetBindCost()
 	{
 		return crestNum == 1 ? harpBindCost : bindCost;
@@ -1385,11 +1413,11 @@ public class PlayerControls : MonoBehaviour
 		infiniteSilk = !infiniteSilk;
 	}
 
-	[Command("toggle_old_death", "death", MonoTargetType.All)] public void toggle_old_death()
-	{
-		if (Death.Instance != null)
-			Death.Instance.ToggleOldVer();
-	}
+	// [Command("toggle_old_death", "death", MonoTargetType.All)] public void toggle_old_death()
+	// {
+	// 	if (Death.Instance != null)
+	// 		Death.Instance.ToggleOldVer();
+	// }
 
 	[Command("restart", "restart", MonoTargetType.All)] public void restart()
 	{
