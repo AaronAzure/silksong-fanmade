@@ -20,7 +20,7 @@ public class PlayerControls : MonoBehaviour
 	[Space] [Header("Status")]
 	[SerializeField] int maxHp=7;
 	[SerializeField] int hp;
-	public int atkDmg=10;
+	public int[] atkDmg={10,8,15,10};
 	public int gossamerDmg=5;
 	public int stabDmg=20;
 	[SerializeField] int silkMeter;
@@ -38,6 +38,7 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] float moveSpeed=5;
 	[SerializeField] float jumpDashForce=10;
 	[SerializeField] float jumpForce=10;
+	[SerializeField] float risingForce=10;
 	[SerializeField] Vector2 wallJumpForce;
 	private float moveX;
 	private float dashDir;
@@ -95,6 +96,7 @@ public class PlayerControls : MonoBehaviour
 	private Coroutine bindCo;
 	private Coroutine parryCo;
 	[SerializeField] int bindCost=9;
+	[SerializeField] int harpBindCost=6;
 	[SerializeField] int skillStabCost=2;
 	[SerializeField] int skillGossamerCost=2;
 	private bool usingSkill;
@@ -181,7 +183,7 @@ public class PlayerControls : MonoBehaviour
 	[Space] [Header("Crests")]
 	[SerializeField] Crest[] crests;
 	[SerializeField] Image[] crestIcons;
-	private int crestNum;
+	public int crestNum;
 
 
 	[Space] [Header("Debug")]
@@ -285,7 +287,7 @@ public class PlayerControls : MonoBehaviour
 				SkillAttack();
 
 			// bind (heal)
-			else if (player.GetButtonDown("A") && (infiniteSilk || silkMeter >= bindCost) && bindCo == null)
+			else if (player.GetButtonDown("A") && (infiniteSilk || silkMeter >= GetBindCost()) && bindCo == null)
 				bindCo = StartCoroutine( BindCo() );
 
 			// tools
@@ -548,6 +550,7 @@ public class PlayerControls : MonoBehaviour
 			}
 			rb.velocity = new Vector2(x * activeMoveSpeed, rb.velocity.y);
 		}
+		// dashing
 		else
 		{
 			bool facingRight = (model.localScale.x > 0);
@@ -592,10 +595,11 @@ public class PlayerControls : MonoBehaviour
 
 	void Attack()
 	{
-		if (isDashing)
+		// dash atk
+		if (isDashing && crestNum <= 1)
 			atkCo = StartCoroutine( AttackCo(3) );
 		// attack up
-		else if (player.GetAxis("Move Vertical") > 0.8f)
+		else if (player.GetAxis("Move Vertical") > 0.7f)
 			atkCo = StartCoroutine( AttackCo(1) );
 		// shaw attack
 		else if (player.GetAxis("Move Vertical") < shawDir)
@@ -608,10 +612,14 @@ public class PlayerControls : MonoBehaviour
 	IEnumerator AttackCo(int atkDir=0)
 	{
 		if (atkCo != null) yield break;
+
+		// cannot shaw on the ground
 		if (atkDir == 2 && isGrounded)
 			atkDir = 0;
 		this.atkDir = atkDir;
-		CancelDash();
+
+		if (crestNum <= 1 && atkDir != 1)
+			CancelDash();
 
 		if (slashObj != null)
 		{
@@ -648,7 +656,7 @@ public class PlayerControls : MonoBehaviour
 	void SkillAttack()
 	{
 		// Gossamer Storm
-		if (player.GetAxis("Move Vertical") > 0.9f && (infiniteSilk || silkMeter >= skillStabCost))
+		if (player.GetAxis("Move Vertical") > 0.7f && (infiniteSilk || silkMeter >= skillStabCost))
 			atkCo = StartCoroutine( SkillAttackCo(1) );
 		// Stabby stabby strike
 		else if ((infiniteSilk || silkMeter >= skillStabCost))
@@ -828,6 +836,7 @@ public class PlayerControls : MonoBehaviour
 			crests[crestNum].ToggleCrest(true);
 			crestIcons[crestNum].color = new Color(1,1,1,1);
 		}
+		anim.SetFloat("crestNum", crestNum > 1 ? 1 : 0);
 	}
 
 	void Jump()
@@ -846,6 +855,14 @@ public class PlayerControls : MonoBehaviour
 		}
 		isJumping = true;
 		jumpTimer = 0;
+	}
+
+	public void PROPEL_UP()
+	{
+		if (isGrounded)
+		{
+			rb.velocity = new Vector2(rb.velocity.x, risingForce);
+		}
 	}
 
 	void JumpDashed()
@@ -987,10 +1004,10 @@ public class PlayerControls : MonoBehaviour
 		MusicManager.Instance.SoftenBgMusic();
 
 		anim.SetBool("isHurt", true);
-		hp = Mathf.Max(0, hp - dmg);
 		ResetAllBools();
 		atkCo = toolCo = null;
 		beenHurt = true;
+		hp = Mathf.Max(0, hp - dmg);
 		SetHp();
 		rb.velocity = Vector2.zero;
 		if (hp != 0)
@@ -1077,10 +1094,10 @@ public class PlayerControls : MonoBehaviour
 		}
 		anim.SetBool("isStunLock", true);
 		inStunLock = true;
-		hp = Mathf.Max(0, hp - 1);
 		ResetAllBools();
 		atkCo = toolCo = null;
 		// beenHurt = true;
+		hp = Mathf.Max(0, hp - 1);
 		SetHp();
 		anim.SetBool("isSkillAttacking", false);
 		anim.SetBool("isGossamerStorm", false);
@@ -1143,10 +1160,10 @@ public class PlayerControls : MonoBehaviour
 		MusicManager.Instance.PlayHurtSFX();
 
 		anim.SetBool("isHurt", true);
-		hp = 0;
 		ResetAllBools();
 		atkCo = toolCo = null;
 		beenHurt = true;
+		hp = 0;
 		SetHp();
 		rb.velocity = Vector2.zero;
 		CinemachineShake.Instance.ShakeCam(15, 0.25f);
@@ -1226,15 +1243,20 @@ public class PlayerControls : MonoBehaviour
 		hurtCo = null;
 	}
 
+	private int GetBindCost()
+	{
+		return crestNum == 1 ? harpBindCost : bindCost;
+	}
+
 	IEnumerator BindCo()
 	{
-		if (silkMeter < bindCost)
+		if (silkMeter < GetBindCost())
 		{
 			bindCo = null;
 			yield break;
 		} 
 		anim.SetBool("isBinding", true);
-		if (!infiniteSilk) SetSilk(-bindCost);
+		if (!infiniteSilk) SetSilk(-GetBindCost());
 		rb.gravityScale = 0;
 		rb.velocity = Vector2.zero;
 		activeMoveSpeed = moveSpeed;
@@ -1249,7 +1271,7 @@ public class PlayerControls : MonoBehaviour
 			yield break;
 		rb.gravityScale = 1;
 		// anim.SetBool("isBinding", false);
-		hp = Mathf.Min(hp+3, hpMasks.Length);
+		hp = Mathf.Min(hp+(crestNum == 1 ? 2 : 3), hpMasks.Length);
 		SetHp(true);
 		bindCo = null;
 	}
@@ -1309,7 +1331,7 @@ public class PlayerControls : MonoBehaviour
 
 		if (spoolImg != null)
 		{
-			spoolImg.sprite = (silkMeter >= bindCost) ? 
+			spoolImg.sprite = (silkMeter >= GetBindCost()) ? 
 				fullSpoolSpr : emptySpoolSpr;
 		}
 

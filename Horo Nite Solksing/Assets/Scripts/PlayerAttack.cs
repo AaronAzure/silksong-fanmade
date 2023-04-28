@@ -45,7 +45,7 @@ public class PlayerAttack : MonoBehaviour
 					);
 				}
 				
-				int dmg = !isStabAttack ? (!isGossamerStorm ? p.atkDmg : p.gossamerDmg) : p.stabDmg;
+				int dmg = !isStabAttack ? (!isGossamerStorm ? p.atkDmg[p.crestNum] : p.gossamerDmg) : p.stabDmg;
 				target.TakeDamage(
 					dmg, 
 					isGossamerStorm ? transform : null,
