@@ -10,6 +10,7 @@ public abstract class Enemy : MonoBehaviour
 	protected bool atPhase2;
 	[SerializeField] protected int phase3;
 	protected bool atPhase3;
+	[Space] [SerializeField] DmgPopup dmgPopup;
 	[Space] [SerializeField] protected int staggerCount=150;
 	[SerializeField] protected int hitCount;
 	[SerializeField] protected float recoverTime=1f;
@@ -293,6 +294,11 @@ public abstract class Enemy : MonoBehaviour
 	IEnumerator TakeDamageCo(int dmg, Transform opponent, Vector2 forceDir, float force, bool canShake)
 	{
 		hp -= dmg;
+		if (dmgPopup != null)
+		{
+			var obj = Instantiate(dmgPopup, transform.position + Vector3.up, Quaternion.identity);
+			obj.txt.text = $"{dmg}";
+		}
 		beenHurt = true;
 		if (opponent != null)
 			forceDir = (self.position - opponent.position).normalized;
