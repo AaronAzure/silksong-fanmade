@@ -294,7 +294,7 @@ public abstract class Enemy : MonoBehaviour
 	IEnumerator TakeDamageCo(int dmg, Transform opponent, Vector2 forceDir, float force, bool canShake)
 	{
 		hp -= dmg;
-		if (dmgPopup != null)
+		if (GameManager.Instance.showDmg && dmgPopup != null)
 		{
 			var obj = Instantiate(dmgPopup, transform.position + Vector3.up, Quaternion.identity);
 			obj.txt.text = $"{dmg}";
