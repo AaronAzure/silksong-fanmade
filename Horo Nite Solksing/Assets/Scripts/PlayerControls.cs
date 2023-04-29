@@ -112,7 +112,8 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] Sprite fullSpoolSpr;
 	[SerializeField] Sprite emptySpoolSpr;
 	[SerializeField] GameObject cacoonObj;
-	[SerializeField] GameObject blackScreenObj;
+	[SerializeField] Animator blackScreenAnim;
+	[SerializeField] GameObject deathAnimObj;
 
 
 	[Space] [Header("Sound effects")]
@@ -1079,6 +1080,8 @@ public class PlayerControls : MonoBehaviour
 	public void Recoil()
 	{
 		rb.velocity = Vector2.zero;
+		isDashing = false;
+		jumpDashed = false;
 
 		rb.AddForce( new Vector2(-moveDir * recoilForce, 0), ForceMode2D.Impulse);
 		StartCoroutine( RegainControlCo(0.1f) );
@@ -1384,9 +1387,15 @@ public class PlayerControls : MonoBehaviour
 		}
 	}
 
+
+	public void DEATH_ANIM_ON()
+	{
+		if (deathAnimObj != null)
+			deathAnimObj.SetActive(true);
+	}
 	IEnumerator DiedCo()
 	{
-		CinemachineShake.Instance.ShakeCam(10f, 5f, 1, true);
+		CinemachineShake.Instance.ShakeCam(8f, 5f, 0.8f, true);
 		MusicManager.Instance.PlayMusic(null);
 		isDead = true;
 		nKilled = 0;
@@ -1396,8 +1405,7 @@ public class PlayerControls : MonoBehaviour
 		deathScene = SceneManager.GetActiveScene().name;
 		deathPos = transform.position;
 
-		blackScreenObj.SetActive(false);
-		yield return new WaitForSeconds(3);
+		yield return new WaitForSeconds(2);
 		transform.position = savedPos;
 		AsyncOperation loadingOperation = SceneManager.LoadSceneAsync(savedScene);
 		float loadTime = 0;
@@ -1407,7 +1415,12 @@ public class PlayerControls : MonoBehaviour
 			loadTime += Time.deltaTime;
 			yield return null;
 		}
-		blackScreenObj.SetActive(true);
+		blackScreenAnim.SetFloat("speed", 0);
+		blackScreenAnim.SetTrigger("reset");
+		yield return new WaitForSeconds(0.05f);
+		if (deathAnimObj != null)
+			deathAnimObj.SetActive(false);
+		blackScreenAnim.SetFloat("speed", 1);
 
 		if (cacoonObj != null && deathScene == SceneManager.GetActiveScene().name)
 		{
@@ -1426,12 +1439,6 @@ public class PlayerControls : MonoBehaviour
 		hurtCo = null;
 	}
 
-	private Coroutine kbCo;
-	IEnumerator ReceiveKnockbackCo()
-	{
-		yield return new WaitForSeconds(0.1f);
-		kbCo = null;
-	}
 
 	private int GetBindCost()
 	{
@@ -1585,7 +1592,7 @@ public class PlayerControls : MonoBehaviour
 	{
 		transform.position = savedPos;
 		SceneManager.LoadScene(savedScene);
-		blackScreenObj.SetActive(true);
+		blackScreenAnim.SetTrigger("reset");
 		cacoonObj.SetActive(false);
 		inStunLock = isDead = false;
 		rb.gravityScale = 1;

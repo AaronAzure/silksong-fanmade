@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class PlayerAttack : MonoBehaviour
 {
@@ -15,6 +16,25 @@ public class PlayerAttack : MonoBehaviour
 	[SerializeField] float offset=15;
 	[SerializeField] GameObject parryEffect;
 
+
+	[Space] [SerializeField] bool ensureSingleHit;
+	private HashSet<GameObject> alreadyHit;
+
+	private void Awake() 
+	{
+		if (ensureSingleHit)
+		{
+			alreadyHit = new HashSet<GameObject>();
+		}	
+	}
+
+	private void OnEnable() 
+	{
+		if (ensureSingleHit)
+		{
+			alreadyHit.Clear();
+		}
+	}
 
 	private void OnTriggerEnter2D(Collider2D other) 
 	{
@@ -34,6 +54,13 @@ public class PlayerAttack : MonoBehaviour
 		}
 		if (other.CompareTag("Enemy"))
 		{
+			if (ensureSingleHit)
+			{
+				if (alreadyHit.Contains(other.gameObject))
+					return;
+				else
+					alreadyHit.Add(other.gameObject);
+			}
 			Enemy target = other.GetComponent<Enemy>();
 			Vector2 temp = (other.transform.position - transform.position).normalized;
 			float angleZ = 
