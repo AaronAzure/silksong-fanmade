@@ -33,6 +33,7 @@ public abstract class Enemy : MonoBehaviour
 	[SerializeField] protected bool isSmart; // if attacked face direction;
 	[SerializeField] protected bool controlledByAnim;
 	[SerializeField] protected bool cannotTakeKb;
+	[SerializeField] protected bool cannotTakeDmg;
 	[SerializeField] float moveSpeed=2.5f;
 	[SerializeField] protected float chaseSpeed=7.5f;
 	[SerializeField] protected float jumpForce=10f;
@@ -120,7 +121,7 @@ public abstract class Enemy : MonoBehaviour
 	protected virtual void CallChildOnFixedUpdate() { }
 	protected virtual void CallChildOnPhase2() { }
 	protected virtual void CallChildOnPhase3() { }
-	protected virtual void CallChildOnHurt(int dmg=10) { }
+	protected virtual void CallChildOnHurt(int dmg, Vector2 forceDir) { }
 	protected virtual void CallChildOnHurtAfter() { }
 	protected virtual void CallChildOnDeath() { }
 	protected virtual void CallChildOnParry() { }
@@ -293,7 +294,8 @@ public abstract class Enemy : MonoBehaviour
 
 	IEnumerator TakeDamageCo(int dmg, Transform opponent, Vector2 forceDir, float force, bool canShake)
 	{
-		hp -= dmg;
+		if (!cannotTakeDmg)
+			hp -= dmg;
 		if (GameManager.Instance.showDmg && dmgPopup != null)
 		{
 			var obj = Instantiate(dmgPopup, transform.position + Vector3.up, Quaternion.identity);
@@ -305,7 +307,8 @@ public abstract class Enemy : MonoBehaviour
 		float angleZ = 
 			Mathf.Atan2(Mathf.Abs(forceDir.y), forceDir.x) * Mathf.Rad2Deg;
 		Instantiate(silkEffectObj, transform.position, Quaternion.Euler(0,0,angleZ+offset*forceDir.x));
-		Instantiate(bloodEffectObj, transform.position, Quaternion.Euler(0,0,angleZ+offset*forceDir.x));
+		if (!cannotTakeDmg)
+			Instantiate(bloodEffectObj, transform.position, Quaternion.Euler(0,0,angleZ+offset*forceDir.x));
 		if (!cannotTakeKb && force != 0)
 		{
 			receivingKb = true;
@@ -335,7 +338,7 @@ public abstract class Enemy : MonoBehaviour
 		if (isSmart && !attackingPlayer)
 			FacePlayer();
 
-		CallChildOnHurt(dmg);
+		CallChildOnHurt(dmg, forceDir);
 		yield return new WaitForSeconds(0.2f);
 		foreach (SpriteRenderer sprite in sprites)
 			sprite.material = defaultMat;

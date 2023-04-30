@@ -138,7 +138,7 @@ public class Death : Enemy
 		// ATTACK_PATTERN();
 	}
 
-	protected override void CallChildOnHurt(int dmg=0)
+	protected override void CallChildOnHurt(int dmg, Vector2 forceDir)
 	{
 		if (anim.GetBool("isStagger"))
 			return;

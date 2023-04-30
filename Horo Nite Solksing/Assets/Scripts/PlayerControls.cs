@@ -202,6 +202,11 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] GameObject hunterSpinObj;
 
 
+	[SerializeField] bool invulnerable;
+	[SerializeField] bool movingToNextScene;
+	[SerializeField] bool movingRight;
+
+
 	[Space] [Header("Debug")]
 	[SerializeField] [Range(1,10)] int silkMultiplier=1;
 	[SerializeField] bool invincible;
@@ -548,6 +553,15 @@ public class PlayerControls : MonoBehaviour
 
 	void Move()
 	{
+		if (movingToNextScene)
+		{
+			rb.velocity = new Vector2(
+				(movingRight ? 1 : -1) * activeMoveSpeed, 
+				rb.velocity.y
+			);
+			return;
+		}
+
 		if (jumpDashed)
 			rb.velocity = new Vector2(dashDir * jumpDashForce, rb.velocity.y);
 			
@@ -1068,14 +1082,6 @@ public class PlayerControls : MonoBehaviour
 				shawEffectObj.SetActive(true);
 				break;
 		}
-		// if (crestNum <= 1)
-		// {
-		// 	rb.AddForce( new Vector2(-moveDir * shawForce, shawForce), ForceMode2D.Impulse);
-		// 	StartCoroutine( RegainControlCo(0.1f) );
-		// }
-		// else
-		// {
-		// }
 	}
 	public void Recoil()
 	{
@@ -1142,11 +1148,16 @@ public class PlayerControls : MonoBehaviour
 		if (hunterSpinObj != null) hunterSpinObj.SetActive(false);
 	}
 
+	private bool CanBeHurt()
+	{
+		return (!isDead && !invulnerable && !invincible && !justParried);
+	}
+
 	private void OnTriggerStay2D(Collider2D other) 
 	{
-		if (!isDead && !invincible && !justParried && (other.CompareTag("Enemy") || other.CompareTag("EnemyAttack")) && hurtCo == null)
+		if (CanBeHurt() && (other.CompareTag("Enemy") || other.CompareTag("EnemyAttack")) && hurtCo == null)
 			hurtCo = StartCoroutine( TakeDamageCo(other.transform) );
-		if (!isDead && !invincible && !justParried && other.CompareTag("EnemyStrongAttack") && hurtCo == null)
+		if (CanBeHurt() && other.CompareTag("EnemyStrongAttack") && hurtCo == null)
 			hurtCo = StartCoroutine( TakeDamageCo(other.transform, 2) );
 	}
 
@@ -1166,6 +1177,12 @@ public class PlayerControls : MonoBehaviour
 		{
 			bench = other.GetComponent<Bench>();
 			t = 0;
+		}
+		if (!movingToNextScene && other.CompareTag("NewArea"))
+		{
+			movingRight = (other.transform.position.x - self.position.x > 0);
+			NewScene n = other.GetComponent<NewScene>();
+			StartCoroutine( MoveToNextScene(n.newSceneName, n.newScenePos) );
 		}
 	}
 
@@ -1387,7 +1404,6 @@ public class PlayerControls : MonoBehaviour
 		}
 	}
 
-
 	public void DEATH_ANIM_ON()
 	{
 		if (deathAnimObj != null)
@@ -1437,6 +1453,30 @@ public class PlayerControls : MonoBehaviour
 		FullRestore();	// respawn
 		SetSilk(-silkMeter);
 		hurtCo = null;
+	}
+
+
+
+	IEnumerator MoveToNextScene(string newSceneName, Vector2 newScenePos)
+	{
+		movingToNextScene = invulnerable = true;
+		yield return new WaitForSeconds(0.25f);
+		blackScreenAnim.SetTrigger("toBlack");
+
+		yield return new WaitForSeconds(0.25f);
+		AsyncOperation loadingOperation = SceneManager.LoadSceneAsync(newSceneName);
+		float loadTime = 0;
+		// wait for scene to load
+		while (!loadingOperation.isDone && loadTime < 5)
+		{
+			loadTime += Time.deltaTime;
+			yield return null;
+		}
+		transform.position = newScenePos;
+		blackScreenAnim.SetTrigger("reset");
+		
+		yield return new WaitForSeconds(0.5f);
+		movingToNextScene = invulnerable = false;
 	}
 
 

@@ -31,7 +31,7 @@ public class MusicManager : MonoBehaviour
 		if (Instance == null)
 			Instance = this;
 		else
-			Destroy(this);
+			Destroy(gameObject);
 		// DontDestroyOnLoad(this);
 
 		if (bgMusic != null) 
