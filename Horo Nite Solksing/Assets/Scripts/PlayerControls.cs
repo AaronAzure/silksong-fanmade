@@ -203,6 +203,7 @@ public class PlayerControls : MonoBehaviour
 
 
 	[SerializeField] bool invulnerable;
+	[SerializeField] float nextSceneSpeed;
 	[SerializeField] bool movingToNextScene;
 	[SerializeField] bool movingRight;
 
@@ -556,7 +557,7 @@ public class PlayerControls : MonoBehaviour
 		if (movingToNextScene)
 		{
 			rb.velocity = new Vector2(
-				(movingRight ? 1 : -1) * activeMoveSpeed, 
+				nextSceneSpeed, 
 				rb.velocity.y
 			);
 			return;
@@ -1460,6 +1461,7 @@ public class PlayerControls : MonoBehaviour
 	IEnumerator MoveToNextScene(string newSceneName, Vector2 newScenePos)
 	{
 		movingToNextScene = invulnerable = true;
+		nextSceneSpeed = (rb.velocity.x > 0) ? 1 : -1;
 		yield return new WaitForSeconds(0.25f);
 		blackScreenAnim.SetTrigger("toBlack");
 
