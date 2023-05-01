@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,6 +7,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Rewired;
 using ED.SC;
+using TMPro;
 // using SmartConsole;
 
 public class PlayerControls : MonoBehaviour
@@ -219,6 +221,11 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] Vector2 savedPos;
 	[SerializeField] string deathScene;
 	[SerializeField] Vector2 deathPos;
+	private bool timeStarted;
+	public bool isCountingTime;
+	[SerializeField] TimeSpan timeSpan;
+	[SerializeField] float timePlayed;
+	[SerializeField] TextMeshProUGUI timePlayedTxt;
 	[SerializeField] Rewired.Integration.UnityUI.RewiredStandaloneInputModule rinput;
 	// public static PlayerControls Instance;
 	private int nKilled=0;
@@ -260,7 +267,7 @@ public class PlayerControls : MonoBehaviour
 		FullRestore(); // starting
 		Screen.SetResolution((int) (16f/9f * Screen.height), Screen.height, true);
 		if (pauseMenu != null) pauseMenu.SetActive(false);
-		// if (rinput != null) rinput.RewiredInputManager
+		// isCountingTime = true;
 	}
 
 	bool CanControl()
@@ -291,6 +298,23 @@ public class PlayerControls : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
+		if (!timeStarted && player.GetAnyButton())
+		{
+			timeStarted = true;
+			isCountingTime = true;
+		}
+		if (isCountingTime)
+		{
+			timePlayed += Time.unscaledDeltaTime;
+			TimeSpan time = TimeSpan.FromSeconds(timePlayed);
+			timePlayedTxt.text = time.ToString(@"mm\:ss\.ff");
+			// float now = Time.realtimeSinceStartup;
+			// int mins = (int) (timePlayed / 60f);
+			// float secs = timePlayed % 60;
+			// string secTxt = secs < 10 ? "0" + secs.ToString("F2") : secs.ToString("F2");
+			// timePlayedTxt.text = $"{mins}:{secTxt}";
+		}
+
 		if (!isPaused && pauseAnim != null && player.GetButtonDown("Start"))
 		{
 			isPaused = true;
@@ -402,7 +426,7 @@ public class PlayerControls : MonoBehaviour
 			t += Time.fixedDeltaTime/stunLockTime;
 			transform.position = Vector3.Lerp(startPosition, stunLockPos.position, t);
 		}
-		else if (!isDead && isResting && t < 1)
+		else if (!isDead && bench != null && isResting && t < 1)
 		{
 			anim.SetFloat("restTime", t);
 			t += Time.fixedDeltaTime/stunLockTime;
@@ -871,7 +895,7 @@ public class PlayerControls : MonoBehaviour
 					toolSummonPos.position, 
 					Quaternion.identity
 				);
-				toolCopy.velocityMultiplier = Random.Range(0.5f,1.5f);
+				toolCopy.velocityMultiplier = UnityEngine.Random.Range(0.5f,1.5f);
 				toolCopy.toRight = model.localScale.x > 0 ? true : false;
 			}
 		}
@@ -1031,7 +1055,11 @@ public class PlayerControls : MonoBehaviour
 		SetHp(true);
 
 		if (clearShadowRealmList)
+		{
 			GameManager.Instance.ClearShadowRealmList();
+			savedScene = SceneManager.GetActiveScene().name;
+			savedPos = self.position;
+		}
 
 		if (tool1 != null && toolUses1 != null)
 		{
@@ -1434,6 +1462,7 @@ public class PlayerControls : MonoBehaviour
 		yield return new WaitForSeconds(2);
 		GameManager.Instance.ClearShadowRealmList();
 		transform.position = savedPos;
+		isCountingTime = false;
 		AsyncOperation loadingOperation = SceneManager.LoadSceneAsync(savedScene);
 		float loadTime = 0;
 		// wait for scene to load
@@ -1442,6 +1471,7 @@ public class PlayerControls : MonoBehaviour
 			loadTime += Time.deltaTime;
 			yield return null;
 		}
+		isCountingTime = true;
 		blackScreenAnim.SetFloat("speed", 0);
 		blackScreenAnim.SetTrigger("reset");
 		yield return new WaitForSeconds(0.05f);
@@ -1457,6 +1487,7 @@ public class PlayerControls : MonoBehaviour
 		anim.SetBool("isHurt", false);
 		beenHurt = false;
 		if (soulLeakPs != null) soulLeakPs.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+		MusicManager.Instance.PlayMusic(MusicManager.Instance.bgMusic);
 		FullRestore();	// respawn
 		SetSilk(-silkMeter);
 		hurtCo = null;
@@ -1476,6 +1507,7 @@ public class PlayerControls : MonoBehaviour
 	{
 		canMove = movingToNextScene = invulnerable = true;
 		nextSceneSpeed = (rb.velocity.x > 0) ? 1 : -1;
+		isCountingTime = false;
 		yield return new WaitForSeconds(0.1f);
 		blackScreenAnim.SetTrigger("toBlack");
 
@@ -1488,11 +1520,12 @@ public class PlayerControls : MonoBehaviour
 			loadTime += Time.deltaTime;
 			yield return null;
 		}
+		isCountingTime = true;
 		canMove = false;
 		transform.position = newScenePos;
 		blackScreenAnim.SetTrigger("reset");
 		CheckForCacoon();
-		
+
 		yield return new WaitForSeconds(0.5f);
 		canMove = true;
 		

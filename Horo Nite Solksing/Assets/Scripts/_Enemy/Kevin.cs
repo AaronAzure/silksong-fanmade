@@ -16,6 +16,12 @@ public class Kevin : Enemy
 		WalkAround();
 	}
 
+	protected override void CallChildOnFixedUpdate()
+	{
+		if (anim != null)
+			anim.SetBool("inAttackAnim", inAttackAnim);
+	}
+
 	protected override void AttackingAction()
 	{
 		if (!inAttackAnim)

@@ -13,6 +13,7 @@ public class Room : MonoBehaviour
 	[SerializeField] GameObject ui;
 	[SerializeField] bool alwaysLockCam;
 	private bool checkedIfCleared;
+	[Space] [SerializeField] GameObject otherObj;
 
 	private void Start() 
 	{
@@ -20,7 +21,10 @@ public class Room : MonoBehaviour
 			wall.SetActive(false);
 		// PlayerControls p = PlayerControls.Instance;
 		if (!checkedIfCleared)
-			CheckedIfCleared();
+		{
+			if (CheckedIfCleared() && otherObj != null)
+				otherObj.SetActive(true);
+		}
 
 		foreach (Enemy enemy in enemies)
 		{

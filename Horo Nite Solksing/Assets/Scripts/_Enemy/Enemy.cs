@@ -79,6 +79,7 @@ public abstract class Enemy : MonoBehaviour
 	protected float maxSearchTime=2;
 	[SerializeField] protected bool spawningIn; // set by animation
 	public bool cannotAtk;
+	public bool activated;
 	public bool inParryState;
 
 
@@ -154,7 +155,7 @@ public abstract class Enemy : MonoBehaviour
 
 	public virtual void FixedUpdate()
     {
-		if (cannotAtk)
+		if (cannotAtk || !activated)
 			return;
 		CallChildOnEarlyUpdate();
 		if (spawningIn || controlledByAnim) return;
@@ -311,8 +312,9 @@ public abstract class Enemy : MonoBehaviour
 		beenHurt = true;
 		if (opponent != null)
 			forceDir = (self.position - opponent.position).normalized;
+		float forceY = isFlying ? forceDir.y : Mathf.Abs(forceDir.y);
 		float angleZ = 
-			Mathf.Atan2(Mathf.Abs(forceDir.y), forceDir.x) * Mathf.Rad2Deg;
+			Mathf.Atan2(forceY, forceDir.x) * Mathf.Rad2Deg;
 		Instantiate(silkEffectObj, transform.position, Quaternion.Euler(0,0,angleZ+offset*forceDir.x));
 		if (!cannotTakeDmg)
 			Instantiate(bloodEffectObj, transform.position, Quaternion.Euler(0,0,angleZ+offset*forceDir.x));
@@ -418,6 +420,12 @@ public abstract class Enemy : MonoBehaviour
 	{
 		col.enabled = true;
 		spawningIn = false;
+	}
+
+	private void OnTriggerEnter2D(Collider2D other) 
+	{
+		if (!activated && other.CompareTag("MainCamera"))	
+			activated = true;
 	}
 	
 
