@@ -1449,11 +1449,7 @@ public class PlayerControls : MonoBehaviour
 			deathAnimObj.SetActive(false);
 		blackScreenAnim.SetFloat("speed", 1);
 
-		if (cacoonObj != null && deathScene == SceneManager.GetActiveScene().name)
-		{
-			cacoonObj.SetActive(true);
-			cacoonObj.transform.position = deathPos;
-		}
+		CheckForCacoon();
 		inStunLock = isDead = false;
 		justParried = false;
 		rb.gravityScale = 1;
@@ -1466,6 +1462,14 @@ public class PlayerControls : MonoBehaviour
 		hurtCo = null;
 	}
 
+	void CheckForCacoon()
+	{
+		if (cacoonObj != null && deathScene == SceneManager.GetActiveScene().name)
+		{
+			cacoonObj.SetActive(true);
+			cacoonObj.transform.position = deathPos;
+		}
+	}
 
 
 	IEnumerator MoveToNextScene(string newSceneName, Vector2 newScenePos)
@@ -1487,7 +1491,8 @@ public class PlayerControls : MonoBehaviour
 		canMove = false;
 		transform.position = newScenePos;
 		blackScreenAnim.SetTrigger("reset");
-
+		CheckForCacoon();
+		
 		yield return new WaitForSeconds(0.5f);
 		canMove = true;
 		

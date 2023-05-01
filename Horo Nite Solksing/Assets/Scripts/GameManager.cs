@@ -7,7 +7,8 @@ public class GameManager : MonoBehaviour
 {
 	public static GameManager Instance;
 	[field : SerializeField] public bool showDmg {get; private set;}
-	public HashSet<string> shadowRealmed;
+	[field: SerializeField] public HashSet<string> shadowRealmed;
+	[field: SerializeField] public HashSet<string> roomCleared;
 
 
 	void Awake()
@@ -18,6 +19,7 @@ public class GameManager : MonoBehaviour
 			Destroy(gameObject);
 		DontDestroyOnLoad(gameObject);
 		shadowRealmed = new HashSet<string>();
+		roomCleared = new HashSet<string>();
 	}	
 
 	public void RegisterNameToShadowRealm(string name)
@@ -40,5 +42,27 @@ public class GameManager : MonoBehaviour
 			shadowRealmed = new HashSet<string>();
 
 		shadowRealmed.Clear();
+	}
+
+	public void RegisterRoomClearedList(string name)
+	{
+		if (roomCleared == null)
+			roomCleared = new HashSet<string>();
+
+		roomCleared.Add(SceneManager.GetActiveScene().name + " " + name);
+	}
+	public bool CheckRoomClearedList(string name)
+	{
+		if (roomCleared == null)
+			roomCleared = new HashSet<string>();
+
+		return roomCleared.Contains(SceneManager.GetActiveScene().name + " " + name);
+	}
+	public void ClearRoomClearedList()
+	{
+		if (roomCleared == null)
+			roomCleared = new HashSet<string>();
+
+		roomCleared.Clear();
 	}
 }

@@ -12,18 +12,37 @@ public class Room : MonoBehaviour
 	[SerializeField] int nDefeated;
 	[SerializeField] GameObject ui;
 	[SerializeField] bool alwaysLockCam;
+	private bool checkedIfCleared;
 
 	private void Start() 
 	{
-		PlayerControls p = GameObject.Find("HORNET (PLAYER)").GetComponent<PlayerControls>();
+		foreach (GameObject wall in walls)
+			wall.SetActive(false);
+		// PlayerControls p = PlayerControls.Instance;
+		if (!checkedIfCleared)
+			CheckedIfCleared();
+
 		foreach (Enemy enemy in enemies)
 		{
 			enemy.cannotAtk = true;	
-			enemy.target = p;
+			// enemy.target = p;
 			enemy.room = this;
 		}
-		foreach (GameObject wall in walls)
-			wall.SetActive(false);
+	}
+
+	bool CheckedIfCleared()
+	{
+		checkedIfCleared = true;
+		if (GameManager.Instance.CheckRoomClearedList(gameObject.name))
+		{
+			startBossFight = done = true;
+			foreach (Enemy enemy in enemies)
+				Destroy(enemy.gameObject);
+			foreach (GameObject wall in walls)
+				wall.SetActive(false);
+			return true;
+		}
+		return false;
 	}
 
 	public void Defeated()
@@ -40,6 +59,7 @@ public class Room : MonoBehaviour
 	{
 		if (done) yield break;
 
+		GameManager.Instance.RegisterRoomClearedList(gameObject.name);
 		done = true;
 		MusicManager.Instance.PlayMusic(MusicManager.Instance.prevMusic);
 		yield return new WaitForSeconds(1);
@@ -56,7 +76,14 @@ public class Room : MonoBehaviour
 		if (!startBossFight && other.CompareTag("Player"))
 		{
 			startBossFight = true;
-			Debug.Log("Player Entered Room");
+			if (!checkedIfCleared)
+			{
+				if (CheckedIfCleared())
+				{
+					return;
+				}
+			}
+			
 			if (ui != null) ui.SetActive(true);
 			
 			foreach (Enemy enemy in enemies)
