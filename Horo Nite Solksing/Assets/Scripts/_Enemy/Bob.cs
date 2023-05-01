@@ -7,6 +7,7 @@ public class Bob : Enemy
 	[SerializeField] Enemy otto;
 	[SerializeField] Enemy edulitoh;
 	[SerializeField] Transform spawnPos;
+	[SerializeField] bool canSpawnEdulitoh;
 	private int x;
 
 
@@ -29,7 +30,7 @@ public class Bob : Enemy
 	{
 		if (x % 4 == 0)
 		{
-			int rng = Random.Range(0,4);
+			int rng = (canSpawnEdulitoh ? Random.Range(0,4) : 1);
 			var obj = Instantiate(rng == 0 ? edulitoh : otto, spawnPos.position, Quaternion.identity);
 			obj.SpawnIn();
 		}

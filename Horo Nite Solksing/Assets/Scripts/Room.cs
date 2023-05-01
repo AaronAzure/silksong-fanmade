@@ -11,6 +11,7 @@ public class Room : MonoBehaviour
 	private bool startBossFight;
 	[SerializeField] int nDefeated;
 	[SerializeField] GameObject ui;
+	[SerializeField] bool alwaysLockCam;
 
 	private void Start() 
 	{
@@ -46,7 +47,8 @@ public class Room : MonoBehaviour
 		// 	wall.SetActive(false);
 		foreach (Animator anim in anims)
 			anim.SetTrigger("open");
-		roomCam.SetActive(false);
+		if (!alwaysLockCam)
+			roomCam.SetActive(false);
 	}
 
     private void OnTriggerEnter2D(Collider2D other) 
@@ -69,6 +71,18 @@ public class Room : MonoBehaviour
 
 			roomCam.SetActive(true);
 			this.enabled = false;
+		}
+		if (done && alwaysLockCam && other.CompareTag("Player"))
+		{
+			roomCam.SetActive(true);
+		}
+	}
+
+	private void OnTriggerExit2D(Collider2D other) 
+	{
+		if (done && alwaysLockCam && other.CompareTag("Player"))
+		{
+			roomCam.SetActive(false);
 		}
 	}
 }

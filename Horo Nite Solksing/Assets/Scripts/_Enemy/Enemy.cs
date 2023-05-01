@@ -135,20 +135,27 @@ public abstract class Enemy : MonoBehaviour
 			CallChildOnRoomEnter();
 		}
 	}
-	public virtual void CallChildOnRoomEnter() { }
+	public virtual void CallChildOnRoomEnter() { cannotAtk = false;}
 
     // Start is called before the first frame update
     public virtual void Start() 
     {
-		// isFlying = rb.gravityScale == 0 ? true : false;
+		if (GameManager.Instance.CheckShadowRealmList(gameObject.name))
+			Destroy(gameObject);
+		
 		initDir = (int) model.localScale.x;
 		nextDir = -initDir;
 		currentAction = (initDir == 1) ? CurrentAction.right : CurrentAction.left;
+		
+		if (PlayerControls.Instance != null)
+			target = PlayerControls.Instance;
 		CallChildOnStart();
     }
 
 	public virtual void FixedUpdate()
     {
+		if (cannotAtk)
+			return;
 		CallChildOnEarlyUpdate();
 		if (spawningIn || controlledByAnim) return;
 
@@ -332,6 +339,7 @@ public abstract class Enemy : MonoBehaviour
 		{
 			rb.AddForce(Vector2.up * 5, ForceMode2D.Impulse);
 			Died(canShake);
+			GameManager.Instance.RegisterNameToShadowRealm(gameObject.name);
 			yield break;
 		}
 
@@ -394,6 +402,9 @@ public abstract class Enemy : MonoBehaviour
 	public void SpawnIn()
 	{
 		if (anim != null) anim.SetTrigger("spawn");
+		if (PlayerControls.Instance != null)
+			target = PlayerControls.Instance;
+		FacePlayer();
 		spawningIn = true;
 		col.enabled = false;
 	}

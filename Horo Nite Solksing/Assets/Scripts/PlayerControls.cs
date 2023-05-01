@@ -202,10 +202,11 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] GameObject hunterSpinObj;
 
 
-	[SerializeField] bool invulnerable;
-	[SerializeField] float nextSceneSpeed;
-	[SerializeField] bool movingToNextScene;
-	[SerializeField] bool movingRight;
+	private bool invulnerable;
+	private float nextSceneSpeed;
+	private bool movingToNextScene;
+	private bool canMove;
+	private bool movingRight;
 
 
 	[Space] [Header("Debug")]
@@ -332,7 +333,7 @@ public class PlayerControls : MonoBehaviour
 					rb.velocity = Vector2.zero;
 					anim.SetBool("isResting", true);
 					startPosition = transform.position;
-					FullRestore(); // rest
+					FullRestore(true); // rest
 				}
 			}
 
@@ -389,7 +390,7 @@ public class PlayerControls : MonoBehaviour
 				if (!inAirDash)
 					Move();
 				else
-					rb.velocity = new Vector2(model.localScale.x * dashSpeed * 0.75f, rb.velocity.y);
+					rb.velocity = new Vector2(model.localScale.x * dashSpeed * 0.9f, rb.velocity.y);
 				CheckIsGrounded();
 				CheckIsWalled();
 				if (jumpDashed && jumped && (isGrounded || isWallSliding || canLedgeGrab))
@@ -556,10 +557,15 @@ public class PlayerControls : MonoBehaviour
 	{
 		if (movingToNextScene)
 		{
-			rb.velocity = new Vector2(
-				nextSceneSpeed, 
-				rb.velocity.y
-			);
+			if (canMove)
+			{
+				rb.velocity = new Vector2(
+					nextSceneSpeed * activeMoveSpeed, 
+					rb.velocity.y
+				);
+			}
+			else
+				rb.velocity = new Vector2(0, rb.velocity.y);
 			return;
 		}
 
@@ -1019,10 +1025,13 @@ public class PlayerControls : MonoBehaviour
 		obj.transform.position = self.position;
 	}
 
-	void FullRestore()
+	void FullRestore(bool clearShadowRealmList=false)
 	{
 		hp = maxHp;
 		SetHp(true);
+
+		if (clearShadowRealmList)
+			GameManager.Instance.ClearShadowRealmList();
 
 		if (tool1 != null && toolUses1 != null)
 		{
@@ -1174,12 +1183,12 @@ public class PlayerControls : MonoBehaviour
 		{
 			hurtCo = StartCoroutine( InstantDeathCo() );
 		}
-		if (other.CompareTag("Bench"))
+		if (!isDead && other.CompareTag("Bench"))
 		{
 			bench = other.GetComponent<Bench>();
 			t = 0;
 		}
-		if (!movingToNextScene && other.CompareTag("NewArea"))
+		if (!isDead && !movingToNextScene && other.CompareTag("NewArea"))
 		{
 			movingRight = (other.transform.position.x - self.position.x > 0);
 			NewScene n = other.GetComponent<NewScene>();
@@ -1423,6 +1432,7 @@ public class PlayerControls : MonoBehaviour
 		deathPos = transform.position;
 
 		yield return new WaitForSeconds(2);
+		GameManager.Instance.ClearShadowRealmList();
 		transform.position = savedPos;
 		AsyncOperation loadingOperation = SceneManager.LoadSceneAsync(savedScene);
 		float loadTime = 0;
@@ -1460,9 +1470,9 @@ public class PlayerControls : MonoBehaviour
 
 	IEnumerator MoveToNextScene(string newSceneName, Vector2 newScenePos)
 	{
-		movingToNextScene = invulnerable = true;
+		canMove = movingToNextScene = invulnerable = true;
 		nextSceneSpeed = (rb.velocity.x > 0) ? 1 : -1;
-		yield return new WaitForSeconds(0.25f);
+		yield return new WaitForSeconds(0.1f);
 		blackScreenAnim.SetTrigger("toBlack");
 
 		yield return new WaitForSeconds(0.25f);
@@ -1474,11 +1484,15 @@ public class PlayerControls : MonoBehaviour
 			loadTime += Time.deltaTime;
 			yield return null;
 		}
+		canMove = false;
 		transform.position = newScenePos;
 		blackScreenAnim.SetTrigger("reset");
+
+		yield return new WaitForSeconds(0.5f);
+		canMove = true;
 		
 		yield return new WaitForSeconds(0.5f);
-		movingToNextScene = invulnerable = false;
+		canMove = movingToNextScene = invulnerable = false;
 	}
 
 
