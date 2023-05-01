@@ -672,7 +672,15 @@ public class PlayerControls : MonoBehaviour
 		anim.SetBool("isWallSliding", isWallSliding);
 
 		if (isWallSliding) 
+		{
 			rb.velocity = new Vector2(rb.velocity.x, Mathf.Max(rb.velocity.y, -wallSlideSpeed));
+			if (isPogoing && nShaw < shawLimit)
+			{
+				isPogoing = false;
+				anim.SetFloat("pogoing", 0);
+			}
+
+		}
 	}
 	void CheckIsWalledWhistShaw()
 	{
@@ -1109,6 +1117,7 @@ public class PlayerControls : MonoBehaviour
 				// StartCoroutine( PogoCo(0.25f) );
 				break;
 			case 3:
+				Debug.Log("reaper - shaw");
 				anim.SetBool("isAttacking", false);
 				rb.velocity = Vector2.zero;
 				anim.SetFloat("pogoing", 1);
