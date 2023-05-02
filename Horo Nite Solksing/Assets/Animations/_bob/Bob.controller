@@ -70,8 +70,8 @@ AnimatorStateMachine:
     m_State: {fileID: 196936089262218261}
     m_Position: {x: 210, y: -130, z: 0}
   - serializedVersion: 1
-    m_State: {fileID: 8450538485131200071}
-    m_Position: {x: 245, y: -65, z: 0}
+    m_State: {fileID: 6916017654300845912}
+    m_Position: {x: 320, y: 0, z: 0}
   m_ChildStateMachines: []
   m_AnyStateTransitions:
   - {fileID: 3719361935761935159}
@@ -262,14 +262,14 @@ AnimatorState:
   m_MirrorParameter: 
   m_CycleOffsetParameter: 
   m_TimeParameter: 
---- !u!1102 &8450538485131200071
+--- !u!1102 &6916017654300845912
 AnimatorState:
   serializedVersion: 6
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: bob_glitch_anim
+  m_Name: bob_spawn_anim
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
@@ -282,7 +282,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: 5eba1b4345f3345e3ac3292baee2dbc4, type: 2}
+  m_Motion: {fileID: 7400000, guid: c2997bf379e2747c3b494bb521ed91e8, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 

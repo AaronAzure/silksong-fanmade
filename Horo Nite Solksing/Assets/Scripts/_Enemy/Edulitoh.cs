@@ -51,7 +51,7 @@ public class Edulitoh : Enemy
 			else if (isClose)
 				closeDistTimer += Time.fixedDeltaTime;
 			else if (closeDistTimer > 0)
-				closeDistTimer -= Time.fixedDeltaTime;
+				closeDistTimer -= (Time.fixedDeltaTime * 0.5f);
 		}
 		else if (!receivingKb)
 		{

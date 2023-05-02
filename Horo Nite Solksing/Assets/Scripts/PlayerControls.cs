@@ -85,9 +85,10 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] float dashSpeed=10;
 	[SerializeField] float dashBurstSpeed=15;
 	[SerializeField] float dashDuration=0.25f;
-	[SerializeField] float dashCooldownDuration=0.5f;
+	[SerializeField] float dashCooldownDuration=0.25f;
 	[SerializeField] float dashCounter;
 	[SerializeField] float dashCooldownCounter;
+	private bool airDashed;
 	[SerializeField] float shawForce=7.5f;
 	[SerializeField] float nShaw;
 	[SerializeField] float shawLimit=3;
@@ -353,6 +354,7 @@ public class PlayerControls : MonoBehaviour
 				else if (bench != null && isGrounded && player.GetAxis("Move Vertical") > 0.7f)
 				{
 					isResting = true;
+					isDashing = jumpDashed = false;
 					rb.gravityScale = 0;
 					rb.velocity = Vector2.zero;
 					anim.SetBool("isResting", true);
@@ -471,7 +473,10 @@ public class PlayerControls : MonoBehaviour
 			jumpTimer = jumpMaxTimer;
 
 			if (!isGrounded)
+			{
 				anim.SetBool("isAirDash", true);
+				airDashed = true;
+			}
 				
 			dashCounter = dashDuration;
 			activeMoveSpeed = dashBurstSpeed;
@@ -506,7 +511,7 @@ public class PlayerControls : MonoBehaviour
 				dashCooldownCounter = dashCooldownDuration;
 			}
 		}
-		if (!isDashing && dashCooldownCounter > 0)
+		if (!airDashed && !isDashing && dashCooldownCounter > 0)
 		{
 			dashCooldownCounter -= Time.fixedDeltaTime;
 		}
@@ -560,7 +565,7 @@ public class PlayerControls : MonoBehaviour
 	void ResetAllBools()
 	{
 		isJumping = jumpDashed = jumped = false;
-		isDashing = false;
+		airDashed = isDashing = false;
 		canLedgeGrab = ledgeGrab = false;
 		isWallSliding = false;
 		isWallJumping = false;
@@ -661,6 +666,8 @@ public class PlayerControls : MonoBehaviour
 			isPogoing = false;
 			anim.SetFloat("pogoing", 0);
 		}
+		if (isGrounded && airDashed)
+			airDashed = false;
 		if (!inAtkState) 
 			anim.SetBool("isGrounded", isGrounded);
 		if (isGrounded && anim.GetBool("isAirDash")) 
@@ -903,7 +910,7 @@ public class PlayerControls : MonoBehaviour
 					toolSummonPos.position, 
 					Quaternion.identity
 				);
-				toolCopy.velocityMultiplier = UnityEngine.Random.Range(0.5f,1.5f);
+				toolCopy.velocityMultiplier = UnityEngine.Random.Range(0.7f,1.3f);
 				toolCopy.toRight = model.localScale.x > 0 ? true : false;
 			}
 		}
@@ -1117,7 +1124,6 @@ public class PlayerControls : MonoBehaviour
 				// StartCoroutine( PogoCo(0.25f) );
 				break;
 			case 3:
-				Debug.Log("reaper - shaw");
 				anim.SetBool("isAttacking", false);
 				rb.velocity = Vector2.zero;
 				anim.SetFloat("pogoing", 1);

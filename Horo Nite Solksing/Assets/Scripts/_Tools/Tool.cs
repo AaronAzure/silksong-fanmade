@@ -33,7 +33,7 @@ public abstract class Tool : MonoBehaviour
 		{
 			if (!toRight)
 			{
-				rb.velocity = new Vector2(-dir.x, dir.y) * velocityMultiplier;
+				rb.velocity = new Vector2(-dir.x * velocityMultiplier, dir.y);
 				kbDir = new Vector2(-kbDir.x, kbDir.y);
 				gameObject.transform.localScale = new Vector3(
 					-transform.localScale.x,

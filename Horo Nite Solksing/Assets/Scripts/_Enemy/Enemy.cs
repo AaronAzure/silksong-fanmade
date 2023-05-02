@@ -122,6 +122,8 @@ public abstract class Enemy : MonoBehaviour
 	protected virtual void CallChildOnFixedUpdate() { }
 	protected virtual void CallChildOnPhase2() { }
 	protected virtual void CallChildOnPhase3() { }
+	protected virtual void CallChildOnInSight() { }
+	protected virtual void CallChildOnLostSight() { }
 	protected virtual void CallChildOnHurt(int dmg, Vector2 forceDir) { }
 	protected virtual void CallChildOnHurtAfter() { }
 	protected virtual void CallChildOnDeath() { }
@@ -188,6 +190,7 @@ public abstract class Enemy : MonoBehaviour
 		bool canSeePlayer = (playerInfo.collider != null && playerInfo.collider.gameObject.CompareTag("Player"));
 		if (canSeePlayer)
 		{
+			CallChildOnInSight();
 			attackingPlayer = true;
 			searchCounter = 0;
 		} 
@@ -211,6 +214,7 @@ public abstract class Enemy : MonoBehaviour
 			{
 				searchCounter = 0;
 				attackingPlayer = false;
+				CallChildOnLostSight();
 			}
 		}
 	}
@@ -312,7 +316,7 @@ public abstract class Enemy : MonoBehaviour
 		beenHurt = true;
 		if (opponent != null)
 			forceDir = (self.position - opponent.position).normalized;
-		float forceY = isFlying ? forceDir.y : Mathf.Abs(forceDir.y);
+		float forceY = (isFlying || !isGrounded) ? forceDir.y : Mathf.Abs(forceDir.y);
 		float angleZ = 
 			Mathf.Atan2(forceY, forceDir.x) * Mathf.Rad2Deg;
 		Instantiate(silkEffectObj, transform.position, Quaternion.Euler(0,0,angleZ+offset*forceDir.x));

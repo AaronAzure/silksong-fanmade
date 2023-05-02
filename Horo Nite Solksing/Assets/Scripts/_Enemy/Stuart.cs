@@ -5,6 +5,7 @@ using UnityEngine;
 public class Stuart : Enemy
 {
 	private bool canJump;
+	private bool engaged;
 
 	protected override void CallChildOnStart()
 	{
@@ -31,11 +32,36 @@ public class Stuart : Enemy
 			ChasePlayer();
 		else
 			MoveInPrevDirection();
-		if (isGrounded && jumpCo == null && target.self.position.y - self.position.y > 1)
+		// player jumped
+		if (isGrounded && engaged && jumpCo == null && target.self.position.y - self.position.y > 1)
 			jumpCo = StartCoroutine( JumpCo(1) );
-		else if (isGrounded && canJump && jumpCo == null && PlayerInFront())
+		else if (isGrounded && engaged && canJump && jumpCo == null && PlayerInFront())
 			jumpCo = StartCoroutine( JumpCo(1) );
 	}
+
+	private bool sighted;
+	protected override void CallChildOnInSight()
+	{
+		if (!sighted)
+		{
+			sighted = true;
+			StartCoroutine( EngageCo() );
+		}
+	}
+	protected override void CallChildOnLostSight()
+	{
+		if (sighted)
+		{
+			engaged = sighted = false;
+		}
+	}
+	
+	IEnumerator EngageCo()
+	{
+		yield return new WaitForSeconds(0.5f);
+		engaged = true;
+	}
+
 
 	IEnumerator ToggleJump()
 	{

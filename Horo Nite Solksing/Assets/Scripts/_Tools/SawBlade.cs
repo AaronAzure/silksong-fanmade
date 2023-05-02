@@ -8,10 +8,15 @@ public class SawBlade : Tool
 	[SerializeField] Animator anim;
 	[SerializeField] float speed=8;
 	[SerializeField] float hitSpeed=0.1f;
+	[SerializeField] float drawbackSpeed=2f;
 	private bool isMoving;
 	private bool isColliding;
+	private bool isOpening;
+	private bool isStuck;
 	private int moveDir=1;
-	[SerializeField] Transform wallDetect;
+	[Space] [SerializeField] Transform wallDetect;
+	[SerializeField] Vector2 wallRect;
+	[SerializeField] LayerMask whatIsGround;
 
 
 	protected override void CallChildOnEnemyHit(Collider2D other)
@@ -20,7 +25,11 @@ public class SawBlade : Tool
 
 	private void OnDrawGizmosSelected() 
 	{
-
+		if (wallDetect != null)
+		{
+			Gizmos.color = Color.red;
+			Gizmos.DrawCube(wallDetect.position, wallRect);
+		}
 	}
 	
 
@@ -43,8 +52,9 @@ public class SawBlade : Tool
 
 	private void OnCollisionEnter2D(Collision2D other)
 	{
-		if (!isMoving && other.gameObject.CompareTag("Ground") && rb.velocity.y <= 0)
+		if (!isMoving && !isOpening && other.gameObject.CompareTag("Ground") && rb.velocity.y <= 0)
 		{
+			isOpening = true;
 			if (anim != null)
 				anim.SetTrigger("open");
 		}
@@ -58,6 +68,22 @@ public class SawBlade : Tool
 				moveDir * (isColliding ? hitSpeed : speed), 
 				rb.velocity.y
 			);
+
+			if (!isStuck)
+			{
+				if (Physics2D.OverlapBox(wallDetect.position, wallRect, 0, whatIsGround))
+				{
+					isStuck = true;
+					if (destroyAfterCo != null) StopCoroutine(destroyAfterCo);
+					destroyAfter = 0.5f;
+					destroyAfterCo = StartCoroutine( DestroyAfterCo() );
+					// Debug.Log("<color=magenta>stuck!!</color>");
+				}
+			}
+		}
+		else if (isOpening)
+		{
+			rb.velocity = new Vector2(-moveDir * drawbackSpeed, rb.velocity.y);
 		}
 	}
 
