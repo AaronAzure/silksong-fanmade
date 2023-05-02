@@ -61,7 +61,7 @@ public class PlayerControls : MonoBehaviour
 	private bool canLedgeGrab;
 	private bool ledgeGrab;
 	private bool noControl;
-	private bool isResting;
+	public bool isResting {get; private set;}
 	private bool inStunLock;
 	public bool justParried {get; private set;}
 	[SerializeField] bool isInvincible;

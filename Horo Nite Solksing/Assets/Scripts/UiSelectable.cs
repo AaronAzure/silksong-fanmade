@@ -15,7 +15,7 @@ public class UiSelectable : MonoBehaviour, ISelectHandler
 	{
 		Assert.IsNotNull(PlayerControls.Instance, "PlayerControls.Instance == null");
 
-		if (tool != null && PlayerControls.Instance != null)
+		if (tool != null && PlayerControls.Instance != null && PlayerControls.Instance.isResting)
 		{
 			PlayerControls.Instance.EquipTool(tool);
 			if (master != null) master.Select();
@@ -25,7 +25,7 @@ public class UiSelectable : MonoBehaviour, ISelectHandler
 	{
 		Assert.IsNotNull(PlayerControls.Instance, "PlayerControls.Instance == null");
 
-		if (PlayerControls.Instance != null)
+		if (PlayerControls.Instance != null && PlayerControls.Instance.isResting)
 		{
 			PlayerControls.Instance.EquipCrest(n);
 			if (master != null) master.Select();
