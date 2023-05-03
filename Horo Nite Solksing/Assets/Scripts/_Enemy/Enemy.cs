@@ -45,7 +45,7 @@ public abstract class Enemy : MonoBehaviour
 	[SerializeField] LayerMask whatIsPlayer;
 	[SerializeField] LayerMask whatIsGround;
 	[SerializeField] LayerMask finalMask;
-	protected bool isGrounded;
+	[SerializeField] protected bool isGrounded;
 	[SerializeField] bool isFlying;
 	[SerializeField] protected bool idleActionOnly;
 	protected bool beenHurt;

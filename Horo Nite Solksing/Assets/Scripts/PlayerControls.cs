@@ -24,7 +24,8 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] int hp;
 	public int[] atkDmg={10,8,15,10};
 	public int gossamerDmg=5;
-	public int stabDmg=20;
+	public int stabDmg=30;
+	public int rushDmg=20;
 	[SerializeField] int silkMeter;
 	[SerializeField] Animator[] silks;
 	[SerializeField] GameObject[] hpMasks;
@@ -46,6 +47,7 @@ public class PlayerControls : MonoBehaviour
 	private float dashDir;
 	private float moveDir;
 	private float atkDir;
+	private float skillDir; // 0 = stab, 1 = rush, else = storm
 	private bool isTool1=true;
 	// private float moveY;
 	private bool jumped;
@@ -97,6 +99,7 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] float quickAtkCooldownDuration=0.1f;
 	[SerializeField] float atkCooldownDuration=0.2f;
 	[SerializeField] float toolCooldownDuration=0.2f;
+	[SerializeField] float rushSpeed=12.5f;
 
 	[Space] [SerializeField] GameObject slashObj;
 	private bool atk1;
@@ -143,6 +146,7 @@ public class PlayerControls : MonoBehaviour
 	[Space] [Header("Animator Controlled")]
 	[SerializeField] bool isLedgeGrabbing; // controlled by animator
 	[SerializeField] bool inAnimation;
+	[SerializeField] bool inRushSkill;
 	[SerializeField] bool performingGossamerStorm;
 	[SerializeField] bool cantRotate;
 	private bool cantRotate2;
@@ -248,7 +252,7 @@ public class PlayerControls : MonoBehaviour
 		DontDestroyOnLoad(gameObject);
 
 		self = transform;
-		tools = new Tool[2];
+		tools = new Tool[1];
 	}
 
 
@@ -274,7 +278,7 @@ public class PlayerControls : MonoBehaviour
 	bool CanControl()
 	{
 		return (!isLedgeGrabbing && !ledgeGrab && !beenHurt && !noControl && !isBinding &&
-			!inAnimation && !isDead && !inStunLock && !isResting && !isPaused);
+			!inAnimation && !isDead && !inStunLock && !isResting && !isPaused && !inRushSkill);
 	}
 
 	public void Unpause()
@@ -299,11 +303,13 @@ public class PlayerControls : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
+		// starting timer
 		if (!timeStarted && player.GetAnyButton())
 		{
 			timeStarted = true;
 			isCountingTime = true;
 		}
+		// timer going
 		if (isCountingTime)
 		{
 			timePlayed += Time.unscaledDeltaTime;
@@ -423,6 +429,10 @@ public class PlayerControls : MonoBehaviour
 				if (jumpDashed && jumped && (isGrounded || isWallSliding || canLedgeGrab))
 					jumpDashed = jumped = false;
 			}
+		}
+		else if (inRushSkill)
+		{
+			rb.velocity = new Vector2(model.localScale.x * rushSpeed, 0);
 		}
 		else if (!isDead && inStunLock)
 		{
@@ -797,40 +807,30 @@ public class PlayerControls : MonoBehaviour
 	void SkillAttack()
 	{
 		// Gossamer Storm
-		if (player.GetAxis("Move Vertical") > 0.7f && (infiniteSilk || silkMeter >= skillStabCost))
-			atkCo = StartCoroutine( SkillAttackCo(1) );
+		// if (player.GetAxis("Move Vertical") > 0.7f && (infiniteSilk || silkMeter >= skillStabCost))
+		// 	atkCo = StartCoroutine( SkillAttackCo(1) );
 		// Stabby stabby strike
-		else if ((infiniteSilk || silkMeter >= skillStabCost))
+		if ((infiniteSilk || silkMeter >= skillStabCost))
 			atkCo = StartCoroutine( SkillAttackCo() );
 	}
 
-	IEnumerator SkillAttackCo(int atkDir=0)
+	IEnumerator SkillAttackCo()
 	{
-		// if (atkCo != null) yield break;
-		// atkCo = null;
 		anim.SetBool("isAttacking", false);
 		usingSkill = true;
 
-		this.atkDir = atkDir;
+		// this.atkDir = atkDir;
+		// this.skillDir = atkDir;
 		CancelDash();
 		jumpDashed = false;
 		rb.gravityScale = 0;
 		rb.velocity = Vector2.zero;
 
-		// Gossamer Storm
-		if (atkDir == 1)
-		{
-			if (!infiniteSilk) SetSilk(-skillGossamerCost);
-			anim.SetBool("isGossamerStorm", true);
-
-			yield return new WaitForSeconds(0.25f);
-			agaleSound.Play();
-			SkillAttackEffect();
-		}
-		else
+		if (skillDir == 0)
 		{
 			if (!infiniteSilk) SetSilk(-skillStabCost);
 			anim.SetBool("isSkillAttacking", true);
+			anim.SetFloat("skillDir", skillDir);
 			adimaSound.Play();
 
 			yield return new WaitForSeconds(0.25f);
@@ -842,6 +842,34 @@ public class PlayerControls : MonoBehaviour
 			rb.gravityScale = 1;
 
 			atkCo = null;
+		}
+		// Rush
+		else if (skillDir == 1)
+		{
+			if (!infiniteSilk) SetSilk(-skillGossamerCost);
+			anim.SetBool("isSkillAttacking", true);
+			anim.SetFloat("skillDir", skillDir);
+			// adimaSound.Play();
+
+			yield return new WaitForSeconds(0.1666f);
+			SkillAttackEffect();
+
+			yield return new WaitForSeconds(0.25f);
+			anim.SetBool("isSkillAttacking", false);
+			usingSkill = false;
+			rb.gravityScale = 1;
+
+			atkCo = null;
+		}
+		// Gossamer Storm
+		else
+		{
+			if (!infiniteSilk) SetSilk(-skillGossamerCost);
+			anim.SetBool("isGossamerStorm", true);
+
+			yield return new WaitForSeconds(0.25f);
+			agaleSound.Play();
+			SkillAttackEffect();
 		}
 	}
 
@@ -917,50 +945,93 @@ public class PlayerControls : MonoBehaviour
 		}
 	}
 
-	public void EquipTool(Tool tool)
+	public void EquipSkill(int n)
 	{
-		// bool unequip = false;
-		Assert.AreEqual(2, toolsEquipped.Length, $"> toolsEquipped.Length = {toolsEquipped.Length}");
-		Assert.AreEqual(2, tools.Length, $"> tools.Length = {tools.Length}");
-		if (toolsEquipped != null)
+		// no change
+		if (skillDir == n) return;
+
+		skillDir = n;
+		anim.SetFloat("skillDir", skillDir);
+	}
+	private Tool currTool;
+	private UiSelectable currToolUi;
+	public bool EquipTool(Tool tool, UiSelectable toolUi)
+	{
+		// equip new tool
+		if (currTool != tool)
 		{
-			for (int i=0 ; i<tools.Length ; i++)
+			// unequip prev tool
+			if (currTool != null)
 			{
-				if (tools[i] == tool)
-				{
-					toolsEquipped[i].sprite = emptySpr;
-					toolIcons[i].sprite = emptySpr;
-					tools[i] = null;
-					if (i == 0)
-						tool1 = null;
-					else if (i == 1)
-						tool2 = null;
-					nEquipped--;
-					FullRestore();	// uneuipped
-					return;
-				}
+				toolsEquipped[0].sprite = emptySpr;
+				toolIcons[0].sprite = emptySpr;
+				tools[0] = null;
+				tool1 = null;
+				nEquipped--;
+				FullRestore();
 			}
-
-			if (nEquipped >= toolsEquipped.Length)
-				return;
-
-			for (int i=0 ; i<tools.Length ; i++)
-			{
-				if (tools[i] == null)
-				{
-					toolsEquipped[i].sprite = tool.icon;
-					toolIcons[i].sprite = tool.icon;
-					tools[i] = tool;
-					if (i == 0)
-						tool1 = tool;
-					else if (i == 1)
-						tool2 = tool;
-					nEquipped++;
-					FullRestore();	// equipped
-					return;
-				}
-			}
+			if (currToolUi != null)
+				currToolUi.UNEQUIP_SKILL();
+			currToolUi = toolUi;
+			currTool = tool;
+			toolsEquipped[0].sprite = tool.icon;
+			toolIcons[0].sprite = tool.icon;
+			tools[0] = tool;
+			currTool = tool;
+			tool1 = tool;
+			nEquipped++;
+			FullRestore();	// equipped
+			return true;
 		}
+		currToolUi = null;
+		currTool = null;
+		toolsEquipped[0].sprite = emptySpr;
+		toolIcons[0].sprite = emptySpr;
+		tools[0] = null;
+		tool1 = null;
+		nEquipped--;
+		FullRestore();
+		return false;
+		// if (toolsEquipped != null)
+		// {
+		// 	for (int i=0 ; i<tools.Length ; i++)
+		// 	{
+		// 		if (tools[i] == tool)
+		// 		{
+		// 			toolsEquipped[i].sprite = emptySpr;
+		// 			toolIcons[i].sprite = emptySpr;
+		// 			tools[i] = null;
+		// 			if (i == 0)
+		// 				tool1 = null;
+		// 			else if (i == 1)
+		// 				tool2 = null;
+		// 			nEquipped--;
+		// 			FullRestore();	// uneuipped
+		// 			return false;
+		// 		}
+		// 	}
+
+		// 	if (nEquipped >= toolsEquipped.Length)
+		// 		return false;
+
+		// 	for (int i=0 ; i<tools.Length ; i++)
+		// 	{
+		// 		if (tools[i] == null)
+		// 		{
+		// 			toolsEquipped[i].sprite = tool.icon;
+		// 			toolIcons[i].sprite = tool.icon;
+		// 			tools[i] = tool;
+		// 			currTool = tool;
+		// 			if (i == 0)
+		// 				tool1 = tool;
+		// 			else if (i == 1)
+		// 				tool2 = tool;
+		// 			nEquipped++;
+		// 			FullRestore();	// equipped
+		// 			return true;
+		// 		}
+		// 	}
+		// }
 	}
 	public void EquipCrest(int n)
 	{
@@ -1204,7 +1275,7 @@ public class PlayerControls : MonoBehaviour
 
 	private bool CanBeHurt()
 	{
-		return (!isDead && !invulnerable && !invincible && !justParried);
+		return (!isDead && !invulnerable && !invincible && !justParried && !inRushSkill);
 	}
 
 	private void OnTriggerStay2D(Collider2D other) 
@@ -1217,7 +1288,7 @@ public class PlayerControls : MonoBehaviour
 
 	private void OnTriggerEnter2D(Collider2D other) 
 	{
-		if (!beenHurt && !isDead && !invincible && !justParried && other.CompareTag("EnemyStun"))
+		if (CanBeHurt() && other.CompareTag("EnemyStun"))
 		{
 			if (stunLockCo != null)
 				StopCoroutine( stunLockCo );

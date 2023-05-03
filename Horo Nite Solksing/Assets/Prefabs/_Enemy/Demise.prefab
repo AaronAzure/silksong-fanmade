@@ -5593,7 +5593,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe0c34c15fdb44bbc9cd6f8c554a9e11, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hp: 800
+  hp: 900
   phase2: 600
   phase3: 300
   dmgPopup: {fileID: 7726691982393478706, guid: 765c5f8d2593949d79978bf59751171b, type: 3}
@@ -5648,10 +5648,11 @@ MonoBehaviour:
   finalMask:
     serializedVersion: 2
     m_Bits: 72
+  isGrounded: 0
   isFlying: 0
   idleActionOnly: 0
   groundCheck: {fileID: 7452915362852078129}
-  groundCheckSize: {x: 0, y: 0}
+  groundCheckSize: {x: 0.5, y: 0.05}
   idleTotalCounter: 5
   initDir: -1
   target: {fileID: 0}

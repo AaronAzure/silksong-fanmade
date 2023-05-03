@@ -18,10 +18,14 @@ public class SawBlade : Tool
 	[SerializeField] Vector2 wallRect;
 	[SerializeField] LayerMask whatIsGround;
 
-
-	protected override void CallChildOnEnemyHit(Collider2D other)
+	protected override void CallChildOnStart()
 	{
+		if (transform.localScale.x < 0)
+		{
+			moveDir = -1;
+		}
 	}
+	protected override void CallChildOnEnemyHit(Collider2D other) {}
 
 	private void OnDrawGizmosSelected() 
 	{
@@ -89,10 +93,6 @@ public class SawBlade : Tool
 
 	public void MOVE()
 	{
-		if (transform.localScale.x < 0)
-		{
-			moveDir = -1;
-		}
 		isMoving = true;
 	}
 

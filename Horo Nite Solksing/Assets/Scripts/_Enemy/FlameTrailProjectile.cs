@@ -38,7 +38,7 @@ public class FlameTrailProjectile : MonoBehaviour
 			Debug.Log($"{other.tag} | {other.name}");	
 	}
 
-	private void OnParticleTrigger() {
-		Debug.Log("laksdnv");
-	}
+	// private void OnParticleTrigger() {
+	// 	Debug.Log("laksdnv");
+	// }
 }

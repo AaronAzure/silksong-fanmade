@@ -11,6 +11,7 @@ public class PlayerAttack : MonoBehaviour
 	[SerializeField] bool isDashAttack;
 	[SerializeField] bool isRisingAttack;
 	[SerializeField] bool isStabAttack;
+	[SerializeField] bool isRushAttack;
 	[SerializeField] bool isGossamerStorm;
 	[SerializeField] GameObject strikePs;
 	[SerializeField] float offset=15;
@@ -78,14 +79,16 @@ public class PlayerAttack : MonoBehaviour
 				}
 				
 				int dmg = !isStabAttack ? (!isGossamerStorm ? p.atkDmg[p.crestNum] : p.gossamerDmg) : p.stabDmg;
+				if (isRushAttack)
+					dmg = p.rushDmg;
 
 				// stronger special
-				if ((isStabAttack || isGossamerStorm) && p.crestNum == 1)
+				if ((isStabAttack || isGossamerStorm || isRushAttack) && p.crestNum == 1)
 					dmg = Mathf.RoundToInt(dmg * 1.25f);
 				// weaker special
-				else if ((isStabAttack || isGossamerStorm) && p.crestNum == 2)
+				else if ((isStabAttack || isGossamerStorm || isRushAttack) && p.crestNum == 2)
 					dmg = (int) (dmg * 0.75f);
-				else if ((isStabAttack || isGossamerStorm) && p.crestNum == 3)
+				else if ((isStabAttack || isGossamerStorm || isRushAttack) && p.crestNum == 3)
 					dmg = (int) (dmg * 0.85f);
 				target.TakeDamage(
 					dmg, 
@@ -101,7 +104,7 @@ public class PlayerAttack : MonoBehaviour
 					p.Recoil();
 
 				// simple attack
-				if (!isStabAttack && !isGossamerStorm)
+				if (!isStabAttack && !isGossamerStorm && !isRushAttack)
 					p.SetSilk(1);
 			}
 		}

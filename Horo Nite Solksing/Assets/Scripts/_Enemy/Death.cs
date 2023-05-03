@@ -310,13 +310,17 @@ public class Death : Enemy
 	public void START_ULT_ATK()
 	{
 		if (!anim.GetBool("isStagger"))
+		{
 			model.gameObject.SetActive(false);
+			cannotTakeDmg = true;
+		}
 	}
 	public void END_ULT_ATK()
 	{
 		model.gameObject.SetActive(true);
 		if (ultAtkEndPos != null)
 		{
+			cannotTakeDmg = false;
 			transform.position = ultAtkEndPos.position;
 		}
 	}
