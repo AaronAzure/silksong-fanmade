@@ -4,15 +4,29 @@ using UnityEngine;
 
 public class RoomSpawner : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+	public Room room;
+    [Space] public Enemy[] enemies;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+	
+	public bool CheckIfHasMoreSpawns(int x)
+	{
+		return (x < enemies.Length && enemies[x] != null);
+	}
+
+	public void SpawnEnemy(int x)
+	{
+		if (x < enemies.Length && enemies[x] != null)
+		{
+			// Debug.Log($"{gameObject.name} spawning");
+			var e = Instantiate(enemies[x], transform.position, Quaternion.identity, transform);
+			e.room = this.room;
+			e.CallChildOnIsSpecial();
+			e.SpawnIn();
+		}
+		else
+		{
+			// Debug.Log($"{gameObject.name} nothing to spawn");
+			room.Defeated();
+		}
+	}
 }

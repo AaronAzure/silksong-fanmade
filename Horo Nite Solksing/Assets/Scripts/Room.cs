@@ -15,11 +15,21 @@ public class Room : MonoBehaviour
 	private bool checkedIfCleared;
 	[Space] [SerializeField] GameObject otherObj;
 
+	
+	[Space] [Header("Waves")] 
+	[SerializeField] bool isWaveRoom;
+	[SerializeField] int nWaves;
+	public int nExtras;
+	// [SerializeField] int nSpawnersDefeated;
+	[SerializeField] RoomSpawner[] spawners;
+
 	private void Start() 
 	{
+		// deactivate all walls
 		foreach (GameObject wall in walls)
 			wall.SetActive(false);
-		// PlayerControls p = PlayerControls.Instance;
+
+		// has been cleared before
 		if (!checkedIfCleared)
 		{
 			if (CheckedIfCleared() && otherObj != null)
@@ -29,8 +39,13 @@ public class Room : MonoBehaviour
 		foreach (Enemy enemy in enemies)
 		{
 			enemy.cannotAtk = true;	
-			// enemy.target = p;
 			enemy.room = this;
+		}
+
+		if (isWaveRoom)
+		{
+			foreach (RoomSpawner spawner in spawners)
+				spawner.room = this;
 		}
 	}
 
@@ -52,9 +67,51 @@ public class Room : MonoBehaviour
 	public void Defeated()
 	{
 		nDefeated++;
-		if (nDefeated >= enemies.Length)
+		Debug.Log($"- Wave {nWaves} = {nDefeated}");
+		// no extra spawns
+		if (!isWaveRoom)
 		{
-			StartCoroutine( RoomClearedCo() );
+			if (nDefeated >= enemies.Length)
+			{
+				StartCoroutine( RoomClearedCo() );
+			}
+		}
+		else
+		{
+			if (nDefeated >= spawners.Length + nExtras)
+			{
+				nExtras = 0;
+				Debug.Log($"-- Wave {nWaves} cleared");
+				nWaves++;
+				nDefeated = 0;
+				bool stillGoing = false;
+				foreach (RoomSpawner spawner in spawners)
+				{
+					Debug.Log($"--- checking {spawner.name}");
+					if (spawner.CheckIfHasMoreSpawns(nWaves))
+					{
+						Debug.Log($"---- {spawner.name} can still go on");
+						stillGoing = true;
+						break;
+					}
+				}
+				if (stillGoing)
+				{
+					StartCoroutine( StartNextWave() );
+				}
+				else
+					StartCoroutine( RoomClearedCo() );
+			}
+		}
+	}
+
+	IEnumerator StartNextWave()
+	{
+		Debug.Log($"> Starting Wave {nWaves}");
+		yield return new WaitForSeconds(1);
+		foreach (RoomSpawner spawner in spawners)
+		{
+			spawner.SpawnEnemy(nWaves);
 		}
 	}
 
@@ -62,6 +119,7 @@ public class Room : MonoBehaviour
 	IEnumerator RoomClearedCo()
 	{
 		if (done) yield break;
+		Debug.Log("<color=green>Room Cleared</color>");
 
 		GameManager.Instance.RegisterRoomClearedList(gameObject.name);
 		done = true;
@@ -72,7 +130,12 @@ public class Room : MonoBehaviour
 		foreach (Animator anim in anims)
 			anim.SetTrigger("open");
 		if (!alwaysLockCam)
+		{
 			roomCam.SetActive(false);
+			if (CinemachineMaster.Instance != null) 
+				CinemachineMaster.Instance.SetCinemachineShakeOnHighestPriority();
+
+		}
 	}
 
     private void OnTriggerEnter2D(Collider2D other) 
@@ -90,10 +153,17 @@ public class Room : MonoBehaviour
 			
 			if (ui != null) ui.SetActive(true);
 			
-			foreach (Enemy enemy in enemies)
+			if (!isWaveRoom)
 			{
-				enemy.RoomEnter();	
-				// enemy.cannotAtk = false;	
+				foreach (Enemy enemy in enemies)
+				{
+					enemy.RoomEnter();
+				}
+			}
+			else
+			{
+				foreach (RoomSpawner spawner in spawners)
+					spawner.SpawnEnemy(nWaves);
 			}
 			foreach (GameObject wall in walls)
 				wall.SetActive(true);
@@ -101,11 +171,15 @@ public class Room : MonoBehaviour
 			MusicManager.Instance.PlayMusic(MusicManager.Instance.bossMusic, true);
 
 			roomCam.SetActive(true);
+			if (CinemachineMaster.Instance != null) 
+				CinemachineMaster.Instance.SetCinemachineShakeOnHighestPriority();
 			this.enabled = false;
 		}
 		if (done && alwaysLockCam && other.CompareTag("Player"))
 		{
 			roomCam.SetActive(true);
+			if (CinemachineMaster.Instance != null) 
+				CinemachineMaster.Instance.SetCinemachineShakeOnHighestPriority();
 		}
 	}
 
@@ -114,6 +188,8 @@ public class Room : MonoBehaviour
 		if (done && alwaysLockCam && other.CompareTag("Player"))
 		{
 			roomCam.SetActive(false);
+			if (CinemachineMaster.Instance != null) 
+				CinemachineMaster.Instance.SetCinemachineShakeOnHighestPriority();
 		}
 	}
 }

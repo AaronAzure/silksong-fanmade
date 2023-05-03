@@ -273,7 +273,7 @@ public class PlayerControls : MonoBehaviour
 
 	bool CanControl()
 	{
-		return (!isLedgeGrabbing && !beenHurt && !noControl && !isBinding &&
+		return (!isLedgeGrabbing && !ledgeGrab && !beenHurt && !noControl && !isBinding &&
 			!inAnimation && !isDead && !inStunLock && !isResting && !isPaused);
 	}
 
@@ -375,10 +375,11 @@ public class PlayerControls : MonoBehaviour
 			if (canLedgeGrab && !isWallJumping && !isLedgeGrabbing && !ledgeGrab)
 				LedgeGrab();
 		}
-		else if (isResting && player.GetAxis("Move Vertical") < -0.7f)
+		else if (isResting && (player.GetButtonDown("B") || player.GetAxis("Move Vertical") < -0.7f))
 		{
 			t = 0;
 			isResting = false;
+			activeMoveSpeed = moveSpeed;
 			rb.gravityScale = 1;
 			rb.velocity = Vector2.zero;
 			anim.SetBool("isResting", false);

@@ -27,7 +27,8 @@ public class GameManager : MonoBehaviour
 		if (shadowRealmed == null)
 			shadowRealmed = new HashSet<string>();
 
-		shadowRealmed.Add(SceneManager.GetActiveScene().name + " " + name);
+		if (!shadowRealmed.Contains(SceneManager.GetActiveScene().name + " " + name))
+			shadowRealmed.Add(SceneManager.GetActiveScene().name + " " + name);
 	}
 	public bool CheckShadowRealmList(string name)
 	{
@@ -49,7 +50,8 @@ public class GameManager : MonoBehaviour
 		if (roomCleared == null)
 			roomCleared = new HashSet<string>();
 
-		roomCleared.Add(SceneManager.GetActiveScene().name + " " + name);
+		if (!roomCleared.Contains(SceneManager.GetActiveScene().name + " " + name))
+			roomCleared.Add(SceneManager.GetActiveScene().name + " " + name);
 	}
 	public bool CheckRoomClearedList(string name)
 	{

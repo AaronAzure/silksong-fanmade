@@ -78,6 +78,7 @@ public abstract class Enemy : MonoBehaviour
 	protected float searchCounter;
 	protected float maxSearchTime=2;
 	[SerializeField] protected bool spawningIn; // set by animation
+	private bool summoned;
 	public bool cannotAtk;
 	public bool activated;
 	public bool inParryState;
@@ -118,6 +119,7 @@ public abstract class Enemy : MonoBehaviour
 	}
 
 	protected virtual void CallChildOnStart() { }
+	public virtual void CallChildOnIsSpecial() { }
 	protected virtual void CallChildOnEarlyUpdate() { }
 	protected virtual void CallChildOnFixedUpdate() { }
 	protected virtual void CallChildOnPhase2() { }
@@ -143,7 +145,7 @@ public abstract class Enemy : MonoBehaviour
     // Start is called before the first frame update
     public virtual void Start() 
     {
-		if (GameManager.Instance.CheckShadowRealmList(gameObject.name))
+		if (!summoned && GameManager.Instance.CheckShadowRealmList(gameObject.name))
 			Destroy(gameObject);
 		
 		initDir = (int) model.localScale.x;
@@ -345,7 +347,8 @@ public abstract class Enemy : MonoBehaviour
 		{
 			rb.AddForce(Vector2.up * 5, ForceMode2D.Impulse);
 			Died(canShake);
-			GameManager.Instance.RegisterNameToShadowRealm(gameObject.name);
+			if (room == null)
+				GameManager.Instance.RegisterNameToShadowRealm(gameObject.name);
 			yield break;
 		}
 
@@ -407,11 +410,14 @@ public abstract class Enemy : MonoBehaviour
 
 	public void SpawnIn()
 	{
+		summoned = true;
+		Debug.Log("spawning in");
 		if (anim != null) anim.SetTrigger("spawn");
 		if (PlayerControls.Instance != null)
 			target = PlayerControls.Instance;
 		FacePlayer();
 		spawningIn = true;
+		anim.SetBool("spawningIn", true);
 		col.enabled = false;
 	}
 
@@ -424,6 +430,7 @@ public abstract class Enemy : MonoBehaviour
 	{
 		col.enabled = true;
 		spawningIn = false;
+		anim.SetBool("spawningIn", false);
 	}
 
 	private void OnTriggerEnter2D(Collider2D other) 

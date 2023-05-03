@@ -85,6 +85,8 @@ public class PlayerAttack : MonoBehaviour
 				// weaker special
 				else if ((isStabAttack || isGossamerStorm) && p.crestNum == 2)
 					dmg = (int) (dmg * 0.75f);
+				else if ((isStabAttack || isGossamerStorm) && p.crestNum == 3)
+					dmg = (int) (dmg * 0.85f);
 				target.TakeDamage(
 					dmg, 
 					isGossamerStorm ? transform : null,

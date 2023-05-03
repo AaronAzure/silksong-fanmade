@@ -5,8 +5,8 @@ using Cinemachine;
 
 public class CinemachineShake : MonoBehaviour
 {
-	public static CinemachineShake Instance {get; private set;}
-	[SerializeField] CinemachineVirtualCamera cm;
+	public static CinemachineShake Instance;
+	public CinemachineVirtualCamera cm;
 	private CinemachineBasicMultiChannelPerlin bmcp;
 	private float shakeTimer;
 	private float shakeTotalTimer;

@@ -26,7 +26,7 @@ public class FlameTrailProjectile : MonoBehaviour
 			);
 			if (wallInfo.collider != null && ps != null)
 			{
-				stop = true;
+				// stop = true;
 				ps.Stop(true, ParticleSystemStopBehavior.StopEmitting);
 			}
 		}

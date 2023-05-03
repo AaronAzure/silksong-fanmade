@@ -8,13 +8,16 @@ public class Bob : Enemy
 	[SerializeField] Enemy edulitoh;
 	[SerializeField] Transform spawnPos;
 	[SerializeField] bool canSpawnEdulitoh;
-	private int x;
 
 
-	protected override void IdleAction()
+	[Space] [SerializeField] int nSpawn;
+
+
+	public override void CallChildOnIsSpecial()
 	{
-		
+		canSpawnEdulitoh = true;
 	}
+	protected override void IdleAction() { }
 
 	protected override void AttackingAction()
 	{
@@ -28,13 +31,19 @@ public class Bob : Enemy
 
 	public void SPAWN_ALLY()
 	{
-		if (x % 4 == 0)
+		// Debug.Log($"{gameObject.name} = {nSpawn} ");
+		if (nSpawn % 4 == 0)
 		{
 			int rng = (canSpawnEdulitoh ? Random.Range(0,4) : 1);
 			var obj = Instantiate(rng == 0 ? edulitoh : otto, spawnPos.position, Quaternion.identity);
 			obj.SpawnIn();
+			if (room != null)
+			{
+				obj.room = this.room;
+				room.nExtras++;
+			}
 		}
-		x++;
+		nSpawn++;
 	}
 
 	public void CRASH_GAME()
