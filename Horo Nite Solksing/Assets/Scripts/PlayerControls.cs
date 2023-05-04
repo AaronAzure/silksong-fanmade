@@ -242,6 +242,7 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] TimeSpan timeSpan;
 	[SerializeField] float timePlayed;
 	[SerializeField] TextMeshProUGUI timePlayedTxt;
+	[SerializeField] TextMeshProUGUI finalTimePlayedTxt;
 	[SerializeField] Rewired.Integration.UnityUI.RewiredStandaloneInputModule rinput;
 	// public static PlayerControls Instance;
 	private int nKilled=0;
@@ -283,7 +284,6 @@ public class PlayerControls : MonoBehaviour
 		FullRestore(); // starting
 		Screen.SetResolution((int) (16f/9f * Screen.height), Screen.height, true);
 		if (pauseMenu != null) pauseMenu.SetActive(false);
-		// isCountingTime = true;
 	}
 
 	bool CanControl()
@@ -690,7 +690,10 @@ public class PlayerControls : MonoBehaviour
 			anim.SetFloat("pogoing", 0);
 		}
 		if (isGrounded && airDashed)
+		{
 			airDashed = false;
+			dashCooldownCounter = 0;
+		}
 		if (!inAtkState) 
 			anim.SetBool("isGrounded", isGrounded);
 		if (isGrounded && anim.GetBool("isAirDash")) 
@@ -1350,6 +1353,19 @@ public class PlayerControls : MonoBehaviour
 			movingRight = (other.transform.position.x - self.position.x > 0);
 			NewScene n = other.GetComponent<NewScene>();
 			StartCoroutine( MoveToNextScene(n.newSceneName, n.newScenePos) );
+		}
+		if (!isDead && !movingToNextScene && other.CompareTag("EditorOnly"))
+		{
+			isDead = movingToNextScene = true;
+			blackScreenAnim.SetTrigger("toBlack");
+			isCountingTime = false;
+			TimeSpan time = TimeSpan.FromSeconds(timePlayed);
+			finalTimePlayedTxt.text = time.ToString(@"mm\:ss\.ff");
+			timePlayedTxt.gameObject.SetActive(false);
+			finalTimePlayedTxt.gameObject.SetActive(true);
+			// movingRight = (other.transform.position.x - self.position.x > 0);
+			// NewScene n = other.GetComponent<NewScene>();
+			// StartCoroutine( MoveToNextScene(n.newSceneName, n.newScenePos) );
 		}
 	}
 

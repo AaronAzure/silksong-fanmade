@@ -12,6 +12,7 @@ public class Edulitoh : Enemy
 	[SerializeField] bool inAttackAnim; // assigned by animation
 	[SerializeField] bool lungeForward; // assigned by animation
 	private bool chase;
+	[SerializeField] bool isDemo;
 
 
     protected override void IdleAction()
@@ -29,7 +30,7 @@ public class Edulitoh : Enemy
 	{
 		if (!inAttackAnim)
 		{
-			Vector2 dir = (target.self.position - transform.position).normalized;
+			Vector2 dir = ((isDemo ? target.self.position + Vector3.up * 2 : target.self.position) - transform.position).normalized;
 			rb.AddForce(dir * chaseSpeed * 5, ForceMode2D.Force);
 			rb.velocity = new Vector2(
 				Mathf.Clamp(rb.velocity.x, -chaseSpeed, chaseSpeed),

@@ -47,6 +47,7 @@ public abstract class Enemy : MonoBehaviour
 	[SerializeField] LayerMask finalMask;
 	[SerializeField] protected bool isGrounded;
 	[SerializeField] bool isFlying;
+	[SerializeField] bool cannotTakeYKb;
 	[SerializeField] protected bool idleActionOnly;
 	protected bool beenHurt;
 	protected bool receivingKb;
@@ -321,6 +322,8 @@ public abstract class Enemy : MonoBehaviour
 		if (opponent != null)
 			forceDir = (self.position - opponent.position).normalized;
 		float forceY = (isFlying || !isGrounded) ? forceDir.y : Mathf.Abs(forceDir.y);
+		if (cannotTakeYKb)
+			forceDir = new Vector2(forceDir.x, 0);
 		float angleZ = 
 			Mathf.Atan2(forceY, forceDir.x) * Mathf.Rad2Deg;
 		Instantiate(silkEffectObj, transform.position, Quaternion.Euler(0,0,angleZ+offset*forceDir.x));
