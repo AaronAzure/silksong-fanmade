@@ -38,7 +38,7 @@ public class Room : MonoBehaviour
 
 		foreach (Enemy enemy in enemies)
 		{
-			enemy.cannotAtk = true;	
+			enemy.isWaiting = enemy.cannotAtk = true;	
 			enemy.room = this;
 		}
 

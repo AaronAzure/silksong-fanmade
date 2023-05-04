@@ -349,11 +349,12 @@ public class PlayerControls : MonoBehaviour
 				// tools
 				else if (player.GetButtonDown("R") && toolCo == null)
 				{
-					int tool = (player.GetAxis("Move Vertical") < -0.7f ? 1 : 0);
+					// int tool = (player.GetAxis("Move Vertical") < -0.7f ? 1 : 0);
+					int tool = 0;
 					if (tool == 0 && nToolUses1 > 0)
 						toolCo = StartCoroutine( UseTool(0) );
-					else if (tool == 1 && nToolUses2 > 0)
-						toolCo = StartCoroutine( UseTool(1) );
+					// else if (tool == 1 && nToolUses2 > 0)
+					// 	toolCo = StartCoroutine( UseTool(1) );
 				}
 
 				// rest on bench

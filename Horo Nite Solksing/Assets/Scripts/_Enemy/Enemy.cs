@@ -95,6 +95,7 @@ public abstract class Enemy : MonoBehaviour
 	[Space] [Header("Room Related")]
 	public Room room;
 	private bool roomEntered;
+	public bool isWaiting;
 
 
 	[Space] [Header("Debug")]
@@ -137,6 +138,7 @@ public abstract class Enemy : MonoBehaviour
 		if (!roomEntered)
 		{
 			roomEntered = true;
+			isWaiting = false;
 			CallChildOnRoomEnter();
 		}
 	}
@@ -298,7 +300,7 @@ public abstract class Enemy : MonoBehaviour
 		{
 			CallChildOnParry();
 		}
-		else
+		else if (!isWaiting)
 		{
 			if (hp > 0 && hurtCo != null)
 				StopCoroutine(hurtCo);

@@ -9,6 +9,11 @@ public class CinemachineMaster : MonoBehaviour
     [SerializeField] CinemachineShake[] vShakes;
 	public static CinemachineMaster Instance;
 
+	private void Start() 
+	{
+		SetCinemachineShakeOnHighestPriority();	
+	}
+
 	public void SetCinemachineShakeOnHighestPriority()
 	{
 		if (vShakes.Length <= 0)

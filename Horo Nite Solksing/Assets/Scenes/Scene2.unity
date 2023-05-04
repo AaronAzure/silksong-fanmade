@@ -12563,8 +12563,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf4be449acbc045988b8e1d2fd435846, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  brain: {fileID: 0}
-  vcam: {fileID: 1092745410}
+  brain: {fileID: 1703790434}
 --- !u!1 &1093850984
 GameObject:
   m_ObjectHideFlags: 0
@@ -25160,7 +25159,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   brain: {fileID: 0}
-  vcam: {fileID: 0}
 --- !u!114 &1703790430
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -25253,7 +25251,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1703790428}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3.39394, y: 1.4999998, z: -10}
+  m_LocalPosition: {x: -3.3871899, y: 1.4999998, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 244930602}
@@ -25282,7 +25280,7 @@ MonoBehaviour:
   m_BlendUpdateMethod: 1
   m_DefaultBlend:
     m_Style: 1
-    m_Time: 0.75
+    m_Time: 0
     m_CustomCurve:
       serializedVersion: 2
       m_Curve: []
@@ -28657,6 +28655,10 @@ MonoBehaviour:
   ui: {fileID: 1736242005}
   alwaysLockCam: 0
   otherObj: {fileID: 0}
+  isWaveRoom: 0
+  nWaves: 0
+  nExtras: 0
+  spawners: []
 --- !u!61 &1926262691
 BoxCollider2D:
   m_ObjectHideFlags: 0
