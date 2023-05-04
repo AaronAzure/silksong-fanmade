@@ -6,6 +6,7 @@ public class Death : Enemy
 {
 	public static Death Instance;
 	[Space] [Header("Death")]
+	[SerializeField] bool inStartAnim;
 	[SerializeField] bool inAttackAnim;
 	[SerializeField] bool tripleStrike;
 	[SerializeField] float tripleStrikeForce=20;
@@ -33,6 +34,7 @@ public class Death : Enemy
 	[SerializeField] Transform ultAtkEndPos;
 	private int ultAtkCounter;
 	private int ultAtkCount;
+	private bool useUltAtk;
 	private bool old;
 
 
@@ -140,6 +142,13 @@ public class Death : Enemy
 
 	protected override void CallChildOnHurt(int dmg, Vector2 forceDir)
 	{
+		if (inStartAnim)
+		{
+			START_FIGHTING();
+			REVEAL_SICKLES();
+			anim.SetFloat("atkPattern", 100);
+			anim.SetTrigger("disrespect");
+		}
 		if (anim.GetBool("isStagger"))
 			return;
 		hitCount += dmg;
