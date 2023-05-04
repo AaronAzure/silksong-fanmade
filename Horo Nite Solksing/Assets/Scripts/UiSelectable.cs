@@ -16,6 +16,11 @@ public class UiSelectable : MonoBehaviour, ISelectHandler
 	[Space][SerializeField] Image skillHolderImg;
 	[SerializeField] Sprite skillSpr;
 
+	
+	[Space][SerializeField] Image passiveHolderImg;
+	[SerializeField] Sprite passiveSpr;
+	[SerializeField] Sprite emptySpr;
+
 
 	public void SET_TOOL()
 	{
@@ -40,6 +45,27 @@ public class UiSelectable : MonoBehaviour, ISelectHandler
 			img.enabled = true;
 			if (skillHolderImg != null && skillSpr != null)
 				skillHolderImg.sprite = skillSpr;
+			if (master != null) master.Select();
+		}
+	}
+	public void SET_PASSIVE(int n)
+	{
+		Assert.IsNotNull(PlayerControls.Instance, "PlayerControls.Instance == null");
+
+		if (tool != null && PlayerControls.Instance != null && PlayerControls.Instance.isResting)
+		{
+			if (PlayerControls.Instance.EquipPassive(n))
+			{
+				if (passiveHolderImg != null && passiveSpr != null)
+					passiveHolderImg.sprite = passiveSpr;
+				img.enabled = true;
+			}
+			else
+			{
+				if (passiveHolderImg != null && emptySpr != null)
+					passiveHolderImg.sprite = emptySpr;
+				img.enabled = false;
+			}
 			if (master != null) master.Select();
 		}
 	}

@@ -126,7 +126,6 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] AudioSource shawSound;
 	[SerializeField] AudioSource agaleSound;
 	[SerializeField] AudioSource adimaSound;
-	// [SerializeField] AudioSource parrySound;
 	[SerializeField] AudioSource gitGudSound;
 
 
@@ -177,6 +176,18 @@ public class PlayerControls : MonoBehaviour
 	private float nToolSlowUses2;
 	[SerializeField] Image toolUses1; // progress bar
 	[SerializeField] Image toolUses2; // progress bar
+	
+
+	[Space] [SerializeField] bool hasShield;
+	[SerializeField] GameObject shieldObj;
+	[SerializeField] Image shieldImg;
+	[SerializeField] Sprite[] shieldSprs;
+	private int shieldHp;
+	[SerializeField] bool hasExtraSpool;
+	[SerializeField] GameObject normSpoolObj;
+	[SerializeField] GameObject extraSpoolObj;
+	[SerializeField] GameObject normHarpistSpoolObj;
+	[SerializeField] GameObject extraHarpistSpoolObj;
 
 
 	[Space] [Header("Ui")]
@@ -993,46 +1004,6 @@ public class PlayerControls : MonoBehaviour
 		nEquipped--;
 		FullRestore();
 		return false;
-		// if (toolsEquipped != null)
-		// {
-		// 	for (int i=0 ; i<tools.Length ; i++)
-		// 	{
-		// 		if (tools[i] == tool)
-		// 		{
-		// 			toolsEquipped[i].sprite = emptySpr;
-		// 			toolIcons[i].sprite = emptySpr;
-		// 			tools[i] = null;
-		// 			if (i == 0)
-		// 				tool1 = null;
-		// 			else if (i == 1)
-		// 				tool2 = null;
-		// 			nEquipped--;
-		// 			FullRestore();	// uneuipped
-		// 			return false;
-		// 		}
-		// 	}
-
-		// 	if (nEquipped >= toolsEquipped.Length)
-		// 		return false;
-
-		// 	for (int i=0 ; i<tools.Length ; i++)
-		// 	{
-		// 		if (tools[i] == null)
-		// 		{
-		// 			toolsEquipped[i].sprite = tool.icon;
-		// 			toolIcons[i].sprite = tool.icon;
-		// 			tools[i] = tool;
-		// 			currTool = tool;
-		// 			if (i == 0)
-		// 				tool1 = tool;
-		// 			else if (i == 1)
-		// 				tool2 = tool;
-		// 			nEquipped++;
-		// 			FullRestore();	// equipped
-		// 			return true;
-		// 		}
-		// 	}
-		// }
 	}
 	public void EquipCrest(int n)
 	{
@@ -1046,11 +1017,71 @@ public class PlayerControls : MonoBehaviour
 				crestIcons[crestNum].color = new Color(1,1,1,0.4f);
 
 			crestNum = n;
+			ChangeSpoolNotch();
 			anim.SetFloat("bindSpeed", n > 1 ? 0.5f : 1);
 			crests[crestNum].ToggleCrest(true);
 			crestIcons[crestNum].color = new Color(1,1,1,1);
 		}
 		anim.SetFloat("crestNum", crestNum);
+	}
+	public bool EquipPassive(int n)
+	{
+		switch (n)
+		{
+			// shield
+			case 0:
+				hasShield = !hasShield;
+				hasExtraSpool = false;
+				if (hasShield)
+				{
+					shieldHp = 3;
+					shieldImg.gameObject.SetActive(true);
+					if (shieldImg != null && shieldHp < shieldSprs.Length) 
+						shieldImg.sprite = shieldSprs[shieldHp];
+				}
+				else
+				{
+					shieldHp = 3;
+					shieldImg.gameObject.SetActive(false);
+				}
+				ChangeSpoolNotch();
+				return hasShield;
+			// extended spool
+			case 1:
+				hasExtraSpool = !hasExtraSpool;
+				hasShield = false;
+				shieldImg.gameObject.SetActive(false);
+				ChangeSpoolNotch();
+				return hasExtraSpool;
+			default:
+				return false;
+		}
+	}
+	void ChangeSpoolNotch()
+	{
+		extraHarpistSpoolObj.SetActive(false);
+		extraSpoolObj.SetActive(false);
+		normHarpistSpoolObj.SetActive(false);
+		normSpoolObj.SetActive(false);
+
+		if (hasExtraSpool)
+		{
+			// harpist
+			if (crestNum == 1)
+				extraHarpistSpoolObj.SetActive(true);
+			// else
+			else
+				extraSpoolObj.SetActive(true);
+		}
+		else
+		{
+			// harpist
+			if (crestNum == 1)
+				normHarpistSpoolObj.SetActive(true);
+			// else
+			else
+				normSpoolObj.SetActive(true);
+		}
 	}
 
 	void Jump()
@@ -1144,10 +1175,20 @@ public class PlayerControls : MonoBehaviour
 
 		if (clearShadowRealmList)
 		{
+			if (silkMeter > 0)
+			{
+				// silkMeter = 0;
+				SetSilk(-12);
+			}
 			GameManager.Instance.ClearShadowRealmList();
 			savedScene = SceneManager.GetActiveScene().name;
 			savedPos = self.position;
 		}
+
+		if (hasShield)
+			shieldHp = 3;
+		if (shieldImg != null && shieldHp < shieldSprs.Length) 
+			shieldImg.sprite = shieldSprs[shieldHp];
 
 		if (tool1 != null && toolUses1 != null)
 		{
@@ -1299,7 +1340,7 @@ public class PlayerControls : MonoBehaviour
 		{
 			hurtCo = StartCoroutine( InstantDeathCo() );
 		}
-		if (!isDead && other.CompareTag("Bench"))
+		if (other.CompareTag("Bench"))
 		{
 			bench = other.GetComponent<Bench>();
 			t = 0;
@@ -1335,7 +1376,22 @@ public class PlayerControls : MonoBehaviour
 		ResetAllBools();
 		atkCo = toolCo = null;
 		beenHurt = true;
-		hp = Mathf.Max(0, hp - dmg);
+
+		for (int i=0 ; i<dmg ; i++)
+		{
+			// Take shield damage
+			if (hasShield && hp == 1 && shieldHp > 0)
+			{
+				shieldHp = Mathf.Max(0, shieldHp - 1);
+				if (shieldImg != null && shieldHp < shieldSprs.Length) 
+					shieldImg.sprite = shieldSprs[shieldHp];
+			}
+			// Take damage
+			else
+			{
+				hp = Mathf.Max(0, hp - 1);
+			}
+		}
 		SetHp();
 		rb.velocity = Vector2.zero;
 		if (hp != 0)
@@ -1685,7 +1741,7 @@ public class PlayerControls : MonoBehaviour
 			soulLeakShortPs.Stop(true, ParticleSystemStopBehavior.StopEmitting);
 			soulLeakShortPs.Play();
 		}
-		if (hp == 1)
+		if ((!hasShield && hp == 1) || (hasShield && shieldHp == 0 && hp == 1))
 		{
 			animeLinesAnim.SetBool("show",true);
 			if (soulLeakPs != null) soulLeakPs.Play();
@@ -1700,9 +1756,10 @@ public class PlayerControls : MonoBehaviour
 	public void SetSilk(int addToSilk=0)
 	{
 		int prevSilk = silkMeter;
-		silkMeter = Mathf.Min(
+		silkMeter = Mathf.Clamp(
 			silkMeter + addToSilk * (addToSilk > 0 ? silkMultiplier : 1), 
-			silks.Length
+			0,
+			(hasExtraSpool ? silks.Length : silks.Length - 3)
 		);
 
 		// cancel if no changes

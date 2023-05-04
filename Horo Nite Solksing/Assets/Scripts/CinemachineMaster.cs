@@ -9,6 +9,14 @@ public class CinemachineMaster : MonoBehaviour
     [SerializeField] CinemachineShake[] vShakes;
 	public static CinemachineMaster Instance;
 
+	private void Awake() 
+	{
+		if (Instance == null)
+			Instance = this;	
+		else
+			Destroy(gameObject);
+	}
+
 	private void Start() 
 	{
 		SetCinemachineShakeOnHighestPriority();	
@@ -29,6 +37,7 @@ public class CinemachineMaster : MonoBehaviour
 				ind = i;
 			}
 		}
+		Debug.Log(vShakes[ind].name);
 		CinemachineShake.Instance = vShakes[ind];
 	}
 }
