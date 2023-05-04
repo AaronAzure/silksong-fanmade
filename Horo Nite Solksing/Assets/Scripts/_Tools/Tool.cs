@@ -31,24 +31,27 @@ public abstract class Tool : MonoBehaviour
 	{
 		if (!noStart)
 		{
-			if (!toRight)
+			if (dir != Vector2.zero)
 			{
-				rb.velocity = new Vector2(-dir.x * velocityMultiplier, dir.y);
-				kbDir = new Vector2(-kbDir.x, kbDir.y);
-				gameObject.transform.localScale = new Vector3(
-					-transform.localScale.x,
-					transform.localScale.y
-				);
-			}
-			else
-			{
-				rb.velocity = dir * velocityMultiplier;
+				if (!toRight)
+				{
+					rb.velocity = new Vector2(-dir.x * velocityMultiplier, dir.y);
+					kbDir = new Vector2(-kbDir.x, kbDir.y);
+					gameObject.transform.localScale = new Vector3(
+						-transform.localScale.x,
+						transform.localScale.y
+					);
+				}
+				else
+				{
+					rb.velocity = dir * velocityMultiplier;
+				}
 			}
 			CallChildOnStart();
-
-			if (destroyAfter > 0)
-				destroyAfterCo = StartCoroutine( DestroyAfterCo() );
 		}
+		CallChildOnStartAlways();
+		if (destroyAfter > 0)
+			destroyAfterCo = StartCoroutine( DestroyAfterCo() );
 	}
 
 	private void OnTriggerEnter2D(Collider2D other) 
@@ -97,6 +100,7 @@ public abstract class Tool : MonoBehaviour
 		Destroy(gameObject);
 	}
 	protected virtual void CallChildOnStart() {}
+	protected virtual void CallChildOnStartAlways() {}
 
 	protected virtual IEnumerator DestroyAfterCo()
 	{
@@ -104,7 +108,7 @@ public abstract class Tool : MonoBehaviour
 		Destroy(gameObject);
 	}
 
-	public void DESTROY() 
+	public virtual void DESTROY() 
 	{
 		Destroy(gameObject);
 	}

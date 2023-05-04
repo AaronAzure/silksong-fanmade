@@ -945,6 +945,8 @@ public class PlayerControls : MonoBehaviour
 			Quaternion.identity
 		);
 		tool.toRight = model.localScale.x > 0 ? true : false;
+
+		// caltrops
 		if (tool.isMultiple)
 		{
 			for (int i=1; i<tool.nCopies ; i++)
@@ -1226,7 +1228,6 @@ public class PlayerControls : MonoBehaviour
 					rb.velocity = new Vector2(rb.velocity.x , 0);
 					rb.AddForce( new Vector2(0, shawForce), ForceMode2D.Impulse);
 				}
-				// StartCoroutine( RegainControlCo(0.1f) );
 				break;
 			case 2:
 				if (!hunterSpinObj.activeSelf)
