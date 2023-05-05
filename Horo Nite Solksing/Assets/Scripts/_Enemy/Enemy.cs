@@ -62,6 +62,7 @@ public abstract class Enemy : MonoBehaviour
 	protected int nextDir;
 	protected Coroutine jumpCo;
 	protected Coroutine hurtCo;
+	private bool died;
 	// protected RaycastHit2D playerInfo;
 	// protected RaycastHit2D groundInfo;
 	// protected RaycastHit2D wallInfo;
@@ -301,7 +302,7 @@ public abstract class Enemy : MonoBehaviour
 		{
 			CallChildOnParry();
 		}
-		else if (!isWaiting)
+		else if (!isWaiting && !died)
 		{
 			if (hp > 0 && hurtCo != null)
 				StopCoroutine(hurtCo);
@@ -348,8 +349,9 @@ public abstract class Enemy : MonoBehaviour
 		}
 		foreach (SpriteRenderer sprite in sprites)
 			sprite.material = dmgMat;
-		if (hp <= 0)
+		if (!died && hp <= 0)
 		{
+			died = true;
 			rb.AddForce(Vector2.up * 5, ForceMode2D.Impulse);
 			Died(canShake);
 			if (room == null)

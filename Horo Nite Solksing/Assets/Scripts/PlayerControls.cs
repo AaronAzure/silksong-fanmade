@@ -147,6 +147,7 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] bool isLedgeGrabbing; // controlled by animator
 	[SerializeField] bool inAnimation;
 	[SerializeField] bool inRushSkill;
+	[SerializeField] bool inInvincibleAnim;
 	[SerializeField] bool performingGossamerStorm;
 	[SerializeField] bool cantRotate;
 	private bool cantRotate2;
@@ -715,7 +716,11 @@ public class PlayerControls : MonoBehaviour
 				isPogoing = false;
 				anim.SetFloat("pogoing", 0);
 			}
-
+			if (airDashed)
+			{
+				airDashed = false;
+				dashCooldownCounter = 0;
+			}
 		}
 	}
 	void CheckIsWalledWhistShaw()
@@ -1324,7 +1329,7 @@ public class PlayerControls : MonoBehaviour
 
 	private bool CanBeHurt()
 	{
-		return (!isDead && !invulnerable && !invincible && !justParried && !inRushSkill);
+		return (!isDead && !invulnerable && !invincible && !justParried && !inInvincibleAnim);
 	}
 
 	private void OnTriggerStay2D(Collider2D other) 

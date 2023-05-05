@@ -64,10 +64,13 @@ public class Room : MonoBehaviour
 		return false;
 	}
 
-	public void Defeated()
+	public void Defeated(bool isSpawner=false)
 	{
 		nDefeated++;
-		Debug.Log($"- Wave {nWaves} = {nDefeated}");
+		if (isSpawner)
+			Debug.Log($"<color=red>- Wave {nWaves} = {nDefeated} (spawner)</color>");
+		else
+			Debug.Log($"<color=red>- Wave {nWaves} = {nDefeated}</color>");
 		// no extra spawns
 		if (!isWaveRoom)
 		{
@@ -80,25 +83,23 @@ public class Room : MonoBehaviour
 		{
 			if (nDefeated >= spawners.Length + nExtras)
 			{
-				Debug.Log($"-- Wave {nWaves} cleared");
+				// Debug.Log($"-- Wave {nWaves} cleared");
+				nExtras = 0;
+				nDefeated = 0;
 				nWaves++;
 				bool stillGoing = false;
 				foreach (RoomSpawner spawner in spawners)
 				{
-					Debug.Log($"--- checking {spawner.name}");
+					// Debug.Log($"--- checking {spawner.name}");
 					if (spawner.CheckIfHasMoreSpawns(nWaves))
 					{
-						Debug.Log($"---- {spawner.name} can still go on");
+						// Debug.Log($"---- {spawner.name} can still go on");
 						stillGoing = true;
 						break;
 					}
 				}
 				if (stillGoing)
-				{
 					StartCoroutine( StartNextWave() );
-					nExtras = 0;
-					nDefeated = 0;
-				}
 				else
 					StartCoroutine( RoomClearedCo() );
 			}
@@ -107,21 +108,23 @@ public class Room : MonoBehaviour
 
 	IEnumerator StartNextWave()
 	{
-		Debug.Log($"> Starting Wave {nWaves}");
+		// Debug.Log($"> Starting Wave {nWaves}");
 		yield return new WaitForSeconds(1);
 		nExtras = 0;
 		nDefeated = 0;
+		Debug.Log($"<color=green>- Wave {nWaves} = {nDefeated}</color>");
 		foreach (RoomSpawner spawner in spawners)
 		{
 			spawner.SpawnEnemy(nWaves);
 		}
+		Debug.Log($"<color=yellow>- Wave {nWaves} = {nDefeated}</color>");
 	}
 
 	private bool done;
 	IEnumerator RoomClearedCo()
 	{
 		if (done) yield break;
-		Debug.Log("<color=green>Room Cleared</color>");
+		// Debug.Log("<color=green>Room Cleared</color>");
 
 		GameManager.Instance.RegisterRoomClearedList(gameObject.name);
 		done = true;

@@ -26,7 +26,7 @@ public class RoomSpawner : MonoBehaviour
 		else
 		{
 			// Debug.Log($"{gameObject.name} nothing to spawn");
-			room.Defeated();
+			room.Defeated(true);
 		}
 	}
 }
