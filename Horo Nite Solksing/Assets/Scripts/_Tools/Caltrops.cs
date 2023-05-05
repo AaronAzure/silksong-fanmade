@@ -7,6 +7,7 @@ public class Caltrops : Tool
 	[Space] [Header("Caltrops")]
 	[SerializeField] Caltrops c;
 	[SerializeField] float angularChangeInDegrees=30;
+	[SerializeField] float maxVelY=10;
 	[SerializeField] Animator anim;
 	[SerializeField] int counter=5;
 	private bool done;
@@ -38,21 +39,6 @@ public class Caltrops : Tool
 		}
 	}
 
-	public void RESET_DESTROY_CO()
-	{
-		if (c != null)
-		{
-			c.ChildResetDestroyCo();
-		}
-	}
-	public void ChildResetDestroyCo()
-	{
-		if (destroyAfterCo != null)
-		{
-			StopCoroutine(destroyAfterCo);
-		}
-		destroyAfterCo = StartCoroutine( DestroyAfterCo() );
-	}
 
 	public void COUNTDOWN()
 	{
@@ -73,6 +59,14 @@ public class Caltrops : Tool
 				anim.SetTrigger("destroy");
 			}
 		}
+	}
+
+	private void FixedUpdate() 
+	{
+		if (c != null)
+		{
+			rb.velocity = new Vector2(rb.velocity.x, Mathf.Min(maxVelY, rb.velocity.y));
+		}	
 	}
 
 
