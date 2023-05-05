@@ -12,6 +12,8 @@ GameObject:
   - component: {fileID: 6600418900668682554}
   - component: {fileID: 7366231504683964476}
   - component: {fileID: 2838661908632252507}
+  - component: {fileID: 712804474417699841}
+  - component: {fileID: 7567582319085801275}
   m_Layer: 0
   m_Name: HITBOX
   m_TagString: Finish
@@ -102,6 +104,34 @@ MonoBehaviour:
   destroyAfter: 0
   duration: 0.1
   col: {fileID: 6600418900668682554}
+--- !u!114 &712804474417699841
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 331955001822599266}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2fba469626724b01a0819630ab20587, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  col: {fileID: 6600418900668682554}
+  timer: 0.1
+--- !u!114 &7567582319085801275
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 331955001822599266}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa58e6df1c14d446f888a1e060a70e77, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  col: {fileID: 6600418900668682554}
+  timer: 0.25
 --- !u!1 &1208764353293556703
 GameObject:
   m_ObjectHideFlags: 0
@@ -5056,6 +5086,7 @@ GameObject:
   - component: {fileID: 6155702141245889150}
   - component: {fileID: 6652396671459899359}
   - component: {fileID: 7285689935984484306}
+  - component: {fileID: 2104430148875677536}
   - component: {fileID: 6812078362109391853}
   m_Layer: 0
   m_Name: HITBOX (1)
@@ -5115,6 +5146,20 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
+--- !u!114 &2104430148875677536
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8688155982429244910}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2fba469626724b01a0819630ab20587, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  col: {fileID: 6652396671459899359}
+  timer: 0.1
 --- !u!114 &6812078362109391853
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5128,4 +5173,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   col: {fileID: 6652396671459899359}
-  timer: 0.1
+  timer: 0.25

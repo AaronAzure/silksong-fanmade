@@ -1,11 +1,17 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Explosion : Tool
 {
 	[SerializeField] float duration;
 	[SerializeField] Collider2D col;
+	private HashSet<GameObject> alreadyHit;
 
+	private void Awake() 
+	{
+		alreadyHit = new HashSet<GameObject>();	
+	}
 
 	protected override void CallChildOnStart()
 	{
@@ -20,6 +26,11 @@ public class Explosion : Tool
 
 	protected override void CallChildOnEnemyHit(Collider2D other)
 	{
+		if (alreadyHit.Contains(other.gameObject))
+			return;
+		else
+			alreadyHit.Add(other.gameObject);
+			
 		Enemy target = other.GetComponent<Enemy>();
 		Vector2 temp = (other.transform.position - transform.position).normalized;
 		float angleZ = 

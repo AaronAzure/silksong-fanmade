@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine;
 using UnityEngine.Assertions;
+using TMPro;
 
 public class UiSelectable : MonoBehaviour, ISelectHandler
 {
@@ -20,6 +21,17 @@ public class UiSelectable : MonoBehaviour, ISelectHandler
 	[Space][SerializeField] Image passiveHolderImg;
 	[SerializeField] Sprite passiveSpr;
 	[SerializeField] Sprite emptySpr;
+
+
+	[Space] [Header("Description")]
+	[SerializeField] string title;
+	[SerializeField] string extraDesc;
+	[SerializeField] [TextArea(3,5)] string desc;
+
+	
+	[Space] [SerializeField] TextMeshProUGUI titleTxt;
+	[Space] [SerializeField] TextMeshProUGUI extraTxt;
+	[Space] [SerializeField] TextMeshProUGUI descTxt;
 
 
 	public void SET_TOOL()
@@ -90,6 +102,18 @@ public class UiSelectable : MonoBehaviour, ISelectHandler
 		{
 			master.selected = self;
 			master.MoveToButton();
+		}
+		if (titleTxt != null)
+		{
+			titleTxt.text = title;
+		}
+		if (extraTxt != null)
+		{
+			extraTxt.text = extraDesc;
+		}
+		if (descTxt != null)
+		{
+			descTxt.text = desc;
 		}
 	}
 }

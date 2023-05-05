@@ -9,7 +9,6 @@ public class Room : MonoBehaviour
 	[SerializeField] GameObject[] walls;
 	[SerializeField] Animator[] anims;
 	private bool startBossFight;
-	[SerializeField] int nDefeated;
 	[SerializeField] GameObject ui;
 	[SerializeField] bool alwaysLockCam;
 	private bool checkedIfCleared;
@@ -17,9 +16,10 @@ public class Room : MonoBehaviour
 
 	
 	[Space] [Header("Waves")] 
-	[SerializeField] bool isWaveRoom;
-	[SerializeField] int nWaves;
+	[SerializeField] int nDefeated;
 	public int nExtras;
+	[Space] [SerializeField] bool isWaveRoom;
+	[SerializeField] int nWaves;
 	// [SerializeField] int nSpawnersDefeated;
 	[SerializeField] RoomSpawner[] spawners;
 
@@ -80,10 +80,8 @@ public class Room : MonoBehaviour
 		{
 			if (nDefeated >= spawners.Length + nExtras)
 			{
-				nExtras = 0;
 				Debug.Log($"-- Wave {nWaves} cleared");
 				nWaves++;
-				nDefeated = 0;
 				bool stillGoing = false;
 				foreach (RoomSpawner spawner in spawners)
 				{
@@ -98,6 +96,8 @@ public class Room : MonoBehaviour
 				if (stillGoing)
 				{
 					StartCoroutine( StartNextWave() );
+					nExtras = 0;
+					nDefeated = 0;
 				}
 				else
 					StartCoroutine( RoomClearedCo() );
@@ -109,6 +109,8 @@ public class Room : MonoBehaviour
 	{
 		Debug.Log($"> Starting Wave {nWaves}");
 		yield return new WaitForSeconds(1);
+		nExtras = 0;
+		nDefeated = 0;
 		foreach (RoomSpawner spawner in spawners)
 		{
 			spawner.SpawnEnemy(nWaves);

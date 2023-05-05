@@ -64,6 +64,7 @@ public class PlayerControls : MonoBehaviour
 	private bool ledgeGrab;
 	private bool noControl;
 	public bool isResting {get; private set;}
+	[SerializeField] GameObject needToRestObj;
 	private bool inStunLock;
 	public bool justParried {get; private set;}
 	[SerializeField] bool isInvincible;
@@ -333,7 +334,7 @@ public class PlayerControls : MonoBehaviour
 			// timePlayedTxt.text = $"{mins}:{secTxt}";
 		}
 
-		if (!isPaused && pauseAnim != null && player.GetButtonDown("Start"))
+		if (!isPaused && pauseAnim != null && player.GetButtonDown("Minus"))
 		{
 			isPaused = true;
 			pauseMenu.SetActive(true);
@@ -341,7 +342,7 @@ public class PlayerControls : MonoBehaviour
 		}
 		else if (isPaused && pauseMenuUi.interactable)
 		{
-			if (player.GetButtonDown("B"))
+			if (player.GetButtonDown("B") || player.GetButtonDown("Minus"))
 				pauseAnim.SetTrigger("close");
 		}
 		else if (CanControl() && !inShawAtk)
@@ -372,6 +373,7 @@ public class PlayerControls : MonoBehaviour
 				else if (bench != null && isGrounded && player.GetAxis("Move Vertical") > 0.7f)
 				{
 					isResting = true;
+					needToRestObj.SetActive(false);
 					isDashing = jumpDashed = false;
 					rb.gravityScale = 0;
 					rb.velocity = Vector2.zero;
@@ -397,6 +399,7 @@ public class PlayerControls : MonoBehaviour
 		{
 			t = 0;
 			isResting = false;
+			needToRestObj.SetActive(true);
 			activeMoveSpeed = moveSpeed;
 			rb.gravityScale = 1;
 			rb.velocity = Vector2.zero;
@@ -1440,6 +1443,7 @@ public class PlayerControls : MonoBehaviour
 		{
 			t = 0;
 			isResting = false;
+			needToRestObj.SetActive(true);
 			rb.gravityScale = 1;
 			rb.velocity = Vector2.zero;
 			anim.SetBool("isResting", false);
