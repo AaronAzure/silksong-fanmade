@@ -6,7 +6,9 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
 	public static GameManager Instance;
-	[field : SerializeField] public bool showDmg {get; private set;}
+
+	[field: SerializeField] public Animator transitionAnim {get; private set;}
+	[field: SerializeField] public bool showDmg {get; private set;}
 	[field: SerializeField] public HashSet<string> shadowRealmed;
 	[field: SerializeField] public HashSet<string> roomCleared;
 
@@ -17,6 +19,7 @@ public class GameManager : MonoBehaviour
 			Instance = this;
 		else
 			Destroy(gameObject);
+
 		DontDestroyOnLoad(gameObject);
 		shadowRealmed = new HashSet<string>();
 		roomCleared = new HashSet<string>();
@@ -66,5 +69,34 @@ public class GameManager : MonoBehaviour
 			roomCleared = new HashSet<string>();
 
 		roomCleared.Clear();
+	}
+
+	public void Restart()
+	{
+		StartCoroutine( RestartCo() );
+	}
+
+	IEnumerator RestartCo()
+	{
+		transitionAnim.SetTrigger("toBlack");
+
+		yield return new WaitForSecondsRealtime(0.5f);
+		if (PlayerControls.Instance != null)
+			Destroy( PlayerControls.Instance.gameObject );
+
+		yield return new WaitForSecondsRealtime(0.5f);
+		GameManager.Instance.ClearShadowRealmList();
+		GameManager.Instance.ClearRoomClearedList();
+
+		AsyncOperation loadingOperation = SceneManager.LoadSceneAsync("Scene1");
+		Time.timeScale = 1;
+		float loadTime = 0;
+		// wait for scene to load
+		while (!loadingOperation.isDone && loadTime < 5)
+		{
+			loadTime += Time.deltaTime;
+			yield return null;
+		}
+		transitionAnim.SetTrigger("reset");
 	}
 }

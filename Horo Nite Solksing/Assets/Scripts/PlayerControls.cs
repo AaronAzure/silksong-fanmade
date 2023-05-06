@@ -119,7 +119,7 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] Sprite fullSpoolSpr;
 	[SerializeField] Sprite emptySpoolSpr;
 	[SerializeField] GameObject cacoonObj;
-	[SerializeField] Animator blackScreenAnim;
+	// [SerializeField] Animator GameManager.Instance.transitionAnim;
 	[SerializeField] GameObject deathAnimObj;
 
 
@@ -195,10 +195,15 @@ public class PlayerControls : MonoBehaviour
 	[Space] [Header("Ui")]
 	[SerializeField] GameObject pauseMenu;
 	[SerializeField] Animator pauseAnim;
-	[SerializeField] Image[] toolIcons;
+	[SerializeField] CanvasGroup pauseMenuUi;
+
+	[Space] [SerializeField] GameObject pause2Menu;
+	[SerializeField] Animator pause2Anim;
+	[SerializeField] CanvasGroup pause2MenuUi;
+
+	[Space] [SerializeField] Image[] toolIcons;
 	[SerializeField] Image[] toolsEquipped;
 	[SerializeField] Sprite emptySpr;
-	[SerializeField] CanvasGroup pauseMenuUi;
 	private int nEquipped;
 
 
@@ -286,6 +291,7 @@ public class PlayerControls : MonoBehaviour
 		FullRestore(); // starting
 		Screen.SetResolution((int) (16f/9f * Screen.height), Screen.height, true);
 		if (pauseMenu != null) pauseMenu.SetActive(false);
+		if (pause2Menu != null) pause2Menu.SetActive(false);
 	}
 
 	bool CanControl()
@@ -335,17 +341,33 @@ public class PlayerControls : MonoBehaviour
 			// timePlayedTxt.text = $"{mins}:{secTxt}";
 		}
 
+		// inventory open
 		if (!isPaused && pauseAnim != null && player.GetButtonDown("Minus"))
 		{
 			isPaused = true;
 			pauseMenu.SetActive(true);
 			pauseAnim.SetTrigger("open");
 		}
-		else if (isPaused && pauseMenuUi.interactable)
+		// pause open
+		else if (!isPaused && pause2Anim != null && player.GetButtonDown("Start"))
 		{
-			if (player.GetButtonDown("B") || player.GetButtonDown("Minus"))
-				pauseAnim.SetTrigger("close");
+			isPaused = true;
+			pause2Menu.SetActive(true);
+			pause2Anim.SetTrigger("open");
 		}
+		// inventory close
+		else if (isPaused)
+		{
+			// close inventory
+			if (pauseMenuUi.gameObject.activeInHierarchy && pauseMenuUi.interactable 
+				&& (player.GetButtonDown("B") || player.GetButtonDown("Minus")))
+				pauseAnim.SetTrigger("close");
+			// close Pause
+			else if (pause2MenuUi.gameObject.activeInHierarchy && pause2MenuUi.interactable 
+				&& (player.GetButtonDown("B") || player.GetButtonDown("Start")))
+				pause2Anim.SetTrigger("close");
+		}
+		// basic movement
 		else if (CanControl() && !inShawAtk)
 		{
 			if (!inAirDash)
@@ -1366,7 +1388,7 @@ public class PlayerControls : MonoBehaviour
 		if (!isDead && !movingToNextScene && other.CompareTag("EditorOnly"))
 		{
 			isDead = movingToNextScene = true;
-			blackScreenAnim.SetTrigger("toBlack");
+			GameManager.Instance.transitionAnim.SetTrigger("toBlack");
 			isCountingTime = false;
 			TimeSpan time = TimeSpan.FromSeconds(timePlayed);
 			finalTimePlayedTxt.text = time.ToString(@"mm\:ss\.ff");
@@ -1642,12 +1664,12 @@ public class PlayerControls : MonoBehaviour
 			yield return null;
 		}
 		isCountingTime = true;
-		blackScreenAnim.SetFloat("speed", 0);
-		blackScreenAnim.SetTrigger("reset");
+		GameManager.Instance.transitionAnim.SetFloat("speed", 0);
+		GameManager.Instance.transitionAnim.SetTrigger("reset");
 		yield return new WaitForSeconds(0.05f);
 		if (deathAnimObj != null)
 			deathAnimObj.SetActive(false);
-		blackScreenAnim.SetFloat("speed", 1);
+		GameManager.Instance.transitionAnim.SetFloat("speed", 1);
 
 		CheckForCacoon();
 		inStunLock = isDead = false;
@@ -1670,6 +1692,11 @@ public class PlayerControls : MonoBehaviour
 			cacoonObj.SetActive(true);
 			cacoonObj.transform.position = deathPos;
 		}
+		else
+		{
+			cacoonObj.SetActive(false);
+			// cacoonObj.transform.position = deathPos;
+		}
 	}
 
 
@@ -1679,7 +1706,7 @@ public class PlayerControls : MonoBehaviour
 		nextSceneSpeed = (rb.velocity.x > 0) ? 1 : -1;
 		isCountingTime = false;
 		yield return new WaitForSeconds(0.1f);
-		blackScreenAnim.SetTrigger("toBlack");
+		GameManager.Instance.transitionAnim.SetTrigger("toBlack");
 
 		yield return new WaitForSeconds(0.25f);
 		AsyncOperation loadingOperation = SceneManager.LoadSceneAsync(newSceneName);
@@ -1693,7 +1720,7 @@ public class PlayerControls : MonoBehaviour
 		isCountingTime = true;
 		canMove = false;
 		transform.position = newScenePos;
-		blackScreenAnim.SetTrigger("reset");
+		GameManager.Instance.transitionAnim.SetTrigger("reset");
 		CheckForCacoon();
 
 		yield return new WaitForSeconds(0.5f);
@@ -1847,17 +1874,11 @@ public class PlayerControls : MonoBehaviour
 		infiniteSilk = !infiniteSilk;
 	}
 
-	// [Command("toggle_old_death", "death", MonoTargetType.All)] public void toggle_old_death()
-	// {
-	// 	if (Death.Instance != null)
-	// 		Death.Instance.ToggleOldVer();
-	// }
-
 	[Command("restart", "restart", MonoTargetType.All)] public void restart()
 	{
 		transform.position = savedPos;
 		SceneManager.LoadScene(savedScene);
-		blackScreenAnim.SetTrigger("reset");
+		GameManager.Instance.transitionAnim.SetTrigger("reset");
 		cacoonObj.SetActive(false);
 		inStunLock = isDead = false;
 		rb.gravityScale = 1;
@@ -1869,5 +1890,21 @@ public class PlayerControls : MonoBehaviour
 		SetSilk(-silkMeter);
 		hurtCo = null;
 		cacoonObj.SetActive(false);
+	}
+
+
+
+	// todo --------------------------------------------------------------------
+
+	public void UNPAUSE()
+	{
+		pause2Anim.SetTrigger("close");
+		isPaused = false;
+	}
+
+	public void RESTART()
+	{
+		GameManager.Instance.Restart();
+		// Destroy(gameObject);
 	}
 }
