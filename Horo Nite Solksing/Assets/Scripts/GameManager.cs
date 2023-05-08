@@ -8,6 +8,7 @@ public class GameManager : MonoBehaviour
 	public static GameManager Instance;
 
 	[field: SerializeField] public Animator transitionAnim {get; private set;}
+	[field: SerializeField] public GameObject remapUi {get; private set;}
 	[field: SerializeField] public bool showDmg {get; private set;}
 	[field: SerializeField] public HashSet<string> shadowRealmed;
 	[field: SerializeField] public HashSet<string> roomCleared;
@@ -98,5 +99,19 @@ public class GameManager : MonoBehaviour
 			yield return null;
 		}
 		transitionAnim.SetTrigger("reset");
+	}
+
+	public void OpenRemapControls()
+	{
+		if (remapUi != null)
+			remapUi.SetActive(true);
+	}
+
+	public void CloseRemapControls()
+	{
+		if (remapUi != null)
+			remapUi.SetActive(false);
+		if (PlayerControls.Instance != null)
+			PlayerControls.Instance.DoneRemapping();
 	}
 }

@@ -7,6 +7,8 @@ public class Explosion : Tool
 	[SerializeField] float duration;
 	[SerializeField] Collider2D col;
 	private HashSet<GameObject> alreadyHit;
+	[SerializeField] bool hasCamShake=true;
+
 
 	private void Awake() 
 	{
@@ -15,8 +17,9 @@ public class Explosion : Tool
 
 	protected override void CallChildOnStart()
 	{
-		CinemachineShake.Instance.ShakeCam(10, 0.75f, 2);
-		StartCoroutine(DeactivateCo());
+		if (hasCamShake)
+			CinemachineShake.Instance.ShakeCam(10, 0.75f, 2);
+		StartCoroutine( DeactivateCo() );
 	}
 	IEnumerator DeactivateCo()
 	{

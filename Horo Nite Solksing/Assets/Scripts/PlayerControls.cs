@@ -84,6 +84,9 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] Vector2 wallCheckSize;
 	[SerializeField] float wallSlideSpeed=2;
 
+	[Space] [SerializeField] Transform ceilingCheck;
+	[SerializeField] Vector2 ceilingCheckSize;
+
 	[Space] [SerializeField] float activeMoveSpeed;
 	[SerializeField] float dashSpeed=10;
 	[SerializeField] float dashBurstSpeed=15;
@@ -360,11 +363,11 @@ public class PlayerControls : MonoBehaviour
 		{
 			// close inventory
 			if (pauseMenuUi.gameObject.activeInHierarchy && pauseMenuUi.interactable 
-				&& (player.GetButtonDown("B") || player.GetButtonDown("Minus")))
+				&& (player.GetButtonDown("No") || player.GetButtonDown("Minus")))
 				pauseAnim.SetTrigger("close");
 			// close Pause
 			else if (pause2MenuUi.gameObject.activeInHierarchy && pause2MenuUi.interactable 
-				&& (player.GetButtonDown("B") || player.GetButtonDown("Start")))
+				&& (player.GetButtonDown("No") || player.GetButtonDown("Start")))
 				pause2Anim.SetTrigger("close");
 		}
 		// basic movement
@@ -372,17 +375,17 @@ public class PlayerControls : MonoBehaviour
 		{
 			if (!inAirDash)
 			{
-				if (player.GetButtonDown("Y") && atkCo == null)
+				if (player.GetButtonDown("Attack") && atkCo == null)
 					Attack();
-				else if (player.GetButtonDown("X"))
+				else if (player.GetButtonDown("Skill"))
 					SkillAttack();
 
 				// bind (heal)
-				else if (player.GetButtonDown("A") && (infiniteSilk || silkMeter >= GetBindCost()) && bindCo == null)
+				else if (player.GetButtonDown("Bind") && (infiniteSilk || silkMeter >= GetBindCost()) && bindCo == null)
 					bindCo = StartCoroutine( BindCo() );
 
 				// tools
-				else if (player.GetButtonDown("R") && toolCo == null)
+				else if (player.GetButtonDown("Tool") && toolCo == null)
 				{
 					// int tool = (player.GetAxis("Move Vertical") < -0.7f ? 1 : 0);
 					int tool = 0;
@@ -418,7 +421,7 @@ public class PlayerControls : MonoBehaviour
 			if (canLedgeGrab && !isWallJumping && !isLedgeGrabbing && !ledgeGrab)
 				LedgeGrab();
 		}
-		else if (isResting && (player.GetButtonDown("B") || player.GetAxis("Move Vertical") < -0.7f))
+		else if (isResting && (player.GetButtonDown("No") || player.GetAxis("Move Vertical") < -0.7f))
 		{
 			t = 0;
 			isResting = false;
@@ -514,7 +517,7 @@ public class PlayerControls : MonoBehaviour
 	void DashMechanic()
 	{
 		// First frame of pressing dash button
-		if (player.GetButtonDown("ZR") && dashCounter <= 0 && 
+		if (player.GetButtonDown("Dash") && dashCounter <= 0 && 
 			dashCooldownCounter <= 0)
 		{
 			isDashing = true; // keep dashing if on ground
@@ -537,7 +540,7 @@ public class PlayerControls : MonoBehaviour
 				Instantiate(dashEffectR, dashSpawnPos.position, dashEffectR.transform.rotation, null);
 		}
 		// First frame of finishing dash
-		if (isDashing && player.GetButtonUp("ZR") && dashCounter <= 0)
+		if (isDashing && player.GetButtonUp("Dash") && dashCounter <= 0)
 		{
 			CancelDash();
 		}
@@ -553,7 +556,7 @@ public class PlayerControls : MonoBehaviour
 
 			if (dashCounter <= 0)
 			{
-				if (!isGrounded || !player.GetButton("ZR") || risingAtk) 
+				if (!isGrounded || !player.GetButton("Dash") || risingAtk) 
 					isDashing = false;
 				activeMoveSpeed = (isDashing) ? dashSpeed : moveSpeed;
 				anim.SetFloat("moveSpeed", activeMoveSpeed);
@@ -582,17 +585,17 @@ public class PlayerControls : MonoBehaviour
 	void JumpMechanic()
 	{
 		// First Frame of Jump
-		if (isGrounded && !isJumping && player.GetButtonDown("B"))
+		if (isGrounded && !isJumping && player.GetButtonDown("Jump"))
 		{
 			Jump();
 		}
 		// Released jump button
-		else if (player.GetButtonUp("B"))
+		else if (player.GetButtonUp("Jump") || CheckIsCeiling())
 		{
 			isJumping = false;
 		}
 		// Holding jump button
-		else if (isJumping && player.GetButton("B"))
+		else if (isJumping && player.GetButton("Jump"))
 		{
 			if (!usingSkill && jumpTimer < jumpMaxTimer)
 			{
@@ -605,7 +608,7 @@ public class PlayerControls : MonoBehaviour
 			}
 		}
 		// wall sliding
-		else if (isWallSliding && player.GetButtonDown("B"))
+		else if (isWallSliding && player.GetButtonDown("Jump"))
 		{
 			WallJump();
 		}
@@ -744,6 +747,10 @@ public class PlayerControls : MonoBehaviour
 				dashCooldownCounter = 0;
 			}
 		}
+	}
+	bool CheckIsCeiling()
+	{
+		return (!isGrounded && Physics2D.OverlapBox(ceilingCheck.position, ceilingCheckSize, 0, whatIsGround));
 	}
 	void CheckIsWalledWhistShaw()
 	{
@@ -930,7 +937,7 @@ public class PlayerControls : MonoBehaviour
 	public void CancelGossamerStorm()
 	{
 		// done
-		if (!player.GetButton("X") || (!infiniteSilk && silkMeter <= 0))
+		if (!player.GetButton("Skill") || (!infiniteSilk && silkMeter <= 0))
 		{
 			anim.SetBool("isGossamerStorm", false);
 			rb.gravityScale = 1;
@@ -1905,6 +1912,15 @@ public class PlayerControls : MonoBehaviour
 	public void RESTART()
 	{
 		GameManager.Instance.Restart();
-		// Destroy(gameObject);
+	}
+	public void REMAP_CONTROLS()
+	{
+		pause2Menu.SetActive(false);
+		GameManager.Instance.OpenRemapControls();
+	}
+	public void DoneRemapping()
+	{
+		pause2Menu.SetActive(true);
+		// GameManager.Instance.OpenRemapControls();
 	}
 }
