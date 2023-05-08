@@ -29,6 +29,8 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] int silkMeter;
 	[SerializeField] Animator[] silks;
 	[SerializeField] GameObject[] hpMasks;
+	[SerializeField] GameObject silkGlowNorm;
+	[SerializeField] GameObject silkGlowHarp;
 	[SerializeField] SpriteRenderer[] sprites;
 	[SerializeField] Material defaultMat;
 	[SerializeField] Material dmgMat;
@@ -1729,6 +1731,17 @@ public class PlayerControls : MonoBehaviour
 		transform.position = newScenePos;
 		GameManager.Instance.transitionAnim.SetTrigger("reset");
 		CheckForCacoon();
+		if (hp != 1 && soulLeakShortPs != null)
+		{
+			soulLeakShortPs.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+			soulLeakShortPs.Play();
+		}
+		if ((!hasShield && hp == 1) || (hasShield && shieldHp == 0 && hp == 1))
+		{
+			animeLinesAnim.SetBool("show",true);
+			soulLeakPs.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+			soulLeakPs.Play();
+		}
 
 		yield return new WaitForSeconds(0.5f);
 		canMove = true;
@@ -1840,6 +1853,15 @@ public class PlayerControls : MonoBehaviour
 			else if (i >= silkMeter && i < prevSilk)
 				silks[i].SetTrigger("unlatch");
 		}
+
+		if (silkMeter != prevSilk)
+		{
+			if (crestNum == 1 && silkGlowHarp != null)
+				silkGlowHarp.SetActive(silkMeter >= 6);
+			else if (crestNum != 1 && silkGlowNorm != null)
+				silkGlowNorm.SetActive(silkMeter >= 9);
+		}
+		
 	}
 
 	public void Parry()
