@@ -168,7 +168,7 @@ public abstract class Enemy : MonoBehaviour
 		CallChildOnEarlyUpdate();
 		if (spawningIn || controlledByAnim) return;
 
-		if (idleActionOnly || !attackingPlayer)
+		if ((idleActionOnly || !attackingPlayer) && !alwaysInRange)
 			IdleAction();
 		else
 			AttackingAction();
@@ -327,8 +327,9 @@ public abstract class Enemy : MonoBehaviour
 			forceDir = new Vector2(forceDir.x, 0);
 		float angleZ = 
 			Mathf.Atan2(forceY, forceDir.x) * Mathf.Rad2Deg;
-		Instantiate(silkEffectObj, transform.position, Quaternion.Euler(0,0,angleZ+offset*forceDir.x));
-		if (!cannotTakeDmg)
+		if (silkEffectObj != null)
+			Instantiate(silkEffectObj, transform.position, Quaternion.Euler(0,0,angleZ+offset*forceDir.x));
+		if (!cannotTakeDmg && bloodEffectObj != null)
 			Instantiate(bloodEffectObj, transform.position, Quaternion.Euler(0,0,angleZ+offset*forceDir.x));
 		if (!cannotTakeKb && force != 0)
 		{
@@ -347,8 +348,9 @@ public abstract class Enemy : MonoBehaviour
 			atPhase2 = true;
 			CallChildOnPhase2();
 		}
-		foreach (SpriteRenderer sprite in sprites)
-			sprite.material = dmgMat;
+		if (sprites != null)
+			foreach (SpriteRenderer sprite in sprites)
+				sprite.material = dmgMat;
 		if (!died && hp <= 0)
 		{
 			died = true;
@@ -364,8 +366,9 @@ public abstract class Enemy : MonoBehaviour
 
 		CallChildOnHurt(dmg, forceDir);
 		yield return new WaitForSeconds(0.2f);
-		foreach (SpriteRenderer sprite in sprites)
-			sprite.material = defaultMat;
+		if (sprites != null)
+			foreach (SpriteRenderer sprite in sprites)
+				sprite.material = defaultMat;
 
 		beenHurt = false;
 		receivingKb = false;

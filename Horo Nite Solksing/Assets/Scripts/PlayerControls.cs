@@ -124,7 +124,6 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] Sprite fullSpoolSpr;
 	[SerializeField] Sprite emptySpoolSpr;
 	[SerializeField] GameObject cacoonObj;
-	// [SerializeField] Animator GameManager.Instance.transitionAnim;
 	[SerializeField] GameObject deathAnimObj;
 
 
@@ -198,7 +197,9 @@ public class PlayerControls : MonoBehaviour
 
 
 	[Space] [Header("Ui")]
-	[SerializeField] GameObject pauseMenu;
+	[SerializeField] Animator transitionAnim;
+
+	[Space] [SerializeField] GameObject pauseMenu;
 	[SerializeField] Animator pauseAnim;
 	[SerializeField] CanvasGroup pauseMenuUi;
 
@@ -283,6 +284,7 @@ public class PlayerControls : MonoBehaviour
 	// Start is called before the first frame update
 	void Start()
 	{
+		transitionAnim.SetTrigger("fromBlack");
 		savedScene = SceneManager.GetActiveScene().name;
 		savedPos = self.position;
 
@@ -407,7 +409,7 @@ public class PlayerControls : MonoBehaviour
 					rb.velocity = Vector2.zero;
 					anim.SetBool("isResting", true);
 					startPosition = transform.position;
-					FullRestore(true); // rest
+					// FullRestore(true); // rest
 				}
 			}
 
@@ -418,7 +420,8 @@ public class PlayerControls : MonoBehaviour
 			DashMechanic();
 
 			CalcMove();
-			CheckCanLedgeGrab();
+			if (atkCo == null)
+				CheckCanLedgeGrab();
 			// Ledge Grab
 			if (canLedgeGrab && !isWallJumping && !isLedgeGrabbing && !ledgeGrab)
 				LedgeGrab();
@@ -1397,15 +1400,13 @@ public class PlayerControls : MonoBehaviour
 		if (!isDead && !movingToNextScene && other.CompareTag("EditorOnly"))
 		{
 			isDead = movingToNextScene = true;
-			GameManager.Instance.transitionAnim.SetTrigger("toBlack");
+			transitionAnim.SetTrigger("toBlack");
+			// GameManager.Instance.transitionAnim.SetTrigger("toBlack");
 			isCountingTime = false;
 			TimeSpan time = TimeSpan.FromSeconds(timePlayed);
 			finalTimePlayedTxt.text = time.ToString(@"mm\:ss\.ff");
 			timePlayedTxt.gameObject.SetActive(false);
 			finalTimePlayedTxt.gameObject.SetActive(true);
-			// movingRight = (other.transform.position.x - self.position.x > 0);
-			// NewScene n = other.GetComponent<NewScene>();
-			// StartCoroutine( MoveToNextScene(n.newSceneName, n.newScenePos) );
 		}
 	}
 
@@ -1451,7 +1452,11 @@ public class PlayerControls : MonoBehaviour
 		SetHp();
 		rb.velocity = Vector2.zero;
 		if (hp != 0)
+		{
 			CinemachineShake.Instance.ShakeCam(15, 0.25f);
+			if (hp > 1 || (hasShield && hp == 1 && shieldHp > 0))
+				animeLinesAnim.SetTrigger("dmg");
+		}
 		anim.SetBool("isSkillAttacking", false);
 		anim.SetBool("isGossamerStorm", false);
 		anim.SetBool("isBinding", false);
@@ -1731,7 +1736,7 @@ public class PlayerControls : MonoBehaviour
 		transform.position = newScenePos;
 		GameManager.Instance.transitionAnim.SetTrigger("reset");
 		CheckForCacoon();
-		if (hp != 1 && soulLeakShortPs != null)
+		if (hp > 1 && soulLeakShortPs != null)
 		{
 			soulLeakShortPs.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
 			soulLeakShortPs.Play();
@@ -1790,6 +1795,9 @@ public class PlayerControls : MonoBehaviour
 			sprite.material = flashMat;
 
 		SpawnExistingObjAtSelf(bindPs);
+		if (isResting)
+			FullRestore(true); // rest
+
 		// Instantiate(bindPs, transform.position, Quaternion.identity);
 		yield return new WaitForSeconds(0.1f);
 		foreach (SpriteRenderer sprite in sprites)

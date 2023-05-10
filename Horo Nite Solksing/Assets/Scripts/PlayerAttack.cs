@@ -108,6 +108,57 @@ public class PlayerAttack : MonoBehaviour
 					p.SetSilk(1);
 			}
 		}
+		if (other.CompareTag("SpecialEnemy"))
+		{
+			if (ensureSingleHit)
+			{
+				if (alreadyHit.Contains(other.gameObject))
+					return;
+				else
+					alreadyHit.Add(other.gameObject);
+			}
+			Enemy target = other.GetComponent<Enemy>();
+			Vector2 temp = (other.transform.position - transform.position).normalized;
+			float angleZ = 
+				Mathf.Atan2(Mathf.Abs(temp.y), temp.x) * Mathf.Rad2Deg;
+
+			if (target != null) 
+			{
+				if (!target.inParryState)
+				{
+					Instantiate(
+						strikePs, 
+						other.transform.position, 
+						Quaternion.Euler(0,0,angleZ + offset * temp.x)
+					);
+				}
+				
+				int dmg = !isStabAttack ? (!isGossamerStorm ? p.atkDmg[p.crestNum] : p.gossamerDmg) : p.stabDmg;
+				if (isRushAttack)
+					dmg = p.rushDmg;
+
+				// stronger special
+				if ((isStabAttack || isGossamerStorm || isRushAttack) && p.crestNum == 1)
+					dmg = Mathf.RoundToInt(dmg * 1.25f);
+				// weaker special
+				else if ((isStabAttack || isGossamerStorm || isRushAttack) && p.crestNum == 2)
+					dmg = (int) (dmg * 0.75f);
+				else if ((isStabAttack || isGossamerStorm || isRushAttack) && p.crestNum == 3)
+					dmg = (int) (dmg * 0.85f);
+				target.TakeDamage(
+					dmg, 
+					isGossamerStorm ? transform : null,
+					new Vector2(p.model.localScale.x * forceDir.x, forceDir.y),
+					force
+				);
+				if (isShawAttack)
+					p.ShawRetreat(isDashAttack);
+				else if (isRisingAttack)
+					p.RisingAtkRetreat();
+				// else if (hasRecoil && !p.justParried)
+				// 	p.Recoil();
+			}
+		}
 		else if (other.CompareTag("Ground") && hasRecoil && !p.justParried)
 			p.Recoil();
 	}

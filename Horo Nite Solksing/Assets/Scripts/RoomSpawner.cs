@@ -20,6 +20,7 @@ public class RoomSpawner : MonoBehaviour
 			// Debug.Log($"{gameObject.name} spawning");
 			var e = Instantiate(enemies[x], transform.position, Quaternion.identity, transform);
 			e.room = this.room;
+			e.alwaysInRange = true;
 			e.CallChildOnIsSpecial();
 			e.SpawnIn();
 		}

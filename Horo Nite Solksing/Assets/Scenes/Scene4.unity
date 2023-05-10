@@ -3594,7 +3594,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1376537067151301452, guid: 9b0d373ca1a894fb7ae67b3105c039c7, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -2.7359085
+      value: -3.7359085
       objectReference: {fileID: 0}
     - target: {fileID: 1376537067151301452, guid: 9b0d373ca1a894fb7ae67b3105c039c7, type: 3}
       propertyPath: m_LocalPosition.y
@@ -5944,7 +5944,7 @@ GameObject:
   - component: {fileID: 450047144}
   - component: {fileID: 450047143}
   m_Layer: 0
-  m_Name: CM vcam1 (1)
+  m_Name: CM vcam1 (room)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -14963,6 +14963,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   brain: {fileID: 1703790434}
+  vcams:
+  - {fileID: 1092745410}
+  - {fileID: 450047144}
 --- !u!1 &1093850984
 GameObject:
   m_ObjectHideFlags: 0
@@ -31521,7 +31524,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1703790428}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3.3898125, y: -0.7000005, z: -10}
+  m_LocalPosition: {x: -3.3879662, y: -0.7000005, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 244930602}
@@ -31550,7 +31553,7 @@ MonoBehaviour:
   m_BlendUpdateMethod: 1
   m_DefaultBlend:
     m_Style: 1
-    m_Time: 0.75
+    m_Time: 0
     m_CustomCurve:
       serializedVersion: 2
       m_Curve: []
