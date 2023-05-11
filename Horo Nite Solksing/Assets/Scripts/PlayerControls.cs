@@ -180,7 +180,7 @@ public class PlayerControls : MonoBehaviour
 	private int nToolUses2;
 	private float nToolSlowUses1;
 	private float nToolSlowUses2;
-	[SerializeField] Image toolUses1; // progress bar
+	[Space] [SerializeField] Image toolUses1; // progress bar
 	[SerializeField] Image toolUses2; // progress bar
 	
 
@@ -370,7 +370,7 @@ public class PlayerControls : MonoBehaviour
 				&& (player.GetButtonDown("No") || player.GetButtonDown("Minus")))
 				pauseAnim.SetTrigger("close");
 			// close Pause
-			else if (pause2MenuUi.gameObject.activeInHierarchy && pause2MenuUi.interactable 
+			if (pause2MenuUi.gameObject.activeInHierarchy && pause2MenuUi.interactable 
 				&& (player.GetButtonDown("No") || player.GetButtonDown("Start")))
 				pause2Anim.SetTrigger("close");
 		}
@@ -561,7 +561,8 @@ public class PlayerControls : MonoBehaviour
 
 			if (dashCounter <= 0)
 			{
-				if (!isGrounded || !player.GetButton("Dash") || risingAtk) 
+				// if (!isGrounded || !player.GetButton("Dash") || risingAtk) 
+				if (!player.GetButton("Dash") || risingAtk) 
 					isDashing = false;
 				activeMoveSpeed = (isDashing) ? dashSpeed : moveSpeed;
 				anim.SetFloat("moveSpeed", activeMoveSpeed);

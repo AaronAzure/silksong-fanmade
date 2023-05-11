@@ -18,7 +18,7 @@ public class Explosion : Tool
 	protected override void CallChildOnStart()
 	{
 		if (hasCamShake)
-			CinemachineShake.Instance.ShakeCam(10, 0.75f, 2);
+			CinemachineShake.Instance.ShakeCam(11.5f, 0.75f, 2);
 		StartCoroutine( DeactivateCo() );
 	}
 	IEnumerator DeactivateCo()

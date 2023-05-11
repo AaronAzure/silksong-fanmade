@@ -10,11 +10,18 @@ public class Otto : Enemy
 	[SerializeField] float throwForce=8;
 	[SerializeField] EnemyProjectile bellObj;
 	[SerializeField] Transform spawnPos;
+	[SerializeField] float atkSpeed=1;
 	private bool chase;
+
+	protected override void CallChildOnStart()
+	{
+		anim.SetFloat("atkSpeed", atkSpeed);
+	}
 
     protected override void IdleAction()
 	{
 		FlyAround();
+			anim.SetFloat("moveSpeed", 1);
 		if (chase)
 		{
 			chase = false;

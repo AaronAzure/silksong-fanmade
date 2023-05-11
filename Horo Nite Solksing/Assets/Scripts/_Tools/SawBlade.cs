@@ -6,7 +6,10 @@ public class SawBlade : Tool
 {
 	[Space] [Header("Saw Blade")] 
 	[SerializeField] Animator anim;
-	[SerializeField] float speed=8;
+	[SerializeField] bool isCollidingAnim;
+
+	
+	[Space] [SerializeField] float speed=8;
 	[SerializeField] float hitSpeed=0.1f;
 	[SerializeField] float drawbackSpeed=2f;
 	private bool isMoving;
@@ -47,7 +50,7 @@ public class SawBlade : Tool
 	}
 	public void ExitEnemy()
 	{
-		if (anim != null)
+		if (!isCollidingAnim && anim != null)
 		{
 			anim.SetBool("isColliding", false);
 			isColliding = false;
@@ -69,7 +72,7 @@ public class SawBlade : Tool
 		if (isMoving)
 		{
 			rb.velocity = new Vector2(
-				moveDir * (isColliding ? hitSpeed : speed), 
+				moveDir * ((isCollidingAnim || isColliding) ? hitSpeed : speed), 
 				rb.velocity.y
 			);
 

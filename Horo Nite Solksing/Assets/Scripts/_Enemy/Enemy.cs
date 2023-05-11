@@ -449,6 +449,12 @@ public abstract class Enemy : MonoBehaviour
 			activated = true;
 	}
 	
+	private void OnTriggerExit2D(Collider2D other) 
+	{
+		if (activated && other.CompareTag("MainCamera2"))	
+			activated = false;
+	}
+	
 
 	// todo --------------------------------------------------------------------
 	// todo ------------------ Attack Patterns ---------------------------------
