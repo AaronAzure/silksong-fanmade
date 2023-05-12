@@ -115,6 +115,7 @@ public class PlayerControls : MonoBehaviour
 	private Coroutine stunLockCo;
 	private Coroutine bindCo;
 	private Coroutine parryCo;
+	private Coroutine pauseCo;
 	[SerializeField] int bindCost=9;
 	[SerializeField] int harpBindCost=6;
 	[SerializeField] int skillStabCost=2;
@@ -329,7 +330,17 @@ public class PlayerControls : MonoBehaviour
 
 	public void Unpause()
 	{
+		if (pauseCo != null)
+			StopCoroutine(pauseCo);
+		pauseCo = StartCoroutine( UnpauseCo() );
+	}
+
+	IEnumerator UnpauseCo()
+	{
+		yield return null;
+		yield return null;
 		isPaused = false;
+		pauseCo = null;
 	}
 
 	private void OnDrawGizmosSelected() 
@@ -1957,7 +1968,9 @@ public class PlayerControls : MonoBehaviour
 	public void UNPAUSE()
 	{
 		pause2Anim.SetTrigger("close");
-		isPaused = false;
+		if (pauseCo != null)
+			StopCoroutine(pauseCo);
+		pauseCo = StartCoroutine( UnpauseCo() );
 	}
 
 	public void RESTART()
