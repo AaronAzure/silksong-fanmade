@@ -289,16 +289,36 @@ public class PlayerControls : MonoBehaviour
 		savedPos = self.position;
 
 		player = ReInput.players.GetPlayer(playerId);
+
 		activeMoveSpeed = moveSpeed;
 		bindPs.transform.parent = null;
 		healingPs.transform.parent = null;
 		bloodBurstPs.transform.parent = null;
 		cacoonObj.transform.parent = null;
+
 		DontDestroyOnLoad(cacoonObj);
 		FullRestore(); // starting
-		Screen.SetResolution((int) (16f/9f * Screen.height), Screen.height, true);
+		// Screen.SetResolution((int) (16f/9f * Screen.height), Screen.height, true);
+
 		if (pauseMenu != null) pauseMenu.SetActive(false);
 		if (pause2Menu != null) pause2Menu.SetActive(false);
+		
+		// var controller = player.controllers.GetFirstControllerWithTemplate<IGamepadTemplate>();
+		// IGamepadTemplate gamepad = controller.GetTemplate<IGamepadTemplate>();
+
+		// // Get the first Controller assigned to the Player that implements Gamepad Template
+		// var controller = player.controllers.GetFirstControllerWithTemplate<IGamepadTemplate>();
+
+		// // Get the Gamepad Template from the Controller
+		// var gamepad = controller.GetTemplate<IGamepadTemplate>();
+
+		// // Get a list of all Controller Templates of a particular type in all Controllers found on the system
+		// var gamepads = ReInput.controllers.GetControllerTemplates<IGamepadTemplate>();
+
+		// // Iterate through all Controller Templates implemented by a Controller
+		// for(int i = 0; i < controller.templateCount; i++) {
+		// 	Debug.Log(controller.name + " implements the " + controller.Templates[i].name + " Template.");
+		// }    
 	}
 
 	bool CanControl()
