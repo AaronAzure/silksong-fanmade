@@ -316,8 +316,16 @@ public abstract class Enemy : MonoBehaviour
 			hp -= dmg;
 		if (GameManager.Instance.showDmg && dmgPopup != null)
 		{
-			var obj = Instantiate(dmgPopup, transform.position + Vector3.up, Quaternion.identity);
-			obj.txt.text = $"{dmg}";
+			// var obj = Instantiate(dmgPopup, transform.position + Vector3.up, Quaternion.identity);
+			if (dmgPopup.gameObject.activeSelf)
+			{
+				dmgPopup.txt.text = $"{dmg + int.Parse(dmgPopup.txt.text)}";
+				dmgPopup.anim.SetTrigger("reset");
+
+			}
+			else
+				dmgPopup.txt.text = $"{dmg}";
+			dmgPopup.gameObject.SetActive(true);
 		}
 		beenHurt = true;
 		if (opponent != null)

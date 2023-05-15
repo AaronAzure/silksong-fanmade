@@ -1,24 +1,32 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class Caltrops : Tool
 {
 	[Space] [Header("Caltrops")]
 	[SerializeField] Caltrops c;
+	[SerializeField] bool oldVer;
 	[SerializeField] float angularChangeInDegrees=30;
 	[SerializeField] float maxVelY=10;
 	[SerializeField] Animator anim;
 	[SerializeField] int counter=5;
+	[SerializeField] TextMeshPro counterTxt;
 	private bool done;
 
 
 	protected override void CallChildOnStartAlways()
 	{
-		if (rb != null)
+		if (rb != null && !oldVer)
 		{
 			float impulse = (angularChangeInDegrees * (toRight ? -1 : 1) * Random.Range(2f,5f) * Mathf.Deg2Rad) * rb.inertia;
 			rb.AddTorque(impulse, ForceMode2D.Impulse);
+		}
+		if (counterTxt != null)
+		{
+			counterTxt.text = $"{counter}";
+			counterTxt.gameObject.SetActive(true);
 		}
 	}
 	protected override void CallChildOnEnemyHit(Collider2D other)
@@ -52,6 +60,10 @@ public class Caltrops : Tool
 		if (counter > 0)
 		{
 			counter--;
+			if (counterTxt != null)
+			{
+				counterTxt.text = $"{counter}";
+			}
 			if (counter == 0 && anim != null)
 			{
 				anim.SetBool("done", true);

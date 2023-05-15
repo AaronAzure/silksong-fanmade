@@ -35,6 +35,7 @@ public class EnemyProjectile : MonoBehaviour
 	void Deactivate()
 	{
 		// sr.color = Color.red;
+		Destroy(gameObject, 5);
 		hurtBox.enabled = false;
 		this.enabled = false;
 	}

@@ -114,4 +114,10 @@ public class GameManager : MonoBehaviour
 		if (PlayerControls.Instance != null)
 			PlayerControls.Instance.DoneRemapping();
 	}
+
+	public bool ToggleDmgIndicator()
+	{
+		showDmg = !showDmg;
+		return showDmg;
+	}
 }

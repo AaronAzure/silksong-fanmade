@@ -22,6 +22,7 @@ public abstract class Tool : MonoBehaviour
 
 	[Space] [SerializeField] bool destroyOnWallHit;
 	[SerializeField] bool destroyOnEnemyHit;
+	[SerializeField] bool destroyOnSpecialHit;
 	[HideInInspector] public bool justThrown;
 	[Space] [SerializeField] bool noStart;
 	[SerializeField] protected float destroyAfter;
@@ -56,17 +57,22 @@ public abstract class Tool : MonoBehaviour
 
 	private void OnTriggerEnter2D(Collider2D other) 
 	{
-		if (other.CompareTag("Enemy"))
+		if (destroyOnSpecialHit && other.CompareTag("ToolBreaker"))
 		{
-			CallChildOnEnemyHit(other);
-			if (destroyOnEnemyHit)
-			{
-				CallChildOnHit();
-			}
+			CallChildOnSpecialHit();
 		}
-		if (destroyOnWallHit && other.CompareTag("Ground"))
+		else 
 		{
-			CallChildOnHit();
+			if (destroyOnWallHit && other.CompareTag("Ground"))
+				CallChildOnHit();
+			if (other.CompareTag("Enemy"))
+			{
+				CallChildOnEnemyHit(other);
+				if (destroyOnEnemyHit)
+				{
+					CallChildOnHit();
+				}
+			}
 		}
 	}
 
@@ -97,6 +103,11 @@ public abstract class Tool : MonoBehaviour
 	}
 	protected virtual void CallChildOnHit() 
 	{
+		Destroy(gameObject);
+	}
+	protected virtual void CallChildOnSpecialHit() 
+	{
+		Debug.Log("<color=magenta>TOOL BREAKER</color>");
 		Destroy(gameObject);
 	}
 	protected virtual void CallChildOnStart() {}

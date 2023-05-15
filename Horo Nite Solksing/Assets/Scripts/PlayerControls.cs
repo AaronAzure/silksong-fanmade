@@ -1089,6 +1089,7 @@ public class PlayerControls : MonoBehaviour
 		// no change
 		if (crestNum == n) return;
 
+		// new crest
 		if (crestNum < crests.Length)
 		{
 			crests[crestNum].ToggleCrest(false);
@@ -1101,8 +1102,18 @@ public class PlayerControls : MonoBehaviour
 			crests[crestNum].ToggleCrest(true);
 			crestIcons[crestNum].color = new Color(1,1,1,1);
 		}
-		anim.SetFloat("crestNum", crestNum);
+
 	}
+
+
+
+
+
+
+
+
+
+	
 	public bool EquipPassive(int n)
 	{
 		switch (n)
@@ -1142,6 +1153,20 @@ public class PlayerControls : MonoBehaviour
 		extraSpoolObj.SetActive(false);
 		normHarpistSpoolObj.SetActive(false);
 		normSpoolObj.SetActive(false);
+
+		if (crestNum != 1 && silkGlowNorm != null)
+		{
+			silkGlowHarp.SetActive(false);
+			silkGlowNorm.SetActive(silkMeter >= 9);
+		}
+		else if (crestNum == 1 && silkGlowHarp != null)
+		{
+			silkGlowNorm.SetActive(false);
+			silkGlowHarp.SetActive(silkMeter >= 6);
+		}
+
+		spoolImg.sprite = (silkMeter >= GetBindCost()) ? 
+			fullSpoolSpr : emptySpoolSpr;
 
 		if (hasExtraSpool)
 		{
@@ -1254,11 +1279,6 @@ public class PlayerControls : MonoBehaviour
 
 		if (clearShadowRealmList)
 		{
-			if (silkMeter > 0)
-			{
-				// silkMeter = 0;
-				SetSilk(-12);
-			}
 			GameManager.Instance.ClearShadowRealmList();
 			savedScene = SceneManager.GetActiveScene().name;
 			savedPos = self.position;
@@ -1901,7 +1921,6 @@ public class PlayerControls : MonoBehaviour
 			else if (crestNum != 1 && silkGlowNorm != null)
 				silkGlowNorm.SetActive(silkMeter >= 9);
 		}
-		
 	}
 
 	public void Parry()
@@ -1981,6 +2000,17 @@ public class PlayerControls : MonoBehaviour
 	{
 		pause2Menu.SetActive(false);
 		GameManager.Instance.OpenRemapControls();
+	}
+	public void SHOW_DMG(TextMeshProUGUI uiTxt)
+	{
+		if (GameManager.Instance.ToggleDmgIndicator())
+		{
+			uiTxt.text = "Hide Dmg";
+		}
+		else
+		{
+			uiTxt.text = "Show Dmg";
+		}
 	}
 	public void DoneRemapping()
 	{
