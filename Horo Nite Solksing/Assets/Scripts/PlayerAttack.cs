@@ -137,20 +137,29 @@ public class PlayerAttack : MonoBehaviour
 				if (isRushAttack)
 					dmg = p.rushDmg;
 
-				// stronger special
-				if ((isStabAttack || isGossamerStorm || isRushAttack) && p.crestNum == 1)
-					dmg = Mathf.RoundToInt(dmg * 1.25f);
-				// weaker special
-				else if ((isStabAttack || isGossamerStorm || isRushAttack) && p.crestNum == 2)
-					dmg = (int) (dmg * 0.75f);
-				else if ((isStabAttack || isGossamerStorm || isRushAttack) && p.crestNum == 3)
-					dmg = (int) (dmg * 0.85f);
+				if (isStabAttack || isGossamerStorm || isRushAttack)
+				{
+					switch (p.crestNum)
+					{
+						case 1:
+							dmg = Mathf.RoundToInt(dmg * 1.25f);
+							break;
+						case 2:
+							dmg = Mathf.RoundToInt(dmg * 0.75f);
+							break;
+						case 3:
+							dmg = Mathf.RoundToInt(dmg * 0.85f);
+							break;
+					}
+				}
+
 				target.TakeDamage(
-					dmg, 
+					dmg,
 					isGossamerStorm ? transform : null,
 					new Vector2(p.model.localScale.x * forceDir.x, forceDir.y),
 					force
 				);
+				
 				if (isShawAttack)
 					p.ShawRetreat(isDashAttack);
 				else if (isRisingAttack)

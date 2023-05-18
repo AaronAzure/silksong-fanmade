@@ -149,7 +149,7 @@ public abstract class Enemy : MonoBehaviour
     // Start is called before the first frame update
     public virtual void Start() 
     {
-		if (!summoned && GameManager.Instance.CheckShadowRealmList(gameObject.name))
+		if (!summoned && GameManager.Instance.CheckEnemiesDefeated(gameObject.name))
 			Destroy(gameObject);
 		
 		initDir = (int) model.localScale.x;
@@ -365,7 +365,7 @@ public abstract class Enemy : MonoBehaviour
 			rb.AddForce(Vector2.up * 5, ForceMode2D.Impulse);
 			Died(canShake);
 			if (room == null)
-				GameManager.Instance.RegisterNameToShadowRealm(gameObject.name);
+				GameManager.Instance.RegisterNameToEnemiesDefeated(gameObject.name);
 			yield break;
 		}
 

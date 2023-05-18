@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class Room : MonoBehaviour
 {
-	[SerializeField] Enemy[] enemies;
+	[SerializeField] bool canBeCleared=true;
+	[Space] [SerializeField] Enemy[] enemies;
 	[SerializeField] GameObject roomCam;
 	[SerializeField] GameObject[] walls;
 	[SerializeField] Animator[] anims;
@@ -126,7 +127,8 @@ public class Room : MonoBehaviour
 		if (done) yield break;
 		// Debug.Log("<color=green>Room Cleared</color>");
 
-		GameManager.Instance.RegisterRoomClearedList(gameObject.name);
+		if (canBeCleared)
+			GameManager.Instance.RegisterRoomClearedList(gameObject.name);
 		done = true;
 		MusicManager.Instance.PlayMusic(MusicManager.Instance.prevMusic);
 		yield return new WaitForSeconds(1);
@@ -139,7 +141,6 @@ public class Room : MonoBehaviour
 			roomCam.SetActive(false);
 			if (CinemachineMaster.Instance != null) 
 				CinemachineMaster.Instance.SetCinemachineShakeOnHighestPriority();
-
 		}
 	}
 

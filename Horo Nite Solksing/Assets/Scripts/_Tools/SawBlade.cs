@@ -82,7 +82,7 @@ public class SawBlade : Tool
 				{
 					isStuck = true;
 					if (destroyAfterCo != null) StopCoroutine(destroyAfterCo);
-					destroyAfter = 0.4f;
+					destroyAfter = 0.2f;
 					destroyAfterCo = StartCoroutine( DestroyAfterCo() );
 					// Debug.Log("<color=magenta>stuck!!</color>");
 				}

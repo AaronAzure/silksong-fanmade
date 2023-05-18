@@ -35,6 +35,7 @@ public class Death : Enemy
 	private int ultAtkCounter;
 	private int ultAtkCount;
 	private bool useUltAtk;
+	private bool useFlameAtk;
 	private bool old;
 
 
@@ -66,6 +67,11 @@ public class Death : Enemy
 				rng = (anim.GetBool("atPhase2")) ? 
 					(distToTarget < 6f ? Random.Range(0,5) : Random.Range(0,3)) :
 					(distToTarget < 6f ? closeAtks[Random.Range(0, closeAtks.Length)] : Random.Range(0,2));
+				if (!useFlameAtk && anim.GetBool("atPhase2"))
+				{
+					useFlameAtk = true;
+					rng = 2;
+				}
 				if (anim.GetBool("atPhase3"))
 				{
 					ultAtkCount++;

@@ -10,8 +10,8 @@ public class GameManager : MonoBehaviour
 	[field: SerializeField] public Animator transitionAnim {get; private set;}
 	[field: SerializeField] public GameObject remapUi {get; private set;}
 	[field: SerializeField] public bool showDmg {get; private set;}
-	[field: SerializeField] public HashSet<string> shadowRealmed;
 	[field: SerializeField] public HashSet<string> roomCleared;
+	[field: SerializeField] public HashSet<string> enemiesDefeated;
 
 
 	void Awake()
@@ -22,31 +22,31 @@ public class GameManager : MonoBehaviour
 			Destroy(gameObject);
 
 		DontDestroyOnLoad(gameObject);
-		shadowRealmed = new HashSet<string>();
+		enemiesDefeated = new HashSet<string>();
 		roomCleared = new HashSet<string>();
 	}	
 
-	public void RegisterNameToShadowRealm(string name)
+	public void RegisterNameToEnemiesDefeated(string name)
 	{
-		if (shadowRealmed == null)
-			shadowRealmed = new HashSet<string>();
+		if (enemiesDefeated == null)
+			enemiesDefeated = new HashSet<string>();
 
-		if (!shadowRealmed.Contains(SceneManager.GetActiveScene().name + " " + name))
-			shadowRealmed.Add(SceneManager.GetActiveScene().name + " " + name);
+		if (!enemiesDefeated.Contains(SceneManager.GetActiveScene().name + " " + name))
+			enemiesDefeated.Add(SceneManager.GetActiveScene().name + " " + name);
 	}
-	public bool CheckShadowRealmList(string name)
+	public bool CheckEnemiesDefeated(string name)
 	{
-		if (shadowRealmed == null)
-			shadowRealmed = new HashSet<string>();
+		if (enemiesDefeated == null)
+			enemiesDefeated = new HashSet<string>();
 
-		return shadowRealmed.Contains(SceneManager.GetActiveScene().name + " " + name);
+		return enemiesDefeated.Contains(SceneManager.GetActiveScene().name + " " + name);
 	}
-	public void ClearShadowRealmList()
+	public void ClearEnemiesDefeated()
 	{
-		if (shadowRealmed == null)
-			shadowRealmed = new HashSet<string>();
+		if (enemiesDefeated == null)
+			enemiesDefeated = new HashSet<string>();
 
-		shadowRealmed.Clear();
+		enemiesDefeated.Clear();
 	}
 
 	public void RegisterRoomClearedList(string name)
@@ -86,7 +86,7 @@ public class GameManager : MonoBehaviour
 			Destroy( PlayerControls.Instance.gameObject );
 
 		yield return new WaitForSecondsRealtime(0.5f);
-		GameManager.Instance.ClearShadowRealmList();
+		GameManager.Instance.ClearEnemiesDefeated();
 		GameManager.Instance.ClearRoomClearedList();
 
 		AsyncOperation loadingOperation = SceneManager.LoadSceneAsync("Scene1");
@@ -120,4 +120,10 @@ public class GameManager : MonoBehaviour
 		showDmg = !showDmg;
 		return showDmg;
 	}
+
+	// public void ResumeTime()
+	// {
+	// 	if (!isPaused)
+	// 		Time.timeScale = 1;
+	// }
 }

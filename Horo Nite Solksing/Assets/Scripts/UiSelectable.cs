@@ -5,10 +5,12 @@ using UnityEngine.EventSystems;
 using UnityEngine;
 using UnityEngine.Assertions;
 using TMPro;
+using Rewired;
 
 public class UiSelectable : MonoBehaviour, ISelectHandler
 {
 	[SerializeField] UiHighlight master;
+	[Space] [SerializeField] Rewired.Integration.UnityUI.RewiredEventSystem eventSystem;
 	[SerializeField] RectTransform self;
 	[SerializeField] Image img;
 	public Tool tool;
@@ -114,6 +116,10 @@ public class UiSelectable : MonoBehaviour, ISelectHandler
 		if (descTxt != null)
 		{
 			descTxt.text = desc;
+		}
+		if (eventSystem != null)
+		{
+			eventSystem.firstSelectedGameObject = this.gameObject;
 		}
 	}
 }

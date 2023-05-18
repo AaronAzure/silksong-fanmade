@@ -166,6 +166,9 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] bool risingAtk;
 	private bool holdingRiseButton;
 	private bool isDead=false;
+	public bool isFinished=false;
+	private float finTime;
+	private bool beaten;
 
 
 	[Space] [Header("In-Game Related")]
@@ -253,10 +256,11 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] Vector2 deathPos;
 	private bool timeStarted;
 	public bool isCountingTime;
-	[SerializeField] TimeSpan timeSpan;
+	// [SerializeField] TimeSpan timeSpan;
 	[SerializeField] float timePlayed;
 	[SerializeField] TextMeshProUGUI timePlayedTxt;
 	[SerializeField] TextMeshProUGUI finalTimePlayedTxt;
+	[SerializeField] GameObject replayObj;
 	[SerializeField] Rewired.Integration.UnityUI.RewiredStandaloneInputModule rinput;
 	// public static PlayerControls Instance;
 	private int nKilled=0;
@@ -325,7 +329,7 @@ public class PlayerControls : MonoBehaviour
 	bool CanControl()
 	{
 		return (!isLedgeGrabbing && !ledgeGrab && !beenHurt && !noControl && !isBinding &&
-			!inAnimation && !isDead && !inStunLock && !isResting && !isPaused && !inRushSkill);
+			!inAnimation && !isDead && !inStunLock && !isResting && !isPaused && !inRushSkill && !isFinished);
 	}
 
 	public void Unpause()
@@ -357,9 +361,24 @@ public class PlayerControls : MonoBehaviour
 		}
 	}
 
+	private bool replaying;
+
 	// Update is called once per frame
 	void Update()
 	{
+		if (isFinished && !replaying)
+		{
+			if (finTime < 3.25f)
+				finTime += Time.unscaledDeltaTime;
+			else if (player.GetAnyButton())
+			{
+				finalTimePlayedTxt.gameObject.SetActive(false);
+				replaying = true;
+				finTime = 0;
+				StartCoroutine( DiedCo(false) );
+			}
+		}
+
 		// starting timer
 		if (!timeStarted && player.GetAnyButton())
 		{
@@ -367,7 +386,7 @@ public class PlayerControls : MonoBehaviour
 			isCountingTime = true;
 		}
 		// timer going
-		if (isCountingTime)
+		if (!beaten && isCountingTime)
 		{
 			timePlayed += Time.unscaledDeltaTime;
 			TimeSpan time = TimeSpan.FromSeconds(timePlayed);
@@ -457,7 +476,10 @@ public class PlayerControls : MonoBehaviour
 			if (canLedgeGrab && !isWallJumping && !isLedgeGrabbing && !ledgeGrab)
 				LedgeGrab();
 		}
-		else if (isResting && (player.GetButtonDown("No") || player.GetAxis("Move Vertical") < -0.7f))
+		else if (isResting && 
+			(player.GetButtonDown("No") || player.GetAxis("Move Vertical") < -0.7f
+			|| player.GetAxis("Move Horizontal") < -0.7f || player.GetAxis("Move Horizontal") > 0.7f)
+		)
 		{
 			t = 0;
 			isResting = false;
@@ -1102,17 +1124,8 @@ public class PlayerControls : MonoBehaviour
 			crests[crestNum].ToggleCrest(true);
 			crestIcons[crestNum].color = new Color(1,1,1,1);
 		}
-
+		anim.SetFloat("crestNum", crestNum);
 	}
-
-
-
-
-
-
-
-
-
 	
 	public bool EquipPassive(int n)
 	{
@@ -1279,7 +1292,7 @@ public class PlayerControls : MonoBehaviour
 
 		if (clearShadowRealmList)
 		{
-			GameManager.Instance.ClearShadowRealmList();
+			GameManager.Instance.ClearEnemiesDefeated();
 			savedScene = SceneManager.GetActiveScene().name;
 			savedPos = self.position;
 		}
@@ -1449,9 +1462,9 @@ public class PlayerControls : MonoBehaviour
 			NewScene n = other.GetComponent<NewScene>();
 			StartCoroutine( MoveToNextScene(n.newSceneName, n.newScenePos) );
 		}
-		if (!isDead && !movingToNextScene && other.CompareTag("EditorOnly"))
+		if (!isFinished && other.CompareTag("EditorOnly"))
 		{
-			isDead = movingToNextScene = true;
+			beaten = isFinished = true;
 			transitionAnim.SetTrigger("toBlack");
 			// GameManager.Instance.transitionAnim.SetTrigger("toBlack");
 			isCountingTime = false;
@@ -1572,7 +1585,8 @@ public class PlayerControls : MonoBehaviour
 
 		yield return new WaitForSecondsRealtime(0.25f);
 		anim.SetBool("isHurt", false);
-		Time.timeScale = 1;
+		if (!isPaused)
+			Time.timeScale = 1;
 
 		yield return new WaitForSeconds(0.25f);
 		beenHurt = false;
@@ -1705,7 +1719,7 @@ public class PlayerControls : MonoBehaviour
 		if (deathAnimObj != null)
 			deathAnimObj.SetActive(true);
 	}
-	IEnumerator DiedCo()
+	IEnumerator DiedCo(bool saveDeath=true)
 	{
 		CinemachineShake.Instance.ShakeCam(8f, 5f, 0.8f, true);
 		MusicManager.Instance.PlayMusic(null);
@@ -1714,11 +1728,15 @@ public class PlayerControls : MonoBehaviour
 		rb.velocity = Vector2.zero;
 		rb.gravityScale = 0;
 		anim.SetBool("isDead", true);
-		deathScene = SceneManager.GetActiveScene().name;
-		deathPos = transform.position;
+
+		if (saveDeath)
+		{
+			deathScene = SceneManager.GetActiveScene().name;
+			deathPos = transform.position;
+		}
 
 		yield return new WaitForSeconds(2);
-		GameManager.Instance.ClearShadowRealmList();
+		GameManager.Instance.ClearEnemiesDefeated();
 		transform.position = savedPos;
 		isCountingTime = false;
 		AsyncOperation loadingOperation = SceneManager.LoadSceneAsync(savedScene);
@@ -1737,12 +1755,22 @@ public class PlayerControls : MonoBehaviour
 			deathAnimObj.SetActive(false);
 		GameManager.Instance.transitionAnim.SetFloat("speed", 1);
 
-		CheckForCacoon();
-		inStunLock = isDead = false;
+		if (!saveDeath)
+		{
+			timePlayedTxt.gameObject.SetActive(true);
+			transitionAnim.SetTrigger("reset");
+		}
+		else
+		{
+			CheckForCacoon();
+		}
+
+		replaying = isFinished = inStunLock = isDead = false;
 		justParried = false;
 		rb.gravityScale = 1;
 		anim.SetBool("isDead", false);
 		anim.SetBool("isHurt", false);
+		anim.SetBool("isStunLock", false);
 		beenHurt = false;
 		if (soulLeakPs != null) soulLeakPs.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
 		MusicManager.Instance.PlayMusic(MusicManager.Instance.bgMusic);
@@ -1938,7 +1966,8 @@ public class PlayerControls : MonoBehaviour
 		justParried = true;
 
 		yield return new WaitForSecondsRealtime(0.25f);
-		Time.timeScale = 1;
+		if (!isPaused)
+			Time.timeScale = 1;
 		parryCo = null;
 
 		yield return new WaitForSecondsRealtime(0.25f);
@@ -1968,7 +1997,7 @@ public class PlayerControls : MonoBehaviour
 		SceneManager.LoadScene(savedScene);
 		GameManager.Instance.transitionAnim.SetTrigger("reset");
 		cacoonObj.SetActive(false);
-		inStunLock = isDead = false;
+		isFinished = inStunLock = isDead = false;
 		rb.gravityScale = 1;
 		anim.SetBool("isDead", false);
 		anim.SetBool("isHurt", false);
