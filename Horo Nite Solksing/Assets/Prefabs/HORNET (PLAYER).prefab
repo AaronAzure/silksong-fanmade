@@ -1928,7 +1928,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -400, y: 0}
+  m_AnchoredPosition: {x: -400, y: 25}
   m_SizeDelta: {x: 500, y: 400}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &858694183128626283
@@ -3035,8 +3035,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4286282215
+  m_fontColor: {r: 0.9058824, g: 0.47450984, b: 0.48235297, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -3414,8 +3414,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4292475532
+  m_fontColor: {r: 0.54901963, g: 0.9803922, b: 0.85098046, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -3837,7 +3837,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -400, y: 0}
+  m_AnchoredPosition: {x: -400, y: 50}
   m_SizeDelta: {x: 550, y: 250}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1566187499646479091
@@ -13072,7 +13072,7 @@ Transform:
   m_GameObject: {fileID: 2970771733868720740}
   m_LocalRotation: {x: 0, y: 0, z: -0.258819, w: 0.9659259}
   m_LocalPosition: {x: 0.16, y: 0.015, z: 0}
-  m_LocalScale: {x: 1.1, y: 1.1, z: 1}
+  m_LocalScale: {x: 1.2, y: 1.2, z: 1}
   m_Children:
   - {fileID: 3505400704641566960}
   m_Father: {fileID: 6424569853490910390}
@@ -29393,10 +29393,10 @@ MonoBehaviour:
   shawForce: 7.5
   nShaw: 0
   shawLimit: 3
-  recoilForce: 7.5
+  recoilForce: 5
   risingRecoilForce: 5
   quickAtkCooldownDuration: 0.1
-  atkCooldownDuration: 0.2
+  atkCooldownDuration: 0.15
   toolCooldownDuration: 0.2
   rushSpeed: 17.5
   slashObj: {fileID: 8166649577717489486}
@@ -29439,6 +29439,11 @@ MonoBehaviour:
   risingAtk: 0
   isFinished: 0
   bench: {fileID: 0}
+  equippedTool: {fileID: 3213973537349224106, guid: 783c6136766b343619f2ca408a0ec303, type: 3}
+  straightPin: {fileID: 8818872947580564614, guid: 5f4c620c5e89a497d9065ad105facee1, type: 3}
+  pimpillo: {fileID: 5939190048978232574, guid: cc1000fd226b14f438e2e61ea717e3b4, type: 3}
+  caltrops: {fileID: 0}
+  sawBlade: {fileID: 0}
   toolSummonPos: {fileID: 7907187834105237403}
   tools: []
   tool1: {fileID: 0}
@@ -66157,7 +66162,7 @@ MonoBehaviour:
   emptySpr: {fileID: 0}
   title: Reaper Mode
   extraDesc: (greater range)
-  desc: 'Dmg (basic) = x1.0
+  desc: 'Dmg (basic) = x0.9
 
     Dmg (skills) = x0.85
 

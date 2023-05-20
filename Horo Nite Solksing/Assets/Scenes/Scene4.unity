@@ -6007,7 +6007,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bgMusic: {fileID: 2066786645}
+  <bgMusicVol>k__BackingField: 0
   bossMusic: {fileID: 1851650129}
+  <bossMusicVol>k__BackingField: 0
+  arenaMusic: {fileID: 0}
+  <arenaMusicVol>k__BackingField: 0
   parrySfx: {fileID: 172467811}
   parry2Sfx: {fileID: 959677564}
   hurtSfx: {fileID: 1782031359}
@@ -31689,7 +31693,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1703790428}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3.3897057, y: -0.7000005, z: -10}
+  m_LocalPosition: {x: -3.3857136, y: -0.7000005, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 244930602}
@@ -35631,6 +35635,7 @@ MonoBehaviour:
   otherObj: {fileID: 754155783}
   nDefeated: 0
   nExtras: 0
+  isBossRoom: 0
   isWaveRoom: 0
   nWaves: 0
   spawners: []

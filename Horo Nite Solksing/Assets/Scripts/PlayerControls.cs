@@ -176,7 +176,13 @@ public class PlayerControls : MonoBehaviour
 
 
 	[Space] [Header("Tools")]
-	[SerializeField] Transform toolSummonPos;
+	[SerializeField] Tool equippedTool;
+	[Space] [SerializeField] StraightPin straightPin;
+	[SerializeField] Pimpillo pimpillo;
+	[SerializeField] Caltrops caltrops;
+	[SerializeField] SawBlade sawBlade;
+
+	[Space] [SerializeField] Transform toolSummonPos;
 	[SerializeField] Tool[] tools;
 	[SerializeField] Tool tool1;
 	[SerializeField] Tool tool2;
@@ -254,6 +260,7 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] Vector2 savedPos;
 	[SerializeField] string deathScene;
 	[SerializeField] Vector2 deathPos;
+	private bool collectedCacoon=true;
 	private bool timeStarted;
 	public bool isCountingTime;
 	// [SerializeField] TimeSpan timeSpan;
@@ -361,6 +368,11 @@ public class PlayerControls : MonoBehaviour
 		}
 	}
 
+	private string ConvertToTime(TimeSpan time)
+	{
+		return time.Hours > 0 ? time.ToString(@"hh\:mm\:ss\.ff") : time.ToString(@"mm\:ss\.ff");
+	}
+
 	private bool replaying;
 
 	// Update is called once per frame
@@ -390,12 +402,7 @@ public class PlayerControls : MonoBehaviour
 		{
 			timePlayed += Time.unscaledDeltaTime;
 			TimeSpan time = TimeSpan.FromSeconds(timePlayed);
-			timePlayedTxt.text = time.ToString(@"mm\:ss\.ff");
-			// float now = Time.realtimeSinceStartup;
-			// int mins = (int) (timePlayed / 60f);
-			// float secs = timePlayed % 60;
-			// string secTxt = secs < 10 ? "0" + secs.ToString("F2") : secs.ToString("F2");
-			// timePlayedTxt.text = $"{mins}:{secTxt}";
+			timePlayedTxt.text = ConvertToTime(time);
 		}
 
 		// inventory open
@@ -963,6 +970,7 @@ public class PlayerControls : MonoBehaviour
 			// adimaSound.Play();
 
 			yield return new WaitForSeconds(0.1666f);
+			MusicManager.Instance.PlayHornetAtkSfx(atk1);
 			SkillAttackEffect();
 
 			yield return new WaitForSeconds(0.25f);
@@ -1466,10 +1474,12 @@ public class PlayerControls : MonoBehaviour
 		{
 			beaten = isFinished = true;
 			transitionAnim.SetTrigger("toBlack");
+			CANCEL_DASH();
+
 			// GameManager.Instance.transitionAnim.SetTrigger("toBlack");
 			isCountingTime = false;
 			TimeSpan time = TimeSpan.FromSeconds(timePlayed);
-			finalTimePlayedTxt.text = time.ToString(@"mm\:ss\.ff");
+			finalTimePlayedTxt.text = ConvertToTime(time);
 			timePlayedTxt.gameObject.SetActive(false);
 			finalTimePlayedTxt.gameObject.SetActive(true);
 		}
@@ -1731,6 +1741,7 @@ public class PlayerControls : MonoBehaviour
 
 		if (saveDeath)
 		{
+			collectedCacoon = false;
 			deathScene = SceneManager.GetActiveScene().name;
 			deathPos = transform.position;
 		}
@@ -1773,7 +1784,7 @@ public class PlayerControls : MonoBehaviour
 		anim.SetBool("isStunLock", false);
 		beenHurt = false;
 		if (soulLeakPs != null) soulLeakPs.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-		MusicManager.Instance.PlayMusic(MusicManager.Instance.bgMusic);
+		MusicManager.Instance.PlayMusic(MusicManager.Instance.bgMusic, MusicManager.Instance.bgMusicVol);
 		FullRestore();	// respawn
 		SetSilk(-silkMeter);
 		hurtCo = null;
@@ -1781,7 +1792,7 @@ public class PlayerControls : MonoBehaviour
 
 	void CheckForCacoon()
 	{
-		if (cacoonObj != null && deathScene == SceneManager.GetActiveScene().name)
+		if (!collectedCacoon && cacoonObj != null && deathScene == SceneManager.GetActiveScene().name)
 		{
 			cacoonObj.SetActive(true);
 			cacoonObj.transform.position = deathPos;
@@ -1789,7 +1800,6 @@ public class PlayerControls : MonoBehaviour
 		else
 		{
 			cacoonObj.SetActive(false);
-			// cacoonObj.transform.position = deathPos;
 		}
 	}
 
@@ -1949,6 +1959,11 @@ public class PlayerControls : MonoBehaviour
 			else if (crestNum != 1 && silkGlowNorm != null)
 				silkGlowNorm.SetActive(silkMeter >= 9);
 		}
+	}
+
+	public void CollectCacoon()
+	{
+		collectedCacoon = true;
 	}
 
 	public void Parry()

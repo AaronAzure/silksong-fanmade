@@ -446,7 +446,8 @@ public abstract class Enemy : MonoBehaviour
 
 	public void ACTIVATE_HITBOX()
 	{
-		col.enabled = true;
+		if (!died)
+			col.enabled = true;
 		spawningIn = false;
 		anim.SetBool("spawningIn", false);
 	}

@@ -11,6 +11,7 @@ public class Cacoon : MonoBehaviour
 		if (other.CompareTag("Finish"))
 		{
 			p.SetSilk(9);
+			p.CollectCacoon();
 			Instantiate(silkPs, this.transform.position, Quaternion.identity);
 			this.gameObject.SetActive(false);
 		}

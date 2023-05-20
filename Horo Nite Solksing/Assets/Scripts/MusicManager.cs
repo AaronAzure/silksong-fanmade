@@ -7,10 +7,15 @@ public class MusicManager : MonoBehaviour
 	public static MusicManager Instance;
 
 	public AudioSource bgMusic;
-	// [SerializeField] float bgMusicVol;
-	public AudioSource bossMusic;
-	// [SerializeField] float bossMusicVol;
-	[SerializeField] AudioSource parrySfx;
+	[field: SerializeField] public float bgMusicVol {get; private set;}
+
+	[Space] public AudioSource bossMusic;
+	[field: SerializeField] public float bossMusicVol {get; private set;}
+
+	[Space] public AudioSource arenaMusic;
+	[field: SerializeField] public float arenaMusicVol {get; private set;}
+	
+	[Space] [SerializeField] AudioSource parrySfx;
 	[SerializeField] AudioSource parry2Sfx;
 	[SerializeField] AudioSource hurtSfx;
 	[SerializeField] AudioSource hornetAtkSfx;
@@ -19,6 +24,7 @@ public class MusicManager : MonoBehaviour
 	private AudioSource currentMusic;
 	private AudioSource nextMusic;
 	public AudioSource prevMusic {get; private set;}
+	public float prevMusicVol {get; private set;}
 
 	private float timer;
 	private float incre;
@@ -35,10 +41,10 @@ public class MusicManager : MonoBehaviour
 		// DontDestroyOnLoad(this);
 
 		if (bgMusic != null) 
-			PlayMusic(this.bgMusic);
+			PlayMusic(this.bgMusic, bgMusicVol);
 	}
 
-    public void PlayMusic(AudioSource a, bool remember=false)
+    public void PlayMusic(AudioSource a, float vol=0.5f, bool remember=false)
 	{
 		this.enabled = true;
 		if (a != null)
@@ -48,8 +54,11 @@ public class MusicManager : MonoBehaviour
 			a.Play();
 		}
 		if (remember)
+		{
 			prevMusic = currentMusic;
-		StartCoroutine( PlayMusicCo(a) );
+			prevMusicVol = currentMusic.volume;
+		}
+		StartCoroutine( PlayMusicCo(a, vol) );
 		// timer = 0;
 		// incre = 0.5f * duration;
 	}
@@ -87,18 +96,23 @@ public class MusicManager : MonoBehaviour
 			hornetAtk2Sfx.Play();
 	}
 
-	IEnumerator PlayMusicCo(AudioSource a)
+	IEnumerator PlayMusicCo(AudioSource a, float vol)
 	{
+		float inc = 0.05f;
+		if (currentMusic != null)
+			inc = currentMusic.volume / 10;
 		while (currentMusic != null && currentMusic.volume > 0)
 		{
 			yield return new WaitForSeconds(0.05f);
-			currentMusic.volume -= 0.05f;
+			currentMusic.volume -= inc;
 		}
 		if (currentMusic != null)
 			currentMusic.Stop();
-		while (a != null && a.volume < 0.5f)
+		
+		inc = vol / 10;
+		while (a != null && a.volume < vol)
 		{
-			a.volume += 0.05f;
+			a.volume += inc;
 			yield return new WaitForSeconds(0.05f);
 		}
 		currentMusic = a;

@@ -53,7 +53,7 @@ public class UiSelectable : MonoBehaviour, ISelectHandler
 	{
 		Assert.IsNotNull(PlayerControls.Instance, "PlayerControls.Instance == null");
 
-		if (tool != null && PlayerControls.Instance != null && PlayerControls.Instance.isResting)
+		if (PlayerControls.Instance != null && PlayerControls.Instance.isResting)
 		{
 			PlayerControls.Instance.EquipSkill(n);
 			img.enabled = true;
@@ -85,7 +85,8 @@ public class UiSelectable : MonoBehaviour, ISelectHandler
 	}
 	public void UNEQUIP_SKILL()
 	{
-		img.enabled = false;
+		if (PlayerControls.Instance != null && PlayerControls.Instance.isResting)
+			img.enabled = false;
 	}
 	public void SET_CREST(int n)
 	{

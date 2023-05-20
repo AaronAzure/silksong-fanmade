@@ -19,6 +19,7 @@ public class Room : MonoBehaviour
 	[Space] [Header("Waves")] 
 	[SerializeField] int nDefeated;
 	public int nExtras;
+	[Space] [SerializeField] bool isBossRoom;
 	[Space] [SerializeField] bool isWaveRoom;
 	[SerializeField] int nWaves;
 	// [SerializeField] int nSpawnersDefeated;
@@ -130,8 +131,9 @@ public class Room : MonoBehaviour
 		if (canBeCleared)
 			GameManager.Instance.RegisterRoomClearedList(gameObject.name);
 		done = true;
-		MusicManager.Instance.PlayMusic(MusicManager.Instance.prevMusic);
+
 		yield return new WaitForSeconds(1);
+		MusicManager.Instance.PlayMusic(MusicManager.Instance.prevMusic, MusicManager.Instance.prevMusicVol);
 		// foreach (GameObject wall in walls)
 		// 	wall.SetActive(false);
 		foreach (Animator anim in anims)
@@ -174,7 +176,12 @@ public class Room : MonoBehaviour
 			foreach (GameObject wall in walls)
 				wall.SetActive(true);
 
-			MusicManager.Instance.PlayMusic(MusicManager.Instance.bossMusic, true);
+			MusicManager m = MusicManager.Instance;
+			m.PlayMusic(
+				!isBossRoom ? m.arenaMusic : m.bossMusic, 
+				!isBossRoom ? m.arenaMusicVol : m.bossMusicVol, 
+				true
+			);
 
 			roomCam.SetActive(true);
 			if (CinemachineMaster.Instance != null) 

@@ -14791,7 +14791,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bgMusic: {fileID: 2066786645}
+  <bgMusicVol>k__BackingField: 0
   bossMusic: {fileID: 1851650129}
+  <bossMusicVol>k__BackingField: 0
+  arenaMusic: {fileID: 0}
+  <arenaMusicVol>k__BackingField: 0
   parrySfx: {fileID: 172467811}
   parry2Sfx: {fileID: 959677564}
   hurtSfx: {fileID: 1782031359}
@@ -15511,6 +15515,10 @@ PrefabInstance:
     - target: {fileID: 5188288345796188222, guid: bd96fd6a43eb84f7c899ab546a27379b, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5491880764366433692, guid: bd96fd6a43eb84f7c899ab546a27379b, type: 3}
+      propertyPath: timePlayed
+      value: 356400
       objectReference: {fileID: 0}
     - target: {fileID: 5491880764366433693, guid: bd96fd6a43eb84f7c899ab546a27379b, type: 3}
       propertyPath: m_RootOrder
@@ -42552,7 +42560,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1703790428}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.8918324, y: 1.5, z: -10}
+  m_LocalPosition: {x: -2.8877544, y: 1.5, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 244930602}
@@ -50716,6 +50724,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d65be45a76bb4a3284e5847125edc0a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  canBeCleared: 1
   enemies:
   - {fileID: 872748571}
   roomCam: {fileID: 450047141}
