@@ -34,13 +34,12 @@ public class GameManager : MonoBehaviour
 		if (!enemiesDefeated.Contains(SceneManager.GetActiveScene().name + " " + name))
 			enemiesDefeated.Add(SceneManager.GetActiveScene().name + " " + name);
 	}
-	public bool CheckEnemiesDefeated(string name)
+	
+	public bool CheckDivineHashmapIfNameIsRegistered(string name)
 	{
-		if (enemiesDefeated == null)
-			enemiesDefeated = new HashSet<string>();
-
 		return enemiesDefeated.Contains(SceneManager.GetActiveScene().name + " " + name);
 	}
+
 	public void ClearEnemiesDefeated()
 	{
 		if (enemiesDefeated == null)

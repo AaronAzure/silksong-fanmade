@@ -149,15 +149,20 @@ public abstract class Enemy : MonoBehaviour
     // Start is called before the first frame update
     public virtual void Start() 
     {
-		if (!summoned && GameManager.Instance.CheckEnemiesDefeated(gameObject.name))
+		if (!summoned && GameManager.Instance.CheckDivineHashmapIfNameIsRegistered(gameObject.name))
+		{
 			Destroy(gameObject);
+		}
 		
 		initDir = (int) model.localScale.x;
 		nextDir = -initDir;
 		currentAction = (initDir == 1) ? CurrentAction.right : CurrentAction.left;
 		
 		if (PlayerControls.Instance != null)
+		{
 			target = PlayerControls.Instance;
+		}
+		
 		CallChildOnStart();
     }
 
