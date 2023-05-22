@@ -967,10 +967,10 @@ public class PlayerControls : MonoBehaviour
 			if (!infiniteSilk) SetSilk(-skillGossamerCost);
 			anim.SetBool("isSkillAttacking", true);
 			anim.SetFloat("skillDir", skillDir);
+			shawSound.Play();
 			// adimaSound.Play();
 
 			yield return new WaitForSeconds(0.1666f);
-			MusicManager.Instance.PlayHornetAtkSfx(atk1);
 			SkillAttackEffect();
 
 			yield return new WaitForSeconds(0.25f);

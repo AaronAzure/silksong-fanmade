@@ -13,6 +13,9 @@ public class Otto : Enemy
 	[SerializeField] float atkSpeed=1;
 	private bool chase;
 
+	[Space] [SerializeField] bool isWatermelon;
+	private int throwCount;
+
 	protected override void CallChildOnStart()
 	{
 		anim.SetFloat("atkSpeed", atkSpeed);
@@ -32,7 +35,7 @@ public class Otto : Enemy
 
 	protected override void AttackingAction()
 	{
-		if (!inAttackAnim)
+		if (!inAttackAnim || isWatermelon)
 		{
 			Vector2 dir = (target.self.position - transform.position).normalized;
 			rb.AddForce(dir * chaseSpeed * 5, ForceMode2D.Force);
@@ -40,6 +43,11 @@ public class Otto : Enemy
 				Mathf.Clamp(rb.velocity.x, -chaseSpeed, chaseSpeed),
 				Mathf.Clamp(rb.velocity.y, -chaseSpeed, chaseSpeed)
 			);
+		}
+
+		// chasing
+		if (!inAttackAnim)
+		{
 			FacePlayer();
 			if (!chase)
 			{
@@ -70,12 +78,34 @@ public class Otto : Enemy
 	{
 		if (bellObj != null)
 		{
+			FacePlayer();
 			var obj = Instantiate(bellObj, spawnPos.position, Quaternion.identity);
 			obj.rb.AddForce( new Vector2(
 				(target.self.position.x - obj.transform.position.x) * 1.75f,
 				throwForce), 
 				ForceMode2D.Impulse
 			);
+			if (isWatermelon)
+			{
+				if (atPhase3 && throwCount < 2)
+				{
+					throwCount++;
+					closeDistTimer = 0;
+					rb.velocity = Vector2.zero;
+					anim.SetTrigger("attack");
+				}
+				else if (!atPhase3 && atPhase2 && throwCount < 1)
+				{
+					throwCount++;
+					closeDistTimer = 0;
+					rb.velocity = Vector2.zero;
+					anim.SetTrigger("attack");
+				}
+				else 
+				{
+					throwCount = 0;
+				}
+			}
 		}
 	}
 }

@@ -1602,8 +1602,10 @@ PolygonCollider2D:
     - - {x: -3, y: 23}
       - {x: -3, y: 29}
       - {x: 3, y: 29}
-      - {x: 3, y: 71}
-      - {x: -24, y: 71}
+      - {x: 3, y: 61}
+      - {x: -17, y: 61}
+      - {x: -17, y: 66}
+      - {x: -24, y: 66}
       - {x: -24, y: 23}
 --- !u!1 &81655975
 GameObject:
@@ -15748,15 +15750,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 962760112214625052, guid: 9f8cb6304e6db40d7a2ca36789a6fb6f, type: 3}
       propertyPath: hp
-      value: 100
+      value: 150
       objectReference: {fileID: 0}
     - target: {fileID: 962760112214625052, guid: 9f8cb6304e6db40d7a2ca36789a6fb6f, type: 3}
       propertyPath: phase2
-      value: 60
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 962760112214625052, guid: 9f8cb6304e6db40d7a2ca36789a6fb6f, type: 3}
       propertyPath: phase3
-      value: 30
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 962760112214625052, guid: 9f8cb6304e6db40d7a2ca36789a6fb6f, type: 3}
       propertyPath: bellObj
@@ -15769,6 +15771,10 @@ PrefabInstance:
     - target: {fileID: 962760112214625052, guid: 9f8cb6304e6db40d7a2ca36789a6fb6f, type: 3}
       propertyPath: chaseSpeed
       value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 962760112214625052, guid: 9f8cb6304e6db40d7a2ca36789a6fb6f, type: 3}
+      propertyPath: isWatermelon
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 962760112214625052, guid: 9f8cb6304e6db40d7a2ca36789a6fb6f, type: 3}
       propertyPath: closeDistTotal
@@ -15796,7 +15802,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1376537067151301452, guid: 9f8cb6304e6db40d7a2ca36789a6fb6f, type: 3}
       propertyPath: m_RootOrder
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1376537067151301452, guid: 9f8cb6304e6db40d7a2ca36789a6fb6f, type: 3}
       propertyPath: m_LocalScale.x
@@ -20002,7 +20008,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1376537067151301452, guid: 3cf329368bcec4e968bb65537719132a, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.735909
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 1376537067151301452, guid: 3cf329368bcec4e968bb65537719132a, type: 3}
       propertyPath: m_LocalPosition.y
