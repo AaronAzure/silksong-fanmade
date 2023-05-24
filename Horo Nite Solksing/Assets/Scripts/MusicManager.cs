@@ -46,6 +46,9 @@ public class MusicManager : MonoBehaviour
 
     public void PlayMusic(AudioSource a, float vol=0.5f, bool remember=false)
 	{
+		string musicName = a != null ? a.name : "None";
+		Debug.Log($"<color=yellow>{musicName}</color>");
+
 		this.enabled = true;
 		if (a != null)
 		{
@@ -103,7 +106,7 @@ public class MusicManager : MonoBehaviour
 			inc = currentMusic.volume / 10;
 		while (currentMusic != null && currentMusic.volume > 0)
 		{
-			yield return new WaitForSeconds(0.05f);
+			yield return new WaitForSecondsRealtime(0.05f);
 			currentMusic.volume -= inc;
 		}
 		if (currentMusic != null)
@@ -113,7 +116,7 @@ public class MusicManager : MonoBehaviour
 		while (a != null && a.volume < vol)
 		{
 			a.volume += inc;
-			yield return new WaitForSeconds(0.05f);
+			yield return new WaitForSecondsRealtime(0.05f);
 		}
 		currentMusic = a;
 	}
@@ -125,11 +128,11 @@ public class MusicManager : MonoBehaviour
 		origVolume = currentMusic.volume;
 		currentMusic.volume = origVolume / 2f;
 
-		yield return new WaitForSeconds(1);
+		yield return new WaitForSecondsRealtime(1);
 		while (currentMusic != null && currentMusic.volume < origVolume)
 		{
 			currentMusic.volume += 0.05f;
-			yield return new WaitForSeconds(0.05f);
+			yield return new WaitForSecondsRealtime(0.05f);
 		}
 		softenCo = null;
 	}

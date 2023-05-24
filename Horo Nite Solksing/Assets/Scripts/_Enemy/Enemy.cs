@@ -162,13 +162,13 @@ public abstract class Enemy : MonoBehaviour
 		{
 			target = PlayerControls.Instance;
 		}
-		
+
 		CallChildOnStart();
     }
 
 	public virtual void FixedUpdate()
     {
-		if (cannotAtk || !activated)
+		if (cannotAtk || !activated || (target == null))
 			return;
 		CallChildOnEarlyUpdate();
 		if (spawningIn || controlledByAnim) return;

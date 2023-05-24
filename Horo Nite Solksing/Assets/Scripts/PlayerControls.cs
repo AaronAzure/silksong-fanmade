@@ -60,6 +60,7 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] bool isGrounded;
 	private bool isPogoing;
 	private bool isPaused;
+	private bool isPauseMenu1;
 	private bool isWallSliding;
 	private float jumpTimer;
 	private bool canLedgeGrab;
@@ -409,6 +410,7 @@ public class PlayerControls : MonoBehaviour
 		if (!isPaused && pauseAnim != null && player.GetButtonDown("Minus"))
 		{
 			isPaused = true;
+			isPauseMenu1 = true;
 			pauseMenu.SetActive(true);
 			pauseAnim.SetTrigger("open");
 		}
@@ -416,6 +418,7 @@ public class PlayerControls : MonoBehaviour
 		else if (!isPaused && pause2Anim != null && player.GetButtonDown("Start"))
 		{
 			isPaused = true;
+			isPauseMenu1 = false;
 			pause2Menu.SetActive(true);
 			pause2Anim.SetTrigger("open");
 		}
@@ -423,12 +426,10 @@ public class PlayerControls : MonoBehaviour
 		else if (isPaused)
 		{
 			// close inventory
-			if (pauseMenuUi.gameObject.activeInHierarchy && pauseMenuUi.interactable 
-				&& (player.GetButtonDown("No") || player.GetButtonDown("Minus")))
+			if (isPauseMenu1 && (player.GetButtonDown("No") || player.GetButtonDown("Minus")))
 				pauseAnim.SetTrigger("close");
 			// close Pause
-			if (pause2MenuUi.gameObject.activeInHierarchy && pause2MenuUi.interactable 
-				&& (player.GetButtonDown("No") || player.GetButtonDown("Start")))
+			if (!isPauseMenu1 && (player.GetButtonDown("No") || player.GetButtonDown("Start")))
 				pause2Anim.SetTrigger("close");
 		}
 		// basic movement
@@ -1037,7 +1038,9 @@ public class PlayerControls : MonoBehaviour
 		anim.SetBool("isAttacking", false);
 
 		// atk cooldown
-		yield return new WaitForSeconds(toolCooldownDuration);
+		yield return new WaitForSeconds(
+			toolCooldownDuration * (tool1 != null && tool1.quickCooldown ? 0.5f : 1f)
+		);
 		toolCo = null;
 	}
 

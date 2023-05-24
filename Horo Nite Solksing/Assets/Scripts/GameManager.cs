@@ -34,7 +34,7 @@ public class GameManager : MonoBehaviour
 		if (!enemiesDefeated.Contains(SceneManager.GetActiveScene().name + " " + name))
 			enemiesDefeated.Add(SceneManager.GetActiveScene().name + " " + name);
 	}
-	
+
 	public bool CheckDivineHashmapIfNameIsRegistered(string name)
 	{
 		return enemiesDefeated.Contains(SceneManager.GetActiveScene().name + " " + name);
@@ -79,6 +79,8 @@ public class GameManager : MonoBehaviour
 	IEnumerator RestartCo()
 	{
 		transitionAnim.SetTrigger("toBlack");
+		MusicManager m = MusicManager.Instance;
+		m.PlayMusic(null, 0);
 
 		yield return new WaitForSecondsRealtime(0.5f);
 		if (PlayerControls.Instance != null)
@@ -98,6 +100,7 @@ public class GameManager : MonoBehaviour
 			yield return null;
 		}
 		transitionAnim.SetTrigger("reset");
+		m.PlayMusic(m.bgMusic, m.bgMusicVol);
 	}
 
 	public void OpenRemapControls()

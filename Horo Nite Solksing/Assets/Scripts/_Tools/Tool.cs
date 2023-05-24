@@ -7,6 +7,7 @@ public abstract class Tool : MonoBehaviour
 	// [SerializeField] protected int uses=4;
 	[SerializeField] public int totaluses=4;
 	[SerializeField] public Sprite icon;
+	[field: SerializeField] public bool quickCooldown {get; private set;}
 
 	[Space] [SerializeField] protected int dmg;
 	public bool toRight=true;
