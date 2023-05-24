@@ -187,6 +187,7 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] Tool[] tools;
 	[SerializeField] Tool tool1;
 	[SerializeField] Tool tool2;
+	private bool refillUses;
 	private int nToolUses1;
 	private int nToolUses2;
 	private float nToolSlowUses1;
@@ -212,15 +213,17 @@ public class PlayerControls : MonoBehaviour
 
 	[Space] [SerializeField] GameObject pauseMenu;
 	[SerializeField] Animator pauseAnim;
-	[SerializeField] CanvasGroup pauseMenuUi;
+	// [SerializeField] CanvasGroup pauseMenuUi;
 
 	[Space] [SerializeField] GameObject pause2Menu;
+	// [SerializeField] GameObject pause2Buttons;
 	[SerializeField] Animator pause2Anim;
-	[SerializeField] CanvasGroup pause2MenuUi;
+	// [SerializeField] CanvasGroup pause2MenuUi;
 
 	[Space] [SerializeField] Image[] toolIcons;
 	[SerializeField] Image[] toolsEquipped;
 	[SerializeField] Sprite emptySpr;
+	[SerializeField] TextMeshProUGUI showDmgTxt;
 	private int nEquipped;
 
 
@@ -291,6 +294,18 @@ public class PlayerControls : MonoBehaviour
 
 		self = transform;
 		tools = new Tool[1];
+
+		if (GameManager.Instance.showDmg)
+		{
+			showDmgTxt.text = "Hide Dmg";
+		}
+		else
+		{
+			showDmgTxt.text = "Show Dmg";
+		}
+
+		MusicManager m = MusicManager.Instance;
+		m.PlayMusic(m.bgMusic, m.bgMusicVol);
 	}
 
 
@@ -557,12 +572,13 @@ public class PlayerControls : MonoBehaviour
 			if (nToolSlowUses1 != nToolUses1)
 			{
 				nToolSlowUses1 = Mathf.Lerp(nToolSlowUses1, nToolUses1, t1);
-				t1 += 0.5f * Time.fixedDeltaTime;
+				t1 += 0.5f * Time.fixedDeltaTime * (refillUses ? 5 : 1);
 				toolUses1.fillAmount = nToolSlowUses1/tool1.totaluses;
 			}
 			else
 			{
 				t1 = 0;
+				refillUses = false;
 			}
 		}
 		if (toolUses2 != null && tool2 != null)
@@ -1316,6 +1332,7 @@ public class PlayerControls : MonoBehaviour
 		if (tool1 != null && toolUses1 != null)
 		{
 			nToolUses1 = tool1.totaluses;
+			refillUses = true;
 		}
 		if (tool2 != null && toolUses2 != null)
 		{
@@ -2048,20 +2065,25 @@ public class PlayerControls : MonoBehaviour
 		pause2Menu.SetActive(false);
 		GameManager.Instance.OpenRemapControls();
 	}
-	public void SHOW_DMG(TextMeshProUGUI uiTxt)
+	public void SHOW_DMG()
 	{
 		if (GameManager.Instance.ToggleDmgIndicator())
 		{
-			uiTxt.text = "Hide Dmg";
+			showDmgTxt.text = "Hide Dmg";
 		}
 		else
 		{
-			uiTxt.text = "Show Dmg";
+			showDmgTxt.text = "Show Dmg";
 		}
 	}
 	public void DoneRemapping()
 	{
 		pause2Menu.SetActive(true);
-		// GameManager.Instance.OpenRemapControls();
+	}
+
+	public void ExitGame()
+	{
+		pause2Menu.SetActive(false);
+		GameManager.Instance.ExitGame();
 	}
 }

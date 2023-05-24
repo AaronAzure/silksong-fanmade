@@ -9,6 +9,8 @@ public class GameManager : MonoBehaviour
 
 	[field: SerializeField] public Animator transitionAnim {get; private set;}
 	[field: SerializeField] public GameObject remapUi {get; private set;}
+	[field: SerializeField] public GameObject remapCanvasUi {get; private set;}
+	[field: SerializeField] public GameObject backdropUi {get; private set;}
 	[field: SerializeField] public bool showDmg {get; private set;}
 	[field: SerializeField] public HashSet<string> roomCleared;
 	[field: SerializeField] public HashSet<string> enemiesDefeated;
@@ -100,13 +102,21 @@ public class GameManager : MonoBehaviour
 			yield return null;
 		}
 		transitionAnim.SetTrigger("reset");
-		m.PlayMusic(m.bgMusic, m.bgMusicVol);
+		// m.PlayMusic(m.bgMusic, m.bgMusicVol);
 	}
 
 	public void OpenRemapControls()
 	{
 		if (remapUi != null)
 			remapUi.SetActive(true);
+		StartCoroutine( ActivateRemapCanvasCo() );
+	}
+
+	IEnumerator ActivateRemapCanvasCo()
+	{
+		yield return null;
+		if (remapCanvasUi != null)
+			remapCanvasUi.SetActive(true);
 	}
 
 	public void CloseRemapControls()
@@ -115,12 +125,46 @@ public class GameManager : MonoBehaviour
 			remapUi.SetActive(false);
 		if (PlayerControls.Instance != null)
 			PlayerControls.Instance.DoneRemapping();
+		if (UiTitleButton.Instance != null)
+			UiTitleButton.Instance.DoneRemapping();
 	}
 
 	public bool ToggleDmgIndicator()
 	{
 		showDmg = !showDmg;
 		return showDmg;
+	}
+
+	public void ExitGame()
+	{
+		StartCoroutine( ExitGameCo() );
+	}
+
+	IEnumerator ExitGameCo()
+	{
+		transitionAnim.SetTrigger("toBlack");
+		MusicManager m = MusicManager.Instance;
+		m.PlayMusic(null, 0);
+
+		yield return new WaitForSecondsRealtime(0.5f);
+		if (PlayerControls.Instance != null)
+			Destroy( PlayerControls.Instance.gameObject );
+
+		yield return new WaitForSecondsRealtime(0.5f);
+		GameManager.Instance.ClearEnemiesDefeated();
+		GameManager.Instance.ClearRoomClearedList();
+
+		AsyncOperation loadingOperation = SceneManager.LoadSceneAsync("0TitleScreen");
+		Time.timeScale = 1;
+		float loadTime = 0;
+		// wait for scene to load
+		while (!loadingOperation.isDone && loadTime < 5)
+		{
+			loadTime += Time.deltaTime;
+			yield return null;
+		}
+		transitionAnim.SetTrigger("reset");
+		// m.PlayMusic(m.bgMusic, m.bgMusicVol);
 	}
 
 	// public void ResumeTime()

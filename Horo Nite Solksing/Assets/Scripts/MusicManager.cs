@@ -14,6 +14,9 @@ public class MusicManager : MonoBehaviour
 
 	[Space] public AudioSource arenaMusic;
 	[field: SerializeField] public float arenaMusicVol {get; private set;}
+
+	[Space] public AudioSource mainThemeMusic;
+	[field: SerializeField] public float mainThemeMusicVol {get; private set;}
 	
 	[Space] [SerializeField] AudioSource parrySfx;
 	[SerializeField] AudioSource parry2Sfx;
@@ -38,10 +41,6 @@ public class MusicManager : MonoBehaviour
 			Instance = this;
 		else
 			Destroy(gameObject);
-		// DontDestroyOnLoad(this);
-
-		if (bgMusic != null) 
-			PlayMusic(this.bgMusic, bgMusicVol);
 	}
 
     public void PlayMusic(AudioSource a, float vol=0.5f, bool remember=false)
