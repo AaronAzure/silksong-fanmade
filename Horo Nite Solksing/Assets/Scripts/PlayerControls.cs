@@ -291,27 +291,15 @@ public class PlayerControls : MonoBehaviour
 		else
 			Destroy(gameObject);
 		DontDestroyOnLoad(gameObject);
-
-		self = transform;
-		tools = new Tool[1];
-
-		if (GameManager.Instance.showDmg)
-		{
-			showDmgTxt.text = "Hide Dmg";
-		}
-		else
-		{
-			showDmgTxt.text = "Show Dmg";
-		}
-
-		MusicManager m = MusicManager.Instance;
-		m.PlayMusic(m.bgMusic, m.bgMusicVol);
 	}
 
 
 	// Start is called before the first frame update
 	void Start()
 	{
+		self = transform;
+		tools = new Tool[1];
+		
 		transitionAnim.SetTrigger("fromBlack");
 		savedScene = SceneManager.GetActiveScene().name;
 		savedPos = self.position;
@@ -330,6 +318,19 @@ public class PlayerControls : MonoBehaviour
 
 		if (pauseMenu != null) pauseMenu.SetActive(false);
 		if (pause2Menu != null) pause2Menu.SetActive(false);
+
+
+		if (GameManager.Instance.showDmg)
+		{
+			showDmgTxt.text = "Hide Dmg";
+		}
+		else
+		{
+			showDmgTxt.text = "Show Dmg";
+		}
+
+		MusicManager m = MusicManager.Instance;
+		m.PlayMusic(m.bgMusic, m.bgMusicVol);
 		
 		// var controller = player.controllers.GetFirstControllerWithTemplate<IGamepadTemplate>();
 		// IGamepadTemplate gamepad = controller.GetTemplate<IGamepadTemplate>();
@@ -464,12 +465,9 @@ public class PlayerControls : MonoBehaviour
 				// tools
 				else if (player.GetButtonDown("Tool") && toolCo == null)
 				{
-					// int tool = (player.GetAxis("Move Vertical") < -0.7f ? 1 : 0);
 					int tool = 0;
 					if (tool == 0 && nToolUses1 > 0)
 						toolCo = StartCoroutine( UseTool(0) );
-					// else if (tool == 1 && nToolUses2 > 0)
-					// 	toolCo = StartCoroutine( UseTool(1) );
 				}
 
 				// rest on bench
@@ -738,8 +736,8 @@ public class PlayerControls : MonoBehaviour
 			
 		if (isWallJumping || jumpDashed || isLedgeGrabbing || inShawAtk) return;
 
-		float moveY = player.GetAxis("Move Vertical");
-		float x = (isGrounded && moveY > 0.8f) ? 0 : moveX;
+		// float moveY = player.GetAxis("Move Vertical");
+		float x = moveX;
 		anim.SetBool("isWalking", x != 0);
 		if (!risingAtk)
 			anim.SetBool("isDashing", isDashing);
