@@ -216,6 +216,7 @@ public class PlayerControls : MonoBehaviour
 	// [SerializeField] CanvasGroup pauseMenuUi;
 
 	[Space] [SerializeField] GameObject pause2Menu;
+	[SerializeField] bool canExitPause2Menu=true;
 	// [SerializeField] GameObject pause2Buttons;
 	[SerializeField] Animator pause2Anim;
 	// [SerializeField] CanvasGroup pause2MenuUi;
@@ -299,8 +300,7 @@ public class PlayerControls : MonoBehaviour
 	{
 		self = transform;
 		tools = new Tool[1];
-		
-		transitionAnim.SetTrigger("fromBlack");
+
 		savedScene = SceneManager.GetActiveScene().name;
 		savedPos = self.position;
 
@@ -445,7 +445,7 @@ public class PlayerControls : MonoBehaviour
 			if (isPauseMenu1 && (player.GetButtonDown("No") || player.GetButtonDown("Minus")))
 				pauseAnim.SetTrigger("close");
 			// close Pause
-			if (!isPauseMenu1 && (player.GetButtonDown("No") || player.GetButtonDown("Start")))
+			if (!isPauseMenu1 && canExitPause2Menu && (player.GetButtonDown("No") || player.GetButtonDown("Start")))
 				pause2Anim.SetTrigger("close");
 		}
 		// basic movement
@@ -1488,15 +1488,17 @@ public class PlayerControls : MonoBehaviour
 			NewScene n = other.GetComponent<NewScene>();
 			StartCoroutine( MoveToNextScene(n.newSceneName, n.newScenePos) );
 		}
-		if (!isFinished && other.CompareTag("EditorOnly"))
+		if (!isFinished && other.CompareTag("Goal"))
 		{
 			beaten = isFinished = true;
 			transitionAnim.SetTrigger("toBlack");
+			Debug.Log("<color=green>Thanks for Playing</color>");
 			CANCEL_DASH();
 
 			// GameManager.Instance.transitionAnim.SetTrigger("toBlack");
 			isCountingTime = false;
 			TimeSpan time = TimeSpan.FromSeconds(timePlayed);
+			Debug.Log($"<color=green>Thanks for Playing: {ConvertToTime(time)}</color>");
 			finalTimePlayedTxt.text = ConvertToTime(time);
 			timePlayedTxt.gameObject.SetActive(false);
 			finalTimePlayedTxt.gameObject.SetActive(true);
@@ -2024,6 +2026,11 @@ public class PlayerControls : MonoBehaviour
 		infiniteSilk = !infiniteSilk;
 	}
 
+	[Command("debug_finished", "debug_finished", MonoTargetType.All)] public void debug_finished()
+	{
+		Debug.Log(isFinished);
+	}
+
 	[Command("restart", "restart", MonoTargetType.All)] public void restart()
 	{
 		transform.position = savedPos;
@@ -2056,6 +2063,7 @@ public class PlayerControls : MonoBehaviour
 
 	public void RESTART()
 	{
+		collectedCacoon = true;
 		GameManager.Instance.Restart();
 	}
 	public void REMAP_CONTROLS()
@@ -2076,7 +2084,15 @@ public class PlayerControls : MonoBehaviour
 	}
 	public void DoneRemapping()
 	{
+		canExitPause2Menu = false;
 		pause2Menu.SetActive(true);
+		StartCoroutine( CanExitPause2MenuCo() );
+	}
+
+	IEnumerator CanExitPause2MenuCo()
+	{
+		yield return null;
+		canExitPause2Menu = true;
 	}
 
 	public void ExitGame()

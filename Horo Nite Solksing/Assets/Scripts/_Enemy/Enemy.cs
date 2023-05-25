@@ -460,13 +460,17 @@ public abstract class Enemy : MonoBehaviour
 	private void OnTriggerEnter2D(Collider2D other) 
 	{
 		if (!activated && other.CompareTag("MainCamera"))	
-			activated = true;
+		{
+			this.enabled = activated = true;
+		}
 	}
 	
 	private void OnTriggerExit2D(Collider2D other) 
 	{
 		if (activated && other.CompareTag("MainCamera2"))	
-			activated = false;
+		{
+			this.enabled = activated = false;
+		}
 	}
 	
 

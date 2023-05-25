@@ -1407,18 +1407,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 3863455304976629557}
-        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: CloseRemapControls
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
   _disabledHighlightedSprite: {fileID: 0}
   _disabledHighlightedColor: {r: 0, g: 0, b: 0, a: 0}
   _disabledHighlightedTrigger: 
@@ -3283,7 +3271,7 @@ MonoBehaviour:
   m_VerticalAxis: Move Vertical
   m_SubmitButton: Yes
   m_CancelButton: No
-  m_InputActionsPerSecond: 5
+  m_InputActionsPerSecond: 8
   m_RepeatDelay: 0
   m_allowMouseInput: 1
   m_allowMouseInputIfTouchSupported: 0
@@ -4804,7 +4792,7 @@ MonoBehaviour:
   _keyboardInputFieldCount: 2
   _mouseInputFieldCount: 1
   _controllerInputFieldCount: 2
-  _showFullAxisInputFields: 1
+  _showFullAxisInputFields: 0
   _showSplitAxisInputFields: 1
   _allowElementAssignmentConflicts: 1
   _allowElementAssignmentSwap: 0
@@ -4832,7 +4820,7 @@ MonoBehaviour:
   _ignoreMouseYAxisAssignment: 1
   _screenToggleAction: -1
   _screenOpenAction: -1
-  _screenCloseAction: -1
+  _screenCloseAction: 22
   _universalCancelAction: -1
   _universalCancelClosesScreen: 1
   _showInputBehaviorSettings: 0
@@ -4909,7 +4897,19 @@ MonoBehaviour:
   _showAssignedControllers: 1
   _onScreenClosed:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 3863455304976629557}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: CloseRemapControls
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   _onScreenOpened:
     m_PersistentCalls:
       m_Calls: []

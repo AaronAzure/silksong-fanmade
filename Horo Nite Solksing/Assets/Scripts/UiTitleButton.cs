@@ -13,7 +13,10 @@ public class UiTitleButton : MonoBehaviour
 	private void Awake() 
 	{
 		Instance = this;
+	}
 
+	private void Start() 
+	{
 		MusicManager m = MusicManager.Instance;
 		m.PlayMusic(m.mainThemeMusic, m.mainThemeMusicVol);
 	}

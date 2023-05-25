@@ -37,7 +37,7 @@ public class CinemachineMaster : MonoBehaviour
 				ind = i;
 			}
 		}
-		Debug.Log(vShakes[ind].name);
+		// Debug.Log(vShakes[ind].name);
 		CinemachineShake.Instance = vShakes[ind];
 	}
 }
