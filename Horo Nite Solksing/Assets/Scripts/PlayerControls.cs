@@ -601,11 +601,21 @@ public class PlayerControls : MonoBehaviour
 			dashCooldownCounter <= 0)
 		{
 			isDashing = true; // keep dashing if on ground
-			jumpDashed = jumped = false;
-			jumpTimer = jumpMaxTimer;
+			isJumping = jumpDashed = jumped = false;
+			// jumpTimer = jumpMaxTimer;
 
+			// air dash
 			if (!isGrounded)
 			{
+				if (moveX != 0)
+				{
+					if (moveX > 0) 
+						model.localScale = new Vector3(1, 1, 1);
+					// left
+					else if (moveX < 0) 
+						model.localScale = new Vector3(-1, 1, 1);
+					moveDir = model.localScale.x;
+				}
 				anim.SetBool("isAirDash", true);
 				airDashed = true;
 			}
@@ -614,7 +624,7 @@ public class PlayerControls : MonoBehaviour
 			activeMoveSpeed = dashBurstSpeed;
 			anim.SetFloat("moveSpeed", dashBurstSpeed);
 
-			if (model.transform.localScale.x > 0)
+			if (model.localScale.x > 0)
 				Instantiate(dashEffectL, dashSpawnPos.position, dashEffectL.transform.rotation, null);
 			else
 				Instantiate(dashEffectR, dashSpawnPos.position, dashEffectR.transform.rotation, null);

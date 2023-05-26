@@ -1714,15 +1714,15 @@ namespace Rewired.UI.ControlMapper
             if(blocked) {
                 window.CreateButton(prefabs.fitButton, UI.UIPivot.BottomCenter, UI.UIAnchor.BottomCenter, Vector2.zero, _language.okay, cancelCallback, cancelCallback, true);
             } else {
-                window.CreateButton(prefabs.fitButton, UI.UIPivot.BottomLeft, UI.UIAnchor.BottomLeft, Vector2.zero, _language.replace, () => { OnElementAssignmentConflictReplaceConfirmed(window.id, pendingInputMapping, assignment, skipOtherPlayers, false); }, cancelCallback, true);
-
                 if(_allowElementAssignmentConflicts) {
-                    window.CreateButton(prefabs.fitButton, UI.UIPivot.BottomCenter, UI.UIAnchor.BottomCenter, Vector2.zero, _language.add, () => { OnElementAssignmentAddConfirmed(window.id, pendingInputMapping, assignment); }, cancelCallback, false);
+                    window.CreateButton(prefabs.fitButton, UI.UIPivot.BottomLeft, UI.UIAnchor.BottomLeft, Vector2.zero, _language.add, () => { OnElementAssignmentAddConfirmed(window.id, pendingInputMapping, assignment); }, cancelCallback, true);
                 } else {
                     if(ShowSwapButton(window.id, pendingInputMapping, assignment, skipOtherPlayers)) {
-                        window.CreateButton(prefabs.fitButton, UI.UIPivot.BottomCenter, UI.UIAnchor.BottomCenter, Vector2.zero, _language.swap, () => { OnElementAssignmentConflictReplaceConfirmed(window.id, pendingInputMapping, assignment, skipOtherPlayers, true); }, cancelCallback, false);
+                        window.CreateButton(prefabs.fitButton, UI.UIPivot.BottomLeft, UI.UIAnchor.BottomLeft, Vector2.zero, _language.swap, () => { OnElementAssignmentConflictReplaceConfirmed(window.id, pendingInputMapping, assignment, skipOtherPlayers, true); }, cancelCallback, true);
                     }
                 }
+
+                window.CreateButton(prefabs.fitButton, UI.UIPivot.BottomCenter, UI.UIAnchor.BottomCenter, Vector2.zero, _language.replace, () => { OnElementAssignmentConflictReplaceConfirmed(window.id, pendingInputMapping, assignment, skipOtherPlayers, false); }, cancelCallback, false);
 
                 window.CreateButton(prefabs.fitButton, UI.UIPivot.BottomRight, UI.UIAnchor.BottomRight, Vector2.zero, _language.cancel, cancelCallback, cancelCallback, false);
             }
