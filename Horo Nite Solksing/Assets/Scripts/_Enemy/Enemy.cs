@@ -371,6 +371,7 @@ public abstract class Enemy : MonoBehaviour
 			Died(canShake);
 			if (room == null)
 				GameManager.Instance.RegisterNameToEnemiesDefeated(gameObject.name);
+			this.enabled = false;
 			yield break;
 		}
 

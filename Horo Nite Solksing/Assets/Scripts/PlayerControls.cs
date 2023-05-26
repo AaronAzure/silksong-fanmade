@@ -602,12 +602,13 @@ public class PlayerControls : MonoBehaviour
 		{
 			isDashing = true; // keep dashing if on ground
 			isJumping = jumpDashed = jumped = false;
-			// jumpTimer = jumpMaxTimer;
+			jumpTimer = jumpMaxTimer;
+			jumpTimer = 0;
 
 			// air dash
 			if (!isGrounded)
 			{
-				if (moveX != 0)
+				if (!isWallSliding && moveX != 0)
 				{
 					if (moveX > 0) 
 						model.localScale = new Vector3(1, 1, 1);
@@ -616,6 +617,8 @@ public class PlayerControls : MonoBehaviour
 						model.localScale = new Vector3(-1, 1, 1);
 					moveDir = model.localScale.x;
 				}
+				else if (isWallSliding)
+					Flip();
 				anim.SetBool("isAirDash", true);
 				airDashed = true;
 			}
@@ -696,6 +699,7 @@ public class PlayerControls : MonoBehaviour
 			else
 			{
 				isJumping = false;
+				jumpTimer = 0;
 			}
 		}
 		// wall sliding
@@ -710,6 +714,7 @@ public class PlayerControls : MonoBehaviour
 		isJumping = jumpDashed = jumped = false;
 		airDashed = isDashing = false;
 		canLedgeGrab = ledgeGrab = false;
+		jumpTimer = 0;
 		isWallSliding = false;
 		isWallJumping = false;
 		rb.gravityScale = 1;
@@ -1290,6 +1295,7 @@ public class PlayerControls : MonoBehaviour
 	void LedgeGrab()
 	{
 		isJumping = jumped = false;
+		jumpTimer = 0;
 		anim.SetBool("isAirDash", false);
 		CancelDash();
 		jumpDashed = false;
@@ -1350,6 +1356,8 @@ public class PlayerControls : MonoBehaviour
 
 	public void ShawRetreat(bool dashStrike=false)
 	{
+		isJumping = false;
+		jumpTimer = 0;
 		switch (crestNum)
 		{
 			case 0:
@@ -1894,6 +1902,7 @@ public class PlayerControls : MonoBehaviour
 		rb.velocity = Vector2.zero;
 		activeMoveSpeed = moveSpeed;
 		isJumping = jumpDashed = jumped = false;
+		jumpTimer = 0;
 		isDashing = false;
 		canLedgeGrab = ledgeGrab = false;
 		SpawnExistingObjAtSelf(healingPs);
