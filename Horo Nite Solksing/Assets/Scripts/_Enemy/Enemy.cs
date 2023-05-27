@@ -25,6 +25,10 @@ public abstract class Enemy : MonoBehaviour
 	[SerializeField] protected Animator anim;
 	[SerializeField] protected Rigidbody2D rb;
 	[SerializeField] Collider2D col;
+	
+
+	[Space][SerializeField] protected GameObject closeRangeFinder;
+	[SerializeField] protected GameObject distRangeFinder;
 
 
 	[SerializeField] protected Material defaultMat;
@@ -412,6 +416,8 @@ public abstract class Enemy : MonoBehaviour
 
 	void Died(bool shake)
 	{
+		if (closeRangeFinder != null) Destroy(closeRangeFinder);
+		if (distRangeFinder != null) Destroy(distRangeFinder);
 		if (shake) CinemachineShake.Instance.ShakeCam(2.5f, 0.5f);
 		StopAllCoroutines();
 		StartCoroutine( DiedCo() );

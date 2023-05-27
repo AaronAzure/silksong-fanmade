@@ -427,6 +427,8 @@ MonoBehaviour:
   anim: {fileID: 1615265125911810022}
   rb: {fileID: 1376537067151301455}
   col: {fileID: 1376537066910156642}
+  closeRangeFinder: {fileID: 8713374008261122446}
+  distRangeFinder: {fileID: 6415627392250083116}
   defaultMat: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
   dmgMat: {fileID: 2100000, guid: 432135ab22bc84106b4fe0a466cbb4d4, type: 2}
   sortGroup: {fileID: 2099911773895242119}
@@ -683,6 +685,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 60f67e43ae43e4889a09f8d5902a4f72, type: 3}
+--- !u!1 &6415627392250083116 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6377824577211555839, guid: 60f67e43ae43e4889a09f8d5902a4f72, type: 3}
+  m_PrefabInstance: {fileID: 111031665990019283}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &7530309673767833169 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7569282644059956866, guid: 60f67e43ae43e4889a09f8d5902a4f72, type: 3}
@@ -833,6 +840,11 @@ PrefabInstance:
 --- !u!4 &5288902313271681267 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7569282644059956866, guid: d92e7d739356a4f428884dcc238898d6, type: 3}
+  m_PrefabInstance: {fileID: 2336957916197013105}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &8713374008261122446 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6377824577211555839, guid: d92e7d739356a4f428884dcc238898d6, type: 3}
   m_PrefabInstance: {fileID: 2336957916197013105}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &7621243124637857393
