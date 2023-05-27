@@ -399,8 +399,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hp: 50
+  easyHp: 30
   phase2: 0
+  easyPhase2: 0
   phase3: 0
+  easyPhase3: 0
   dmgPopup: {fileID: 7405988773988434733}
   staggerCount: 150
   hitCount: 0
@@ -432,7 +435,7 @@ MonoBehaviour:
   cannotTakeKb: 0
   cannotTakeDmg: 0
   moveSpeed: 1.5
-  chaseSpeed: 3.5
+  chaseSpeed: 3
   jumpForce: 10
   runSpeed: 5
   groundDetect: {fileID: 7452915362852078129}

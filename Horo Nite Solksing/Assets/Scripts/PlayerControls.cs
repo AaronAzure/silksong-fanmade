@@ -17,11 +17,14 @@ public class PlayerControls : MonoBehaviour
 	public Transform self {get; private set;}
 	[SerializeField] Animator anim;
 	public static PlayerControls Instance;
+	private GameManager gm;
 
 
 	[Space] [Header("Status")]
-	[SerializeField] int maxHp=7;
+	[SerializeField] int maxHp=6;
 	[SerializeField] int hp;
+	[SerializeField] GameObject[] extraHp;
+	[SerializeField] GameObject[] extraHpMasks;
 	public int[] atkDmg={10,8,15,10};
 	public int gossamerDmg=5;
 	public int stabDmg=30;
@@ -67,6 +70,7 @@ public class PlayerControls : MonoBehaviour
 	private bool ledgeGrab;
 	private bool noControl;
 	public bool isResting {get; private set;}
+	public bool canUnrest {get; private set;}
 	[SerializeField] GameObject needToRestObj;
 	private bool inStunLock;
 	public bool justParried {get; private set;}
@@ -272,6 +276,7 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] float timePlayed;
 	[SerializeField] TextMeshProUGUI timePlayedTxt;
 	[SerializeField] TextMeshProUGUI finalTimePlayedTxt;
+	[SerializeField] GameObject difficultyObj;
 	[SerializeField] GameObject replayObj;
 	[SerializeField] Rewired.Integration.UnityUI.RewiredStandaloneInputModule rinput;
 	// public static PlayerControls Instance;
@@ -319,14 +324,36 @@ public class PlayerControls : MonoBehaviour
 		if (pauseMenu != null) pauseMenu.SetActive(false);
 		if (pause2Menu != null) pause2Menu.SetActive(false);
 
+		gm = GameManager.Instance;
 
-		if (GameManager.Instance.showDmg)
+		if (gm.showDmg)
 		{
-			showDmgTxt.text = "Hide Dmg";
+			showDmgTxt.text = "Show Dmg: On";
 		}
 		else
 		{
-			showDmgTxt.text = "Show Dmg";
+			showDmgTxt.text = "Show Dmg: Off";
+		}
+
+		// More Hp and More invincibilty on Easy Mode
+		if (gm.easyMode)
+		{
+			if (difficultyObj != null)
+				difficultyObj.SetActive(true);
+			if (extraHp != null && extraHp.Length > 0)
+			{
+				maxHp = 8;
+				List<GameObject> temp = new List<GameObject>(hpMasks);
+				foreach (GameObject obj in extraHp)
+				{
+					obj.SetActive(true);
+				}
+				foreach (GameObject obj in extraHpMasks)
+				{
+					temp.Add(obj);
+				}
+				hpMasks = temp.ToArray();
+			}
 		}
 
 		MusicManager m = MusicManager.Instance;
@@ -471,7 +498,7 @@ public class PlayerControls : MonoBehaviour
 				}
 
 				// rest on bench
-				else if (bench != null && isGrounded && player.GetAxis("Move Vertical") > 0.7f)
+				else if (!isResting && bench != null && isGrounded && player.GetAxis("Move Vertical") > 0.7f)
 				{
 					isResting = true;
 					needToRestObj.SetActive(false);
@@ -497,13 +524,13 @@ public class PlayerControls : MonoBehaviour
 			if (canLedgeGrab && !isWallJumping && !isLedgeGrabbing && !ledgeGrab)
 				LedgeGrab();
 		}
-		else if (isResting && 
+		else if (isResting && canUnrest &&
 			(player.GetButtonDown("No") || player.GetAxis("Move Vertical") < -0.7f
 			|| player.GetAxis("Move Horizontal") < -0.7f || player.GetAxis("Move Horizontal") > 0.7f)
 		)
 		{
 			t = 0;
-			isResting = false;
+			canUnrest = isResting = false;
 			needToRestObj.SetActive(true);
 			activeMoveSpeed = moveSpeed;
 			rb.gravityScale = 1;
@@ -1333,7 +1360,7 @@ public class PlayerControls : MonoBehaviour
 
 		if (clearShadowRealmList)
 		{
-			GameManager.Instance.ClearEnemiesDefeated();
+			gm.ClearEnemiesDefeated();
 			savedScene = SceneManager.GetActiveScene().name;
 			savedPos = self.position;
 		}
@@ -1513,7 +1540,7 @@ public class PlayerControls : MonoBehaviour
 			Debug.Log("<color=green>Thanks for Playing</color>");
 			CANCEL_DASH();
 
-			// GameManager.Instance.transitionAnim.SetTrigger("toBlack");
+			// gm.transitionAnim.SetTrigger("toBlack");
 			isCountingTime = false;
 			TimeSpan time = TimeSpan.FromSeconds(timePlayed);
 			Debug.Log($"<color=green>Thanks for Playing: {ConvertToTime(time)}</color>");
@@ -1628,18 +1655,25 @@ public class PlayerControls : MonoBehaviour
 		}
 
 		// Knockback
-		Vector2 direction = (opponent.position - transform.position).normalized;
-        rb.velocity = new Vector2(-direction.x * 10, 5);
+		float dirX = model.localScale.x;
+		if ((opponent.position.x - transform.position.x) > 0)
+			dirX = 1;
+		else if ((opponent.position.x - transform.position.x) < 0)
+			dirX = -1;
+        rb.velocity = new Vector2(-dirX * 5, 5);
 
+		// Freeze frame over
 		yield return new WaitForSecondsRealtime(0.25f);
 		anim.SetBool("isHurt", false);
 		if (!isPaused)
 			Time.timeScale = 1;
 
+		// Can control again
 		yield return new WaitForSeconds(0.25f);
 		beenHurt = false;
 
-		yield return new WaitForSeconds(0.5f);
+		// invincibility over
+		yield return new WaitForSeconds(gm.easyMode ? 1.25f : 0.5f);
 		foreach (SpriteRenderer sprite in sprites)
 			sprite.material = defaultMat;
 		hurtCo = null;
@@ -1785,7 +1819,7 @@ public class PlayerControls : MonoBehaviour
 		}
 
 		yield return new WaitForSeconds(2);
-		GameManager.Instance.ClearEnemiesDefeated();
+		gm.ClearEnemiesDefeated();
 		transform.position = savedPos;
 		isCountingTime = false;
 		AsyncOperation loadingOperation = SceneManager.LoadSceneAsync(savedScene);
@@ -1797,12 +1831,12 @@ public class PlayerControls : MonoBehaviour
 			yield return null;
 		}
 		isCountingTime = true;
-		GameManager.Instance.transitionAnim.SetFloat("speed", 0);
-		GameManager.Instance.transitionAnim.SetTrigger("reset");
+		gm.transitionAnim.SetFloat("speed", 0);
+		gm.transitionAnim.SetTrigger("reset");
 		yield return new WaitForSeconds(0.05f);
 		if (deathAnimObj != null)
 			deathAnimObj.SetActive(false);
-		GameManager.Instance.transitionAnim.SetFloat("speed", 1);
+		gm.transitionAnim.SetFloat("speed", 1);
 
 		if (!saveDeath)
 		{
@@ -1848,7 +1882,7 @@ public class PlayerControls : MonoBehaviour
 		nextSceneSpeed = (rb.velocity.x > 0) ? 1 : -1;
 		isCountingTime = false;
 		yield return new WaitForSeconds(0.1f);
-		GameManager.Instance.transitionAnim.SetTrigger("toBlack");
+		gm.transitionAnim.SetTrigger("toBlack");
 
 		yield return new WaitForSeconds(0.25f);
 		AsyncOperation loadingOperation = SceneManager.LoadSceneAsync(newSceneName);
@@ -1862,7 +1896,7 @@ public class PlayerControls : MonoBehaviour
 		isCountingTime = true;
 		canMove = false;
 		transform.position = newScenePos;
-		GameManager.Instance.transitionAnim.SetTrigger("reset");
+		gm.transitionAnim.SetTrigger("reset");
 		CheckForCacoon();
 		if (hp > 1 && soulLeakShortPs != null)
 		{
@@ -1925,7 +1959,10 @@ public class PlayerControls : MonoBehaviour
 
 		SpawnExistingObjAtSelf(bindPs);
 		if (isResting)
+		{
 			FullRestore(true); // rest
+			canUnrest = true;
+		}
 
 		// Instantiate(bindPs, transform.position, Quaternion.identity);
 		yield return new WaitForSeconds(0.1f);
@@ -2054,7 +2091,7 @@ public class PlayerControls : MonoBehaviour
 	{
 		transform.position = savedPos;
 		SceneManager.LoadScene(savedScene);
-		GameManager.Instance.transitionAnim.SetTrigger("reset");
+		gm.transitionAnim.SetTrigger("reset");
 		cacoonObj.SetActive(false);
 		isFinished = inStunLock = isDead = false;
 		rb.gravityScale = 1;
@@ -2083,22 +2120,22 @@ public class PlayerControls : MonoBehaviour
 	public void RESTART()
 	{
 		collectedCacoon = true;
-		GameManager.Instance.Restart();
+		gm.Restart();
 	}
 	public void REMAP_CONTROLS()
 	{
 		pause2Menu.SetActive(false);
-		GameManager.Instance.OpenRemapControls();
+		gm.OpenRemapControls();
 	}
 	public void SHOW_DMG()
 	{
-		if (GameManager.Instance.ToggleDmgIndicator())
+		if (gm.ToggleDmgIndicator())
 		{
-			showDmgTxt.text = "Hide Dmg";
+			showDmgTxt.text = "Show Dmg: On";
 		}
 		else
 		{
-			showDmgTxt.text = "Show Dmg";
+			showDmgTxt.text = "Show Dmg: Off";
 		}
 	}
 	public void DoneRemapping()
@@ -2117,6 +2154,6 @@ public class PlayerControls : MonoBehaviour
 	public void ExitGame()
 	{
 		pause2Menu.SetActive(false);
-		GameManager.Instance.ExitGame();
+		gm.ExitGame();
 	}
 }

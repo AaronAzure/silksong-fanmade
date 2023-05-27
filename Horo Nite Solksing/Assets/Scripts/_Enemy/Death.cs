@@ -42,6 +42,7 @@ public class Death : Enemy
 	public void Awake()
 	{
 		Instance = this;
+		anim.SetBool("isEasyMode", GameManager.Instance.easyMode);
 	}
 
 	public void ToggleOldVer()

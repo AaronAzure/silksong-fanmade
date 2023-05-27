@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour
 	[field: SerializeField] public GameObject remapCanvasUi {get; private set;}
 	[field: SerializeField] public GameObject backdropUi {get; private set;}
 	[field: SerializeField] public bool showDmg {get; private set;}
+	[field: SerializeField] public bool easyMode {get; private set;}
 	[field: SerializeField] public HashSet<string> roomCleared;
 	[field: SerializeField] public HashSet<string> enemiesDefeated;
 
@@ -133,6 +134,12 @@ public class GameManager : MonoBehaviour
 	{
 		showDmg = !showDmg;
 		return showDmg;
+	}
+
+	public bool ToggleEasyMode()
+	{
+		easyMode = !easyMode;
+		return easyMode;
 	}
 
 	public void ExitGame()

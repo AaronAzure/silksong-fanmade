@@ -6,9 +6,12 @@ using UnityEngine.Rendering;
 public abstract class Enemy : MonoBehaviour
 {
 	[SerializeField] protected int hp=10;
-	[SerializeField] protected int phase2;
+	[SerializeField] protected int easyHp=5;
+	[Space] [SerializeField] protected int phase2;
+	[SerializeField] protected int easyPhase2;
 	protected bool atPhase2;
 	[SerializeField] protected int phase3;
+	[SerializeField] protected int easyPhase3;
 	protected bool atPhase3;
 	[Space] [SerializeField] DmgPopup dmgPopup;
 	[Space] [SerializeField] protected int staggerCount=150;
@@ -152,6 +155,13 @@ public abstract class Enemy : MonoBehaviour
 		if (!summoned && GameManager.Instance.CheckDivineHashmapIfNameIsRegistered(gameObject.name))
 		{
 			Destroy(gameObject);
+		}
+
+		if (GameManager.Instance.easyMode)
+		{
+			hp = easyHp;
+			phase2 = easyPhase2;
+			phase3 = easyPhase3;
 		}
 		
 		initDir = (int) model.localScale.x;
@@ -368,10 +378,9 @@ public abstract class Enemy : MonoBehaviour
 		{
 			died = true;
 			rb.AddForce(Vector2.up * 5, ForceMode2D.Impulse);
-			Died(canShake);
 			if (room == null)
 				GameManager.Instance.RegisterNameToEnemiesDefeated(gameObject.name);
-			this.enabled = false;
+			Died(canShake);
 			yield break;
 		}
 
@@ -407,6 +416,7 @@ public abstract class Enemy : MonoBehaviour
 		StopAllCoroutines();
 		StartCoroutine( DiedCo() );
 		CallChildOnDeath();
+		this.enabled = false;
 	}
 	
 	IEnumerator DiedCo()
@@ -430,6 +440,7 @@ public abstract class Enemy : MonoBehaviour
 			sprite.material = defaultMat;
 		foreach (SpriteRenderer sprite in sprites)
 			sprite.color = new Color(0.4f,0.4f,0.4f,1);
+		this.enabled = false;
 	}
 
 	public void SpawnIn()

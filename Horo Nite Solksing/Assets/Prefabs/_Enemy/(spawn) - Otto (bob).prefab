@@ -213,8 +213,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hp: 25
+  easyHp: 17
   phase2: 0
+  easyPhase2: 0
   phase3: 0
+  easyPhase3: 0
   dmgPopup: {fileID: 8997556194849580195}
   staggerCount: 150
   hitCount: 0
@@ -242,7 +245,7 @@ MonoBehaviour:
   cannotTakeKb: 0
   cannotTakeDmg: 0
   moveSpeed: 1
-  chaseSpeed: 3
+  chaseSpeed: 2.5
   jumpForce: 10
   runSpeed: 5
   groundDetect: {fileID: 9114477566536772447}
@@ -288,6 +291,7 @@ MonoBehaviour:
   bellObj: {fileID: 2995109457061421178}
   spawnPos: {fileID: 613745454999855695}
   atkSpeed: 1
+  isWatermelon: 0
 --- !u!1 &3433202526179080487
 GameObject:
   m_ObjectHideFlags: 0

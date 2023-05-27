@@ -1,13 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
+using TMPro;
 
 public class UiTitleButton : MonoBehaviour
 {
 	[SerializeField] CanvasGroup canvasGroup;
 	public static UiTitleButton Instance;
 	[SerializeField] GameObject eventSystem;
+	[SerializeField] TextMeshProUGUI difficultyTxt;
+	[SerializeField] GameObject gmObj;
+	private GameManager gm;
 
 
 	private void Awake() 
@@ -17,25 +20,45 @@ public class UiTitleButton : MonoBehaviour
 
 	private void Start() 
 	{
+		gm = GameManager.Instance;
+		if (gm != null && gm.easyMode)
+			difficultyTxt.text = "Difficulty: Easy";
+		else
+			difficultyTxt.text = "Difficulty: Gamer";
 		MusicManager m = MusicManager.Instance;
 		m.PlayMusic(m.mainThemeMusic, m.mainThemeMusicVol);
 	}
 
 	public void START_GAME()
 	{
-		if (GameManager.Instance != null)
+		if (gm != null)
 		{
-			GameManager.Instance.Restart();
+			gm.Restart();
 			DisableInteractable();
 		}
 	}
 
 	public void CONTROLS()
 	{
-		if (GameManager.Instance != null)
+		if (gm != null)
 		{
-			GameManager.Instance.OpenRemapControls();
+			gm.OpenRemapControls();
 			DisableInteractable();
+		}
+	}
+
+	public void DIFFICULTY()
+	{
+		if (gm != null)
+		{
+			if (gm.ToggleEasyMode())
+				difficultyTxt.text = "Difficulty: Easy";
+			else
+				difficultyTxt.text = "Difficulty: Gamer";
+		}
+		else if (gmObj != null)
+		{
+			gmObj.SetActive(!gmObj.activeSelf);
 		}
 	}
 
