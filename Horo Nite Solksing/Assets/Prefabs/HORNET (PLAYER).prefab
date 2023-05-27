@@ -14840,10 +14840,10 @@ MonoBehaviour:
   playerMice: []
   moveOneElementPerAxisPress: 0
   setActionsById: 0
-  horizontalActionId: -1
-  verticalActionId: -1
-  submitActionId: -1
-  cancelActionId: -1
+  horizontalActionId: 0
+  verticalActionId: 1
+  submitActionId: 21
+  cancelActionId: 22
   m_HorizontalAxis: Move Horizontal
   m_VerticalAxis: Move Vertical
   m_SubmitButton: Yes
@@ -29655,10 +29655,13 @@ MonoBehaviour:
   moveSpeed: 5
   jumpDashForce: 10
   jumpForce: 5
+  fallSpeed: 3
+  fallGrav: 1.2
   risingForce: 10
   wallJumpForce: {x: 4, y: 8}
   isGrounded: 0
   needToRestObj: {fileID: 4518672902730830674}
+  stunLockSpeed: 8
   isInvincible: 0
   hasLedge: 0
   hasWall: 0
@@ -67796,10 +67799,10 @@ MonoBehaviour:
   playerMice: []
   moveOneElementPerAxisPress: 0
   setActionsById: 0
-  horizontalActionId: -1
-  verticalActionId: -1
-  submitActionId: -1
-  cancelActionId: -1
+  horizontalActionId: 0
+  verticalActionId: 1
+  submitActionId: 21
+  cancelActionId: 22
   m_HorizontalAxis: Move Horizontal
   m_VerticalAxis: Move Vertical
   m_SubmitButton: Yes

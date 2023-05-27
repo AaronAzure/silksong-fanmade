@@ -87,7 +87,7 @@ public class GameManager : MonoBehaviour
 
 		yield return new WaitForSecondsRealtime(0.5f);
 		if (PlayerControls.Instance != null)
-			Destroy( PlayerControls.Instance.gameObject );
+			PlayerControls.Instance.DestroyItself();
 
 		yield return new WaitForSecondsRealtime(0.5f);
 		GameManager.Instance.ClearEnemiesDefeated();
@@ -155,7 +155,7 @@ public class GameManager : MonoBehaviour
 
 		yield return new WaitForSecondsRealtime(0.5f);
 		if (PlayerControls.Instance != null)
-			Destroy( PlayerControls.Instance.gameObject );
+			PlayerControls.Instance.DestroyItself();
 
 		yield return new WaitForSecondsRealtime(0.5f);
 		GameManager.Instance.ClearEnemiesDefeated();

@@ -46,8 +46,12 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] float moveSpeed=5;
 	[SerializeField] float jumpDashForce=10;
 	[SerializeField] float jumpForce=10;
+	[SerializeField] float fallSpeed=3;
+	[SerializeField] float fallGrav=1.2f;
+	private bool isFalling;
 	[SerializeField] float risingForce=10;
 	[SerializeField] Vector2 wallJumpForce;
+	private float origGrav;
 	private float moveX;
 	private float dashDir;
 	private float moveDir;
@@ -73,6 +77,7 @@ public class PlayerControls : MonoBehaviour
 	public bool canUnrest {get; private set;}
 	[SerializeField] GameObject needToRestObj;
 	private bool inStunLock;
+	[SerializeField] float stunLockSpeed=8;
 	public bool justParried {get; private set;}
 	[SerializeField] bool isInvincible;
 	[SerializeField] bool hasLedge;
@@ -299,6 +304,15 @@ public class PlayerControls : MonoBehaviour
 		DontDestroyOnLoad(gameObject);
 	}
 
+	public void DestroyItself()
+	{
+		if (cacoonObj != null) Destroy(cacoonObj);
+		if (bindPs != null) Destroy(bindPs);
+		if (healingPs != null) Destroy(healingPs);
+		if (bloodBurstPs != null) Destroy(bloodBurstPs);
+		Destroy(gameObject);
+	}
+
 
 	// Start is called before the first frame update
 	void Start()
@@ -325,6 +339,7 @@ public class PlayerControls : MonoBehaviour
 		if (pause2Menu != null) pause2Menu.SetActive(false);
 
 		gm = GameManager.Instance;
+		origGrav = rb.gravityScale;
 
 		if (gm.showDmg)
 		{
@@ -358,23 +373,6 @@ public class PlayerControls : MonoBehaviour
 
 		MusicManager m = MusicManager.Instance;
 		m.PlayMusic(m.bgMusic, m.bgMusicVol);
-		
-		// var controller = player.controllers.GetFirstControllerWithTemplate<IGamepadTemplate>();
-		// IGamepadTemplate gamepad = controller.GetTemplate<IGamepadTemplate>();
-
-		// // Get the first Controller assigned to the Player that implements Gamepad Template
-		// var controller = player.controllers.GetFirstControllerWithTemplate<IGamepadTemplate>();
-
-		// // Get the Gamepad Template from the Controller
-		// var gamepad = controller.GetTemplate<IGamepadTemplate>();
-
-		// // Get a list of all Controller Templates of a particular type in all Controllers found on the system
-		// var gamepads = ReInput.controllers.GetControllerTemplates<IGamepadTemplate>();
-
-		// // Iterate through all Controller Templates implemented by a Controller
-		// for(int i = 0; i < controller.templateCount; i++) {
-		// 	Debug.Log(controller.name + " implements the " + controller.Templates[i].name + " Template.");
-		// }    
 	}
 
 	bool CanControl()
@@ -567,10 +565,13 @@ public class PlayerControls : MonoBehaviour
 				// Dash
 				CalcDash();
 
+				// Normal movement
 				if (!inAirDash)
 					Move();
+				// Air dashed
 				else
 					rb.velocity = new Vector2(model.localScale.x * dashSpeed * 0.9f, rb.velocity.y);
+
 				CheckIsGrounded();
 				CheckIsWalled();
 				if (jumpDashed && jumped && (isGrounded || isWallSliding || canLedgeGrab))
@@ -583,8 +584,11 @@ public class PlayerControls : MonoBehaviour
 		}
 		else if (!isDead && inStunLock)
 		{
-			t += Time.fixedDeltaTime/stunLockTime;
-			transform.position = Vector3.Lerp(startPosition, stunLockPos.position, t);
+			// t += Time.fixedDeltaTime/stunLockTime;
+			Vector2 dir = (stunLockPos.position - transform.position);
+			rb.velocity = dir.normalized 
+				* stunLockSpeed * dir.magnitude;
+			// transform.position = Vector3.Lerp(startPosition, stunLockPos.position, t);
 		}
 		else if (!isDead && bench != null && isResting && t < 1)
 		{
@@ -742,6 +746,7 @@ public class PlayerControls : MonoBehaviour
 		airDashed = isDashing = false;
 		canLedgeGrab = ledgeGrab = false;
 		jumpTimer = 0;
+		rb.gravityScale = origGrav;
 		isWallSliding = false;
 		isWallJumping = false;
 		rb.gravityScale = 1;
@@ -804,6 +809,10 @@ public class PlayerControls : MonoBehaviour
 			{
 				anim.SetFloat("moveSpeed", x != 0 ? x * activeMoveSpeed : 1);
 			}
+			// if (!isGrounded && !isJumping && !isWallJumping && rb.velocity.y < fallSpeed)
+			// 	rb.gravityScale = fallGrav;
+			// else
+			// 	rb.gravityScale = origGrav;
 			rb.velocity = new Vector2(x * activeMoveSpeed, rb.velocity.y);
 		}
 		// dashing
@@ -1810,6 +1819,7 @@ public class PlayerControls : MonoBehaviour
 		rb.velocity = Vector2.zero;
 		rb.gravityScale = 0;
 		anim.SetBool("isDead", true);
+		rb.gravityScale = origGrav;
 
 		if (saveDeath)
 		{

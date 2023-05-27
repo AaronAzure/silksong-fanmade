@@ -37,6 +37,7 @@ public class Death : Enemy
 	private bool useUltAtk;
 	private bool useFlameAtk;
 	private bool old;
+	private bool justParried;
 
 
 	public void Awake()
@@ -97,6 +98,17 @@ public class Death : Enemy
 			{
 				nSickleRetrieved = 0;
 				anim.SetBool("sickled", true);
+			}
+			else if (rng == 4)
+			{
+				// cannot parry twice in a row
+				if (justParried)
+				{
+					rng = 2;
+					justParried = false;
+				}
+				else
+					justParried = true;
 			}
 			anim.SetFloat("atkPattern", rng);
 		}
