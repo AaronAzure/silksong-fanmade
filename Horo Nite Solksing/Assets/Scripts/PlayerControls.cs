@@ -1669,7 +1669,7 @@ public class PlayerControls : MonoBehaviour
 			dirX = 1;
 		else if ((opponent.position.x - transform.position.x) < 0)
 			dirX = -1;
-        rb.velocity = new Vector2(-dirX * 5, 5);
+        rb.velocity = new Vector2(-dirX * 8, 5);
 
 		// Freeze frame over
 		yield return new WaitForSecondsRealtime(0.25f);
@@ -1700,8 +1700,22 @@ public class PlayerControls : MonoBehaviour
 		inStunLock = true;
 		ResetAllBools();
 		atkCo = toolCo = null;
-		// beenHurt = true;
-		hp = Mathf.Max(0, hp - 1);
+		
+		for (int i=0 ; i<1 ; i++)
+		{
+			// Take shield damage
+			if (hasShield && hp == 1 && shieldHp > 0)
+			{
+				shieldHp = Mathf.Max(0, shieldHp - 1);
+				if (shieldImg != null && shieldHp < shieldSprs.Length) 
+					shieldImg.sprite = shieldSprs[shieldHp];
+			}
+			// Take damage
+			else
+			{
+				hp = Mathf.Max(0, hp - 1);
+			}
+		}
 		SetHp();
 		anim.SetBool("isSkillAttacking", false);
 		anim.SetBool("isGossamerStorm", false);

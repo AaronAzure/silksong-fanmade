@@ -645,4 +645,13 @@ public abstract class Enemy : MonoBehaviour
 		yield return new WaitForSeconds(delay);
 		jumpCo = null;
 	}
+
+	public IEnumerator JUMP()
+	{
+		rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+		moveDir = moveSpeed * model.localScale.x;
+		
+		yield return new WaitForSeconds(2f);
+		jumpCo = null;
+	}
 }
