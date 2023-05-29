@@ -13,6 +13,8 @@ public abstract class Enemy : MonoBehaviour
 	[SerializeField] protected int phase3;
 	[SerializeField] protected int easyPhase3;
 	protected bool atPhase3;
+
+
 	[Space] [SerializeField] DmgPopup dmgPopup;
 	[SerializeField] OnTriggerTest inArea;
 
