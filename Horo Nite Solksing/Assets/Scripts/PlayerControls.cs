@@ -267,6 +267,7 @@ public class PlayerControls : MonoBehaviour
 	[Space] [Header("Debug")]
 	[SerializeField] [Range(1,10)] int silkMultiplier=1;
 	[SerializeField] bool invincible;
+	[SerializeField] bool infiniteHp;
 	[SerializeField] bool infiniteSilk;
 	[SerializeField] bool canParry=true;
 	[SerializeField] [Range(-1,0)] float shawDir=-0.7f;
@@ -1568,6 +1569,29 @@ public class PlayerControls : MonoBehaviour
 		}
 	}
 
+	void LoseHp(int dmg=1)
+	{
+		if (!infiniteHp)
+		{
+			for (int i=0 ; i<dmg ; i++)
+			{
+				// Take shield damage
+				if (hasShield && hp == 1 && shieldHp > 0)
+				{
+					shieldHp = Mathf.Max(0, shieldHp - 1);
+					if (shieldImg != null && shieldHp < shieldSprs.Length) 
+						shieldImg.sprite = shieldSprs[shieldHp];
+				}
+				// Take damage
+				else
+				{
+					hp = Mathf.Max(0, hp - 1);
+				}
+			}
+			SetHp();
+		}
+	}
+
 	IEnumerator TakeDamageCo(Transform opponent, int dmg=1)
 	{
 		if (isInvincible)
@@ -1584,22 +1608,7 @@ public class PlayerControls : MonoBehaviour
 		atkCo = toolCo = null;
 		beenHurt = true;
 
-		for (int i=0 ; i<dmg ; i++)
-		{
-			// Take shield damage
-			if (hasShield && hp == 1 && shieldHp > 0)
-			{
-				shieldHp = Mathf.Max(0, shieldHp - 1);
-				if (shieldImg != null && shieldHp < shieldSprs.Length) 
-					shieldImg.sprite = shieldSprs[shieldHp];
-			}
-			// Take damage
-			else
-			{
-				hp = Mathf.Max(0, hp - 1);
-			}
-		}
-		SetHp();
+		LoseHp(dmg);
 		rb.velocity = Vector2.zero;
 		if (hp != 0)
 		{
@@ -1702,22 +1711,7 @@ public class PlayerControls : MonoBehaviour
 		ResetAllBools();
 		atkCo = toolCo = null;
 		
-		for (int i=0 ; i<1 ; i++)
-		{
-			// Take shield damage
-			if (hasShield && hp == 1 && shieldHp > 0)
-			{
-				shieldHp = Mathf.Max(0, shieldHp - 1);
-				if (shieldImg != null && shieldHp < shieldSprs.Length) 
-					shieldImg.sprite = shieldSprs[shieldHp];
-			}
-			// Take damage
-			else
-			{
-				hp = Mathf.Max(0, hp - 1);
-			}
-		}
-		SetHp();
+		LoseHp(1);
 		anim.SetBool("isSkillAttacking", false);
 		anim.SetBool("isGossamerStorm", false);
 		anim.SetBool("isBinding", false);
