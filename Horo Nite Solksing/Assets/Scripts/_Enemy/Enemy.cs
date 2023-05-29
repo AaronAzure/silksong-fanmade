@@ -14,6 +14,9 @@ public abstract class Enemy : MonoBehaviour
 	[SerializeField] protected int easyPhase3;
 	protected bool atPhase3;
 	[Space] [SerializeField] DmgPopup dmgPopup;
+	[SerializeField] OnTriggerTest inArea;
+
+
 	[Space] [SerializeField] protected int staggerCount=150;
 	[SerializeField] protected int hitCount;
 	[SerializeField] protected float recoverTime=1f;
@@ -178,6 +181,12 @@ public abstract class Enemy : MonoBehaviour
 		}
 
 		CallChildOnStart();
+
+		if (room == null && inArea != null)
+		{
+			inArea.SwapParent(transform);
+			gameObject.SetActive(false);
+		}
     }
 
 	public virtual void FixedUpdate()
@@ -418,6 +427,11 @@ public abstract class Enemy : MonoBehaviour
 	{
 		if (closeRangeFinder != null) Destroy(closeRangeFinder);
 		if (distRangeFinder != null) Destroy(distRangeFinder);
+		if (inArea != null) 
+		{
+			transform.parent = null;
+			Destroy(inArea);
+		}
 		if (shake) CinemachineShake.Instance.ShakeCam(2.5f, 0.5f);
 		StopAllCoroutines();
 		StartCoroutine( DiedCo() );

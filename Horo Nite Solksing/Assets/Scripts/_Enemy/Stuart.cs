@@ -30,15 +30,15 @@ public class Stuart : Enemy
 	protected override void AttackingAction()
 	{
 		// if (jumpCo)
-		if (!jumping)
-		{
+		// if (!jumping)
+		// {
 			// chasing
-			if (isGrounded)
+			if (isGrounded && !jumping)
 				ChasePlayer();
 			// cannot change direction whilst falling
 			else
 				MoveInPrevDirection();
-		}
+		// }
 
 		// player jumped
 		if (isGrounded && engaged && jumpCo == null && target.self.position.y - self.position.y > 1)
