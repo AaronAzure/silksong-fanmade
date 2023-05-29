@@ -46,6 +46,14 @@ public class Death : Enemy
 		anim.SetBool("isEasyMode", GameManager.Instance.easyMode);
 	}
 
+	protected override void CallChildOnStart()
+	{
+		if (GameManager.Instance != null && GameManager.Instance.easyMode)
+		{
+			anim.SetFloat("idleSpeed", 0.5f);
+		}
+	}
+
 	public void ToggleOldVer()
 	{
 		old = !old;

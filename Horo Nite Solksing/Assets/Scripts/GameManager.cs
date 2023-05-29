@@ -15,6 +15,7 @@ public class GameManager : MonoBehaviour
 	[field: SerializeField] public bool easyMode {get; private set;}
 	[field: SerializeField] public HashSet<string> roomCleared;
 	[field: SerializeField] public HashSet<string> enemiesDefeated;
+	[field: SerializeField] public HashSet<string> bossCleared;
 
 
 	void Awake()
@@ -26,6 +27,7 @@ public class GameManager : MonoBehaviour
 
 		DontDestroyOnLoad(gameObject);
 		enemiesDefeated = new HashSet<string>();
+		bossCleared = new HashSet<string>();
 		roomCleared = new HashSet<string>();
 	}	
 
@@ -72,6 +74,29 @@ public class GameManager : MonoBehaviour
 			roomCleared = new HashSet<string>();
 
 		roomCleared.Clear();
+	}
+
+	public void RegisterBossClearedList(string name)
+	{
+		if (bossCleared == null)
+			bossCleared = new HashSet<string>();
+
+		if (!bossCleared.Contains(SceneManager.GetActiveScene().name + " " + name))
+			bossCleared.Add(SceneManager.GetActiveScene().name + " " + name);
+	}
+	public bool CheckBossClearedList(string name)
+	{
+		if (bossCleared == null)
+			bossCleared = new HashSet<string>();
+
+		return bossCleared.Contains(SceneManager.GetActiveScene().name + " " + name);
+	}
+	public void ClearBossClearedList()
+	{
+		if (bossCleared == null)
+			bossCleared = new HashSet<string>();
+
+		bossCleared.Clear();
 	}
 
 	public void Restart()

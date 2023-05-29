@@ -54,7 +54,8 @@ public class Room : MonoBehaviour
 	bool CheckedIfCleared()
 	{
 		checkedIfCleared = true;
-		if (GameManager.Instance.CheckRoomClearedList(gameObject.name))
+		if (GameManager.Instance.CheckRoomClearedList(gameObject.name) || 
+			GameManager.Instance.CheckBossClearedList(gameObject.name))
 		{
 			startBossFight = done = true;
 			foreach (Enemy enemy in enemies)
@@ -130,6 +131,8 @@ public class Room : MonoBehaviour
 
 		if (canBeCleared)
 			GameManager.Instance.RegisterRoomClearedList(gameObject.name);
+		else
+			GameManager.Instance.RegisterBossClearedList(gameObject.name);
 		done = true;
 
 		yield return new WaitForSeconds(1);

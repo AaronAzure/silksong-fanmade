@@ -429,6 +429,7 @@ public class PlayerControls : MonoBehaviour
 				finalTimePlayedTxt.gameObject.SetActive(false);
 				replaying = true;
 				finTime = 0;
+				gm.ClearBossClearedList();
 				StartCoroutine( DiedCo(false) );
 			}
 		}

@@ -422,7 +422,6 @@ public abstract class Enemy : MonoBehaviour
 		StopAllCoroutines();
 		StartCoroutine( DiedCo() );
 		CallChildOnDeath();
-		this.enabled = false;
 	}
 	
 	IEnumerator DiedCo()
@@ -446,7 +445,8 @@ public abstract class Enemy : MonoBehaviour
 			sprite.material = defaultMat;
 		foreach (SpriteRenderer sprite in sprites)
 			sprite.color = new Color(0.4f,0.4f,0.4f,1);
-		this.enabled = false;
+		Destroy(this);
+		// this.enabled = false;
 	}
 
 	public void SpawnIn()
