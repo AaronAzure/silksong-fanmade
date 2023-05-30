@@ -50,7 +50,7 @@ public class Death : Enemy
 	{
 		if (GameManager.Instance != null && GameManager.Instance.easyMode)
 		{
-			anim.SetFloat("idleSpeed", 0.5f);
+			anim.SetFloat("idleSpeed", 2f/3f);
 		}
 	}
 

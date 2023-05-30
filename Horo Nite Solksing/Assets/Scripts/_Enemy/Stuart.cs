@@ -33,7 +33,7 @@ public class Stuart : Enemy
 		// if (!jumping)
 		// {
 			// chasing
-			if (isGrounded && !jumping)
+			if (isGrounded)
 				ChasePlayer();
 			// cannot change direction whilst falling
 			else

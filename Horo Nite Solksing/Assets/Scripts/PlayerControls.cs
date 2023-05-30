@@ -64,7 +64,10 @@ public class PlayerControls : MonoBehaviour
 	private bool isDashing;
 	private bool isJumping;
 	private bool isWallJumping;
-	[SerializeField] bool isGrounded;
+
+	private bool isGrounded;
+	private bool isCloseToGround;
+	private bool jumpRegistered;
 	private bool isPogoing;
 	private bool isPaused;
 	private bool isPauseMenu1;
@@ -90,7 +93,9 @@ public class PlayerControls : MonoBehaviour
 
 	[Space] [SerializeField] float jumpMaxTimer=0.5f;
 	[SerializeField] Transform groundCheck;
+	[SerializeField] Transform closeToGroundCheck;
 	[SerializeField] Vector2 groundCheckSize;
+	[SerializeField] Vector2 closeToGroundCheckSize;
 	[SerializeField] LayerMask whatIsGround;
 	[SerializeField] Transform wallCheck;
 	[SerializeField] Vector2 wallCheckSize;
@@ -399,16 +404,21 @@ public class PlayerControls : MonoBehaviour
 
 	private void OnDrawGizmosSelected() 
 	{
-		if (ledgeCheckPos != null)
-		{
-			Gizmos.color = Color.green;
-			Gizmos.DrawLine(ledgeCheckPos.position, ledgeCheckPos.position + new Vector3(model.localScale.x * ledgeGrabDist, 0));
-		}
-		if (wallCheckPos != null)
+		if (closeToGroundCheck != null)
 		{
 			Gizmos.color = Color.yellow;
-			Gizmos.DrawLine(wallCheckPos.position, wallCheckPos.position + new Vector3(model.localScale.x * ledgeGrabDist, 0));
+			Gizmos.DrawCube(closeToGroundCheck.position, closeToGroundCheckSize);
 		}
+		// if (ledgeCheckPos != null)
+		// {
+		// 	Gizmos.color = Color.green;
+		// 	Gizmos.DrawLine(ledgeCheckPos.position, ledgeCheckPos.position + new Vector3(model.localScale.x * ledgeGrabDist, 0));
+		// }
+		// if (wallCheckPos != null)
+		// {
+		// 	Gizmos.color = Color.yellow;
+		// 	Gizmos.DrawLine(wallCheckPos.position, wallCheckPos.position + new Vector3(model.localScale.x * ledgeGrabDist, 0));
+		// }
 	}
 
 	private string ConvertToTime(TimeSpan time)
@@ -574,6 +584,7 @@ public class PlayerControls : MonoBehaviour
 				else
 					rb.velocity = new Vector2(model.localScale.x * dashSpeed * 0.9f, rb.velocity.y);
 
+				CheckIsCloseToGround();
 				CheckIsGrounded();
 				CheckIsWalled();
 				if (jumpDashed && jumped && (isGrounded || isWallSliding || canLedgeGrab))
@@ -712,14 +723,20 @@ public class PlayerControls : MonoBehaviour
 	void JumpMechanic()
 	{
 		// First Frame of Jump
-		if (isGrounded && !isJumping && player.GetButtonDown("Jump"))
+		if (isCloseToGround && player.GetButtonDown("Jump"))
 		{
+			jumpRegistered = true;
+		}
+		// First Frame of Jump
+		if (isGrounded && !isJumping && jumpRegistered)
+		{
+			jumpRegistered = false;
 			Jump();
 		}
 		// Released jump button
 		else if (player.GetButtonUp("Jump") || CheckIsCeiling())
 		{
-			isJumping = false;
+			jumpRegistered = isJumping = false;
 		}
 		// Holding jump button
 		else if (isJumping && player.GetButton("Jump"))
@@ -811,10 +828,10 @@ public class PlayerControls : MonoBehaviour
 			{
 				anim.SetFloat("moveSpeed", x != 0 ? x * activeMoveSpeed : 1);
 			}
-			// if (!isGrounded && !isJumping && !isWallJumping && rb.velocity.y < fallSpeed)
-			// 	rb.gravityScale = fallGrav;
-			// else
-			// 	rb.gravityScale = origGrav;
+			if (!isGrounded && !inShawAtk && !isJumping && !isWallJumping && rb.velocity.y < fallSpeed)
+				rb.gravityScale = fallGrav;
+			else
+				rb.gravityScale = origGrav;
 			rb.velocity = new Vector2(x * activeMoveSpeed, rb.velocity.y);
 		}
 		// dashing
@@ -861,6 +878,12 @@ public class PlayerControls : MonoBehaviour
 			anim.SetBool("isGrounded", isGrounded);
 		if (isGrounded && anim.GetBool("isAirDash")) 
 			anim.SetBool("isAirDash", false);
+	}
+	void CheckIsCloseToGround()
+	{
+		isCloseToGround = Physics2D.OverlapBox(
+			closeToGroundCheck.position, closeToGroundCheckSize, 0, whatIsGround
+		);
 	}
 	void CheckIsWalled()
 	{
@@ -1510,7 +1533,7 @@ public class PlayerControls : MonoBehaviour
 
 	private bool CanBeHurt()
 	{
-		return (!isDead && !invulnerable && !invincible && !justParried && !inInvincibleAnim);
+		return (!isDead && !invulnerable && !invincible && !justParried && !inInvincibleAnim && !movingToNextScene);
 	}
 
 	private void OnTriggerStay2D(Collider2D other) 
@@ -1692,7 +1715,7 @@ public class PlayerControls : MonoBehaviour
 		beenHurt = false;
 
 		// invincibility over
-		yield return new WaitForSeconds(gm.easyMode ? 1.25f : 0.5f);
+		yield return new WaitForSeconds(gm.easyMode ? 1.25f : 0.6f);
 		foreach (SpriteRenderer sprite in sprites)
 			sprite.material = defaultMat;
 		hurtCo = null;
