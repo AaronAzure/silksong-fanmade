@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
 	[field: SerializeField] public GameObject backdropUi {get; private set;}
 	[field: SerializeField] public bool showDmg {get; private set;}
 	[field: SerializeField] public bool easyMode {get; private set;}
+	[field: SerializeField] public float invincibilityDuration {get; private set;}
 	[field: SerializeField] public HashSet<string> roomCleared;
 	[field: SerializeField] public HashSet<string> enemiesDefeated;
 	[field: SerializeField] public HashSet<string> bossCleared;
@@ -26,10 +27,15 @@ public class GameManager : MonoBehaviour
 			Destroy(gameObject);
 
 		DontDestroyOnLoad(gameObject);
+	}	
+
+	private void Start() 
+	{
 		enemiesDefeated = new HashSet<string>();
 		bossCleared = new HashSet<string>();
 		roomCleared = new HashSet<string>();
-	}	
+		invincibilityDuration = easyMode ? 1.25f : 0.5f;
+	}
 
 	public void RegisterNameToEnemiesDefeated(string name)
 	{
@@ -164,7 +170,38 @@ public class GameManager : MonoBehaviour
 	public bool ToggleEasyMode()
 	{
 		easyMode = !easyMode;
+		invincibilityDuration = easyMode ? 1.25f : 0.5f;
+		// if (easyMode)
+		// 	invincibilityDuration = 1.25f;
 		return easyMode;
+	}
+	public float ChangeInvincibilityDuration()
+	{
+		switch (invincibilityDuration)
+		{
+			case 0.50f:
+				invincibilityDuration = 0.75f;
+				break;
+			case 0.75f:
+				invincibilityDuration = 1.00f;
+				break;
+			case 1.00f:
+				invincibilityDuration = 1.25f;
+				break;
+			case 1.25f:
+				invincibilityDuration = 1.5f;
+				break;
+			case 1.5f:
+				invincibilityDuration = 1.75f;
+				break;
+			case 1.75f:
+				invincibilityDuration = 2f;
+				break;
+			default:
+				invincibilityDuration = 0.5f;
+				break;
+		}
+		return invincibilityDuration;
 	}
 
 	public void ExitGame()

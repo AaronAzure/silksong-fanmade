@@ -9,6 +9,8 @@ public class UiTitleButton : MonoBehaviour
 	public static UiTitleButton Instance;
 	[SerializeField] GameObject eventSystem;
 	[SerializeField] TextMeshProUGUI difficultyTxt;
+	[SerializeField] TextMeshProUGUI iFrameTxt;
+	[SerializeField] TextMeshProUGUI showDmgTxt;
 	[SerializeField] GameObject gmObj;
 	private GameManager gm;
 
@@ -25,6 +27,8 @@ public class UiTitleButton : MonoBehaviour
 			difficultyTxt.text = "Difficulty: Easy";
 		else
 			difficultyTxt.text = "Difficulty: Gamer";
+		iFrameTxt.text = $"Invincibility: {gm.invincibilityDuration}s";
+		showDmgTxt.text = gm.showDmg ? "Show Dmg: On" : "Show Dmg: Off";
 		MusicManager m = MusicManager.Instance;
 		m.PlayMusic(m.mainThemeMusic, m.mainThemeMusicVol);
 	}
@@ -55,10 +59,32 @@ public class UiTitleButton : MonoBehaviour
 				difficultyTxt.text = "Difficulty: Easy";
 			else
 				difficultyTxt.text = "Difficulty: Gamer";
+			iFrameTxt.text = $"Invincibility: {gm.invincibilityDuration}s";
 		}
 		else if (gmObj != null)
 		{
 			gmObj.SetActive(!gmObj.activeSelf);
+		}
+	}
+
+	public void I_FRAME()
+	{
+		if (gm != null)
+		{
+			gm.ChangeInvincibilityDuration();
+			iFrameTxt.text = $"Invincibility: {gm.invincibilityDuration}s";
+		}
+	}
+
+	public void SHOW_DMG()
+	{
+		if (gm.ToggleDmgIndicator())
+		{
+			showDmgTxt.text = "Show Dmg: On";
+		}
+		else
+		{
+			showDmgTxt.text = "Show Dmg: Off";
 		}
 	}
 

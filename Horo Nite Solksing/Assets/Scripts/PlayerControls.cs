@@ -288,6 +288,7 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] TextMeshProUGUI timePlayedTxt;
 	[SerializeField] TextMeshProUGUI finalTimePlayedTxt;
 	[SerializeField] GameObject difficultyObj;
+	[SerializeField] TextMeshProUGUI iframeTxt;
 	[SerializeField] GameObject replayObj;
 	[SerializeField] Rewired.Integration.UnityUI.RewiredStandaloneInputModule rinput;
 	// public static PlayerControls Instance;
@@ -1578,6 +1579,11 @@ public class PlayerControls : MonoBehaviour
 			isCountingTime = false;
 			TimeSpan time = TimeSpan.FromSeconds(timePlayed);
 			Debug.Log($"<color=green>Thanks for Playing: {ConvertToTime(time)}</color>");
+			if (gm.invincibilityDuration > 0.5f)
+			{
+				iframeTxt.gameObject.SetActive(true);
+				iframeTxt.text = "Now try with shorter iframes xD";
+			}
 			finalTimePlayedTxt.text = ConvertToTime(time);
 			timePlayedTxt.gameObject.SetActive(false);
 			finalTimePlayedTxt.gameObject.SetActive(true);
@@ -1715,7 +1721,7 @@ public class PlayerControls : MonoBehaviour
 		beenHurt = false;
 
 		// invincibility over
-		yield return new WaitForSeconds(gm.easyMode ? 1.25f : 0.6f);
+		yield return new WaitForSeconds(gm.invincibilityDuration);
 		foreach (SpriteRenderer sprite in sprites)
 			sprite.material = defaultMat;
 		hurtCo = null;
