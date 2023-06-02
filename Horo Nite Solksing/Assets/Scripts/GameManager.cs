@@ -15,7 +15,7 @@ public class GameManager : MonoBehaviour
 	[field: SerializeField] public bool easyMode {get; private set;}
 	[field: SerializeField] public float invincibilityDuration {get; private set;}
 	[field: SerializeField] public HashSet<string> roomCleared;
-	[field: SerializeField] public HashSet<string> enemiesDefeated;
+	[field: SerializeField] public HashSet<string>  enemiesDefeated;
 	[field: SerializeField] public HashSet<string> bossCleared;
 
 
@@ -121,6 +121,7 @@ public class GameManager : MonoBehaviour
 			PlayerControls.Instance.DestroyItself();
 
 		yield return new WaitForSecondsRealtime(0.5f);
+		GameManager.Instance.ClearBossClearedList();
 		GameManager.Instance.ClearEnemiesDefeated();
 		GameManager.Instance.ClearRoomClearedList();
 
@@ -220,6 +221,7 @@ public class GameManager : MonoBehaviour
 			PlayerControls.Instance.DestroyItself();
 
 		yield return new WaitForSecondsRealtime(0.5f);
+		GameManager.Instance.ClearBossClearedList();
 		GameManager.Instance.ClearEnemiesDefeated();
 		GameManager.Instance.ClearRoomClearedList();
 

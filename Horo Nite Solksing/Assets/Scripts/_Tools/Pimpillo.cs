@@ -7,6 +7,7 @@ public class Pimpillo : Tool
 	[Space] [Header("Pimpillo")]
 	[SerializeField] ParticleSystem trailPs;
 	[SerializeField] GameObject explosion;
+	private bool createdExplosion;
 
 
 	protected override void CallChildOnEnemyHit(Collider2D other)
@@ -15,6 +16,10 @@ public class Pimpillo : Tool
 
 	protected override void CallChildOnSpecialHit()
 	{
+		// create single explosion
+		if (createdExplosion) return;
+		createdExplosion = true;
+
 		if (trailPs != null)
 		{
 			trailPs.transform.parent = null;
@@ -28,6 +33,10 @@ public class Pimpillo : Tool
 	}
 	protected override void CallChildOnHit()
 	{
+		// create single explosion
+		if (createdExplosion) return;
+		createdExplosion = true;
+		
 		if (trailPs != null)
 		{
 			trailPs.transform.parent = null;

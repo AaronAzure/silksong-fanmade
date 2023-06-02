@@ -12,8 +12,6 @@ GameObject:
   - component: {fileID: 6600418900668682554}
   - component: {fileID: 7366231504683964476}
   - component: {fileID: 2838661908632252507}
-  - component: {fileID: 712804474417699841}
-  - component: {fileID: 7567582319085801275}
   m_Layer: 0
   m_Name: HITBOX
   m_TagString: Finish
@@ -68,7 +66,7 @@ Rigidbody2D:
   m_AngularDrag: 0.05
   m_GravityScale: 1
   m_Material: {fileID: 0}
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
@@ -86,7 +84,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   totaluses: 6
   icon: {fileID: 0}
-  dmg: 35
+  <quickCooldown>k__BackingField: 0
+  dmg: 40
   toRight: 1
   dir: {x: 0, y: 0}
   velocityMultiplier: 1
@@ -103,37 +102,10 @@ MonoBehaviour:
   justThrown: 0
   noStart: 0
   destroyAfter: 0
-  duration: 0.1
+  duration: 0
   col: {fileID: 6600418900668682554}
   hasCamShake: 1
---- !u!114 &712804474417699841
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 331955001822599266}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c2fba469626724b01a0819630ab20587, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  col: {fileID: 6600418900668682554}
-  timer: 0.1
---- !u!114 &7567582319085801275
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 331955001822599266}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fa58e6df1c14d446f888a1e060a70e77, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  col: {fileID: 6600418900668682554}
-  timer: 0.25
+  c: 0
 --- !u!1 &1208764353293556703
 GameObject:
   m_ObjectHideFlags: 0
@@ -146,6 +118,8 @@ GameObject:
   - component: {fileID: 2130849242485122682}
   - component: {fileID: 5613290221264666393}
   - component: {fileID: 7697639528460849675}
+  - component: {fileID: 8345340200527978416}
+  - component: {fileID: 3940830646791212296}
   m_Layer: 0
   m_Name: EXplosion (PS)
   m_TagString: Finish
@@ -5077,6 +5051,34 @@ SortingGroup:
   m_SortingLayerID: -1355153031
   m_SortingLayer: 1
   m_SortingOrder: 4
+--- !u!114 &8345340200527978416
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1208764353293556703}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2fba469626724b01a0819630ab20587, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  col: {fileID: 6600418900668682554}
+  timer: 0.1
+--- !u!114 &3940830646791212296
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1208764353293556703}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa58e6df1c14d446f888a1e060a70e77, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  col: {fileID: 6600418900668682554}
+  timer: 0.25
 --- !u!1 &8688155982429244910
 GameObject:
   m_ObjectHideFlags: 0
@@ -5091,7 +5093,7 @@ GameObject:
   - component: {fileID: 2104430148875677536}
   - component: {fileID: 6812078362109391853}
   m_Layer: 0
-  m_Name: HITBOX (1)
+  m_Name: HITBOX (friendly fire)
   m_TagString: EnemyStrongAttack
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

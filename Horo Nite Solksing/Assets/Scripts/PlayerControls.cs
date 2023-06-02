@@ -275,7 +275,7 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] bool infiniteHp;
 	[SerializeField] bool infiniteSilk;
 	[SerializeField] bool canParry=true;
-	[SerializeField] [Range(-1,0)] float shawDir=-0.7f;
+	private float shawDir=-0.85f;
 	[SerializeField] string savedScene="Scene1";
 	[SerializeField] Vector2 savedPos;
 	[SerializeField] string deathScene;
@@ -509,7 +509,7 @@ public class PlayerControls : MonoBehaviour
 				}
 
 				// rest on bench
-				else if (!isResting && bench != null && isGrounded && player.GetAxis("Move Vertical") > 0.7f)
+				else if (!isResting && bench != null && isGrounded && player.GetAxis("Move Vertical") > 0.85f)
 				{
 					isResting = true;
 					needToRestObj.SetActive(false);
@@ -536,8 +536,8 @@ public class PlayerControls : MonoBehaviour
 				LedgeGrab();
 		}
 		else if (isResting && canUnrest &&
-			(player.GetButtonDown("No") || player.GetAxis("Move Vertical") < -0.7f
-			|| player.GetAxis("Move Horizontal") < -0.7f || player.GetAxis("Move Horizontal") > 0.7f)
+			(player.GetButtonDown("No") || player.GetAxis("Move Vertical") < -0.85f
+			|| player.GetAxis("Move Horizontal") < -0.7f || player.GetAxis("Move Horizontal") > 0.85f)
 		)
 		{
 			t = 0;
@@ -575,6 +575,10 @@ public class PlayerControls : MonoBehaviour
 				if (!isGrounded)
 					anim.SetFloat("jumpVelocity", rb.velocity.y);
 
+				CheckIsCloseToGround();
+				CheckIsGrounded();
+				CheckIsWalled();
+
 				// Dash
 				CalcDash();
 
@@ -585,9 +589,6 @@ public class PlayerControls : MonoBehaviour
 				else
 					rb.velocity = new Vector2(model.localScale.x * dashSpeed * 0.9f, rb.velocity.y);
 
-				CheckIsCloseToGround();
-				CheckIsGrounded();
-				CheckIsWalled();
 				if (jumpDashed && jumped && (isGrounded || isWallSliding || canLedgeGrab))
 					jumpDashed = jumped = false;
 			}
@@ -639,11 +640,11 @@ public class PlayerControls : MonoBehaviour
 		}
 	}
 
-	void DashMechanic()
+	void DashMechanic(bool alreadyRegistered=false)
 	{
 		// First frame of pressing dash button
-		if (player.GetButtonDown("Dash") && dashCounter <= 0 && 
-			dashCooldownCounter <= 0)
+		if (alreadyRegistered || (player.GetButtonDown("Dash") && dashCounter <= 0 && 
+			dashCooldownCounter <= 0))
 		{
 			isDashing = true; // keep dashing if on ground
 			isJumping = jumpDashed = jumped = false;
@@ -803,7 +804,6 @@ public class PlayerControls : MonoBehaviour
 			
 		if (isWallJumping || jumpDashed || isLedgeGrabbing || inShawAtk) return;
 
-		// float moveY = player.GetAxis("Move Vertical");
 		float x = moveX;
 		anim.SetBool("isWalking", x != 0);
 		if (!risingAtk)
@@ -928,7 +928,7 @@ public class PlayerControls : MonoBehaviour
 		if (isDashing && crestNum <= 1)
 			atkCo = StartCoroutine( AttackCo(3) );
 		// attack up
-		else if (player.GetAxis("Move Vertical") > 0.7f)
+		else if (player.GetAxis("Move Vertical") > 0.85f)
 			atkCo = StartCoroutine( AttackCo(1) );
 		// shaw attack
 		else if (player.GetAxis("Move Vertical") < shawDir && nShaw < shawLimit)
@@ -1016,9 +1016,6 @@ public class PlayerControls : MonoBehaviour
 	
 	void SkillAttack()
 	{
-		// Gossamer Storm
-		// if (player.GetAxis("Move Vertical") > 0.7f && (infiniteSilk || silkMeter >= skillStabCost))
-		// 	atkCo = StartCoroutine( SkillAttackCo(1) );
 		// Stabby stabby strike
 		if ((infiniteSilk || silkMeter >= skillStabCost))
 			atkCo = StartCoroutine( SkillAttackCo() );
@@ -1364,6 +1361,7 @@ public class PlayerControls : MonoBehaviour
 
 		moveDir = model.localScale.x;
 		rb.gravityScale = 0;
+		dashCounter = 0;
 		rb.velocity = Vector2.zero;
 		anim.SetFloat("moveDir", moveDir);
 		anim.SetBool("isLedgeGrabbing", true);
@@ -1372,10 +1370,15 @@ public class PlayerControls : MonoBehaviour
 	public void GRAB_LEDGE()
 	{
 		transform.position += new Vector3(moveDir * 0.5f, 0.8f);
-		canLedgeGrab = ledgeGrab = false;
+		isWallSliding = canLedgeGrab = ledgeGrab = false;
+		dashCooldownCounter = dashCounter = 0;
 		rb.gravityScale = 1;
 		rb.velocity = Vector2.zero;
 		anim.SetBool("isLedgeGrabbing", false);
+		if (player.GetButton("Dash"))
+		{
+			DashMechanic(true);
+		}
 	}
 
 

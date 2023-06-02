@@ -29,7 +29,7 @@ public class OnTriggerTest : MonoBehaviour
 
 	private void OnTriggerEnter2D(Collider2D other) 
 	{
-		if (other.CompareTag("MainCamera"))	
+		if (obj != null && other.CompareTag("MainCamera"))	
 		{
 			obj.SetActive(true);	
 			SwapParent(master, false);
@@ -38,7 +38,7 @@ public class OnTriggerTest : MonoBehaviour
 
 	private void OnTriggerExit2D(Collider2D other) 
 	{
-		if (other.CompareTag("MainCamera2"))	
+		if (obj != null && other.CompareTag("MainCamera2"))	
 		{
 			obj.SetActive(false);
 			SwapParent(master, true);
