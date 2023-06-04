@@ -427,6 +427,7 @@ public abstract class Enemy : MonoBehaviour
 
 	void Died(bool shake)
 	{
+		StopAllCoroutines();
 		if (closeRangeFinder != null) Destroy(closeRangeFinder);
 		if (distRangeFinder != null) Destroy(distRangeFinder);
 		if (inArea != null) 
@@ -435,7 +436,6 @@ public abstract class Enemy : MonoBehaviour
 			Destroy(inArea);
 		}
 		if (shake) CinemachineShake.Instance.ShakeCam(2.5f, 0.5f);
-		StopAllCoroutines();
 		StartCoroutine( DiedCo() );
 		CallChildOnDeath();
 	}
