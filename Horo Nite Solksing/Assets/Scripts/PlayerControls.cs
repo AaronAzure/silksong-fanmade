@@ -43,6 +43,8 @@ public class PlayerControls : MonoBehaviour
 	[Space] [Header("Platformer")]
 	[SerializeField] Rigidbody2D rb;
 	public Transform model;
+	[SerializeField] ParticleSystem dustTrailPs;
+	private bool isDustTrailPlaying=true;
 	[SerializeField] float moveSpeed=5;
 	[SerializeField] float jumpDashForce=10;
 	[SerializeField] float jumpForce=10;
@@ -188,6 +190,7 @@ public class PlayerControls : MonoBehaviour
 
 	[Space] [Header("In-Game Related")]
 	[SerializeField] Bench bench;
+	[SerializeField] bool startWalkingIn;
 
 
 	[Space] [Header("Tools")]
@@ -265,7 +268,11 @@ public class PlayerControls : MonoBehaviour
 	private bool invulnerable;
 	private float nextSceneSpeed;
 	private bool movingToNextScene;
+	private bool movingVertically;	// jumping or falling through new scene 
+	private bool movingVerticallyJumping;
 	private bool canMove;
+	private bool canMoveBegin;
+	private bool canMoveHorz;
 	private bool movingRight;
 
 
@@ -377,6 +384,9 @@ public class PlayerControls : MonoBehaviour
 				hpMasks = temp.ToArray();
 			}
 		}
+
+		if (startWalkingIn)
+			StartCoroutine( MoveOutOfStart() );
 
 		MusicManager m = MusicManager.Instance;
 		m.PlayMusic(m.bgMusic, m.bgMusicVol);
@@ -783,19 +793,66 @@ public class PlayerControls : MonoBehaviour
 		moveX = (temp < 0.3f && temp > -0.3f) ? 0 : temp;
 	}
 
+	float NewSceneJumpMovement()
+	{
+		if (movingVerticallyJumping)
+		{
+			// carries player's momentum
+			if (canMoveBegin)
+				return rb.velocity.x;
+			// preset velocity
+			if (canMoveHorz)
+				return nextSceneSpeed * activeMoveSpeed;
+		}
+		else
+		{
+			// carries player's momentum
+			if (canMoveBegin)
+				return rb.velocity.x;
+		}
+		// preset velocity
+		return 0;
+	}
+
 	void Move()
 	{
+		// cutscene
 		if (movingToNextScene)
 		{
-			if (canMove)
+			// jumping up or falling down
+			if (movingVertically)
 			{
-				rb.velocity = new Vector2(
-					nextSceneSpeed * activeMoveSpeed, 
-					rb.velocity.y
-				);
+				if (canMove)
+				{
+					Debug.Log("vertical - moving");
+					rb.velocity = new Vector2(
+						NewSceneJumpMovement(), 
+						movingVerticallyJumping ? jumpForce : rb.velocity.y
+					);
+				}
+				else
+				{
+					Debug.Log("vertical - still");
+					rb.velocity = new Vector2(0, 0);
+				}
 			}
+			// moving left or right
 			else
-				rb.velocity = new Vector2(0, rb.velocity.y);
+			{
+				if (canMove)
+				{
+					Debug.Log("horizontal - moving");
+					rb.velocity = new Vector2(
+						nextSceneSpeed * activeMoveSpeed, 
+						rb.velocity.y
+					);
+				}
+				else
+				{
+					Debug.Log("horizontal - still");
+					rb.velocity = new Vector2(0, rb.velocity.y);
+				}
+			}
 			return;
 		}
 
@@ -863,6 +920,20 @@ public class PlayerControls : MonoBehaviour
 	void CheckIsGrounded()
 	{
 		isGrounded = Physics2D.OverlapBox(groundCheck.position, groundCheckSize, 0, whatIsGround);
+		if (dustTrailPs != null)
+		{
+			if (isDustTrailPlaying && !isGrounded)
+			{
+				isDustTrailPlaying = false;
+				dustTrailPs.Stop(false, ParticleSystemStopBehavior.StopEmitting);
+			}
+			else if (!isDustTrailPlaying && isGrounded)
+			{
+				isDustTrailPlaying = true;
+				dustTrailPs.Play();
+				dustTrailPs.Emit(10);
+			}
+		}
 		if (isGrounded && nShaw != 0)
 			nShaw = 0;
 		if (isGrounded && isPogoing)
@@ -1334,16 +1405,22 @@ public class PlayerControls : MonoBehaviour
 
 	void WallJump()
 	{
-		isWallSliding = false;
-		isWallJumping = true;
-		rb.velocity = model.localScale.x > 0 ? new Vector2(-wallJumpForce.x, wallJumpForce.y) : wallJumpForce;
-		model.localScale = rb.velocity.x > 0 ? new Vector3(1, 1, 1) : new Vector3(-1, 1, 1);
-		Invoke("ResetWallJump", 0.25f);
+		if (!movingToNextScene)
+		{
+			isWallSliding = false;
+			isWallJumping = true;
+			rb.velocity = model.localScale.x > 0 ? new Vector2(-wallJumpForce.x, wallJumpForce.y) : wallJumpForce;
+			model.localScale = rb.velocity.x > 0 ? new Vector3(1, 1, 1) : new Vector3(-1, 1, 1);
+			Invoke("ResetWallJump", 0.25f);
+		}
 	}
 
 	void ResetWallJump()
 	{
-		isWallJumping = false;
+		if (!movingToNextScene)
+		{
+			isWallJumping = false;
+		}
 	}
 
 	public void FinishAirDash()
@@ -1569,6 +1646,12 @@ public class PlayerControls : MonoBehaviour
 		{
 			movingRight = (other.transform.position.x - self.position.x > 0);
 			NewScene n = other.GetComponent<NewScene>();
+			movingVertically = n.isVertical;
+			if (movingVertically)
+			{
+				// jumping up to new scene
+				movingVerticallyJumping = n.transform.position.y - self.position.y > 0;
+			}
 			StartCoroutine( MoveToNextScene(n.newSceneName, n.newScenePos) );
 		}
 		if (!isFinished && other.CompareTag("Goal"))
@@ -1929,9 +2012,12 @@ public class PlayerControls : MonoBehaviour
 
 	IEnumerator MoveToNextScene(string newSceneName, Vector2 newScenePos)
 	{
-		canMove = movingToNextScene = invulnerable = true;
-		nextSceneSpeed = (rb.velocity.x > 0) ? 1 : -1;
-		isCountingTime = false;
+		canMoveBegin = canMove = movingToNextScene = invulnerable = true;
+		if (movingVerticallyJumping)
+			nextSceneSpeed = (model.localScale.x > 0) ? 1 : -1;
+		else
+			nextSceneSpeed = (rb.velocity.x > 0) ? 1 : -1;
+		isWallJumping = isCountingTime = false;
 		yield return new WaitForSeconds(0.1f);
 		gm.transitionAnim.SetTrigger("toBlack");
 
@@ -1945,14 +2031,14 @@ public class PlayerControls : MonoBehaviour
 			yield return null;
 		}
 		isCountingTime = true;
-		canMove = false;
+		canMoveBegin = canMoveHorz = canMove = false;
 		transform.position = newScenePos;
 		gm.transitionAnim.SetTrigger("reset");
 		CheckForCacoon();
 		if (hp > 1 && soulLeakShortPs != null)
 		{
 			soulLeakShortPs.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-			soulLeakShortPs.Play();
+			// soulLeakShortPs.Play();
 		}
 		if ((!hasShield && hp == 1) || (hasShield && shieldHp == 0 && hp == 1))
 		{
@@ -1963,7 +2049,29 @@ public class PlayerControls : MonoBehaviour
 
 		yield return new WaitForSeconds(0.5f);
 		canMove = true;
+
+		if (movingVertically && movingVerticallyJumping)
+		{
+			yield return new WaitForSeconds(0.1f);
+			canMoveHorz = true;
+		}
 		
+		yield return new WaitForSeconds(0.5f);
+		canMoveHorz = canMove = movingToNextScene = invulnerable = false;
+	}
+
+	IEnumerator MoveOutOfStart()
+	{
+		canMove = movingToNextScene = invulnerable = true;
+		nextSceneSpeed = (model.localScale.x > 0) ? 1 : -1;
+		canMove = isCountingTime = false;
+
+		yield return new WaitForSeconds(1f);
+		canMove = true;
+		moveX = moveSpeed * nextSceneSpeed;
+		anim.SetBool("isWalking", true);
+		anim.SetFloat("moveSpeed", moveSpeed * nextSceneSpeed);
+
 		yield return new WaitForSeconds(0.5f);
 		canMove = movingToNextScene = invulnerable = false;
 	}
