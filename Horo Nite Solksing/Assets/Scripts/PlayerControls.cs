@@ -43,8 +43,12 @@ public class PlayerControls : MonoBehaviour
 	[Space] [Header("Platformer")]
 	[SerializeField] Rigidbody2D rb;
 	public Transform model;
-	[SerializeField] ParticleSystem dustTrailPs;
+
+	[Space] [SerializeField] ParticleSystem dustTrailPs;
+	[SerializeField] ParticleSystem wallSlideTrailPsRight;
+	[SerializeField] ParticleSystem wallSlideTrailPsLeft;
 	private bool isDustTrailPlaying=true;
+	private bool isWallSlideTrailPlaying=true;
 	[SerializeField] float moveSpeed=5;
 	[SerializeField] float jumpDashForce=10;
 	[SerializeField] float jumpForce=10;
@@ -305,6 +309,8 @@ public class PlayerControls : MonoBehaviour
 	float t1;
 	float t2;
     Vector3 startPosition;
+    Vector3 newScenePos;
+	private bool stuckToNewScene;
 	private Transform stunLockPos;
     float stunLockTime=0.5f;
 
@@ -562,6 +568,10 @@ public class PlayerControls : MonoBehaviour
 
 	void FixedUpdate()
 	{
+		if (stuckToNewScene)
+		{
+			transform.position = this.newScenePos;
+		}
 		if (CanControl())
 		{
 			if (inShawAtk)
@@ -653,8 +663,8 @@ public class PlayerControls : MonoBehaviour
 	void DashMechanic(bool alreadyRegistered=false)
 	{
 		// First frame of pressing dash button
-		if (alreadyRegistered || (player.GetButtonDown("Dash") && dashCounter <= 0 && 
-			dashCooldownCounter <= 0))
+		if (alreadyRegistered || (!isLedgeGrabbing && player.GetButtonDown("Dash") 
+			&& dashCounter <= 0 && dashCooldownCounter <= 0))
 		{
 			isDashing = true; // keep dashing if on ground
 			isJumping = jumpDashed = jumped = false;
@@ -683,7 +693,7 @@ public class PlayerControls : MonoBehaviour
 			activeMoveSpeed = dashBurstSpeed;
 			anim.SetFloat("moveSpeed", dashBurstSpeed);
 
-			if (model.localScale.x > 0)
+			if (IsFacingRight())
 				Instantiate(dashEffectL, dashSpawnPos.position, dashEffectL.transform.rotation, null);
 			else
 				Instantiate(dashEffectR, dashSpawnPos.position, dashEffectR.transform.rotation, null);
@@ -773,6 +783,7 @@ public class PlayerControls : MonoBehaviour
 
 	void ResetAllBools()
 	{
+		stuckToNewScene = false;
 		isJumping = jumpDashed = jumped = false;
 		airDashed = isDashing = false;
 		canLedgeGrab = ledgeGrab = false;
@@ -895,7 +906,7 @@ public class PlayerControls : MonoBehaviour
 		// dashing
 		else
 		{
-			bool facingRight = (model.localScale.x > 0);
+			bool facingRight = IsFacingRight();
 			rb.AddForce(
 				new Vector2((facingRight ? 1 : -1) * activeMoveSpeed * 5 * (risingAtk ? 0.5f : 1), 0), 
 				ForceMode2D.Force
@@ -976,6 +987,29 @@ public class PlayerControls : MonoBehaviour
 				dashCooldownCounter = 0;
 			}
 		}
+		if (wallSlideTrailPsRight != null && wallSlideTrailPsLeft != null)
+		{
+			if (isWallSlideTrailPlaying && !isWallSliding)
+			{
+				isWallSlideTrailPlaying = false;
+				wallSlideTrailPsRight.Stop(false, ParticleSystemStopBehavior.StopEmitting);
+				wallSlideTrailPsLeft.Stop(false, ParticleSystemStopBehavior.StopEmitting);
+			}
+			else if (!isWallSlideTrailPlaying && isWallSliding)
+			{
+				isWallSlideTrailPlaying = true;
+				if (IsFacingRight())
+				{
+					wallSlideTrailPsLeft.Emit(10);
+					wallSlideTrailPsLeft.Play();
+				}
+				else
+				{
+					wallSlideTrailPsRight.Emit(10);
+					wallSlideTrailPsRight.Play();
+				}
+			}
+		}
 	}
 	bool CheckIsCeiling()
 	{
@@ -991,6 +1025,11 @@ public class PlayerControls : MonoBehaviour
 		hasLedge = Physics2D.Raycast(ledgeCheckPos.position, new Vector2(moveDir, 0), ledgeGrabDist, whatIsGround);
 		hasWall = Physics2D.Raycast(wallCheckPos.position, new Vector2(moveDir, 0), ledgeGrabDist, whatIsGround);
 		canLedgeGrab = (!hasLedge && hasWall && !isGrounded);
+	}
+
+	bool IsFacingRight()
+	{
+		return model.localScale.x > 0;
 	}
 
 	void Attack()
@@ -1210,7 +1249,7 @@ public class PlayerControls : MonoBehaviour
 			toolSummonPos.position, 
 			Quaternion.identity
 		);
-		tool.toRight = model.localScale.x > 0 ? true : false;
+		tool.toRight = IsFacingRight();
 
 		// caltrops
 		if (tool.isMultiple)
@@ -1223,7 +1262,7 @@ public class PlayerControls : MonoBehaviour
 					Quaternion.identity
 				);
 				toolCopy.velocityMultiplier = UnityEngine.Random.Range(0.7f,1.3f);
-				toolCopy.toRight = model.localScale.x > 0 ? true : false;
+				toolCopy.toRight = IsFacingRight();
 			}
 		}
 	}
@@ -2014,7 +2053,7 @@ public class PlayerControls : MonoBehaviour
 	{
 		canMoveBegin = canMove = movingToNextScene = invulnerable = true;
 		if (movingVerticallyJumping)
-			nextSceneSpeed = (model.localScale.x > 0) ? 1 : -1;
+			nextSceneSpeed = (IsFacingRight()) ? 1 : -1;
 		else
 			nextSceneSpeed = (rb.velocity.x > 0) ? 1 : -1;
 		isWallJumping = isCountingTime = false;
@@ -2024,6 +2063,8 @@ public class PlayerControls : MonoBehaviour
 		yield return new WaitForSeconds(0.25f);
 		AsyncOperation loadingOperation = SceneManager.LoadSceneAsync(newSceneName);
 		float loadTime = 0;
+		rb.velocity = Vector2.zero;
+
 		// wait for scene to load
 		while (!loadingOperation.isDone && loadTime < 5)
 		{
@@ -2031,10 +2072,19 @@ public class PlayerControls : MonoBehaviour
 			yield return null;
 		}
 		isCountingTime = true;
+		isWallJumping = false;
 		canMoveBegin = canMoveHorz = canMove = false;
-		transform.position = newScenePos;
+		this.newScenePos = transform.position = newScenePos;
+		stuckToNewScene = true;
 		gm.transitionAnim.SetTrigger("reset");
+
 		CheckForCacoon();
+		if (wallSlideTrailPsRight != null)
+			wallSlideTrailPsRight.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
+		if (wallSlideTrailPsLeft != null)
+			wallSlideTrailPsLeft.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
+		if (dustTrailPs != null)
+			dustTrailPs.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
 		if (hp > 1 && soulLeakShortPs != null)
 		{
 			soulLeakShortPs.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
@@ -2048,6 +2098,7 @@ public class PlayerControls : MonoBehaviour
 		}
 
 		yield return new WaitForSeconds(0.5f);
+		stuckToNewScene = false;
 		canMove = true;
 
 		if (movingVertically && movingVerticallyJumping)
@@ -2066,13 +2117,13 @@ public class PlayerControls : MonoBehaviour
 		nextSceneSpeed = (model.localScale.x > 0) ? 1 : -1;
 		canMove = isCountingTime = false;
 
-		yield return new WaitForSeconds(1f);
+		yield return new WaitForSeconds(0.5f);
 		canMove = true;
 		moveX = moveSpeed * nextSceneSpeed;
 		anim.SetBool("isWalking", true);
 		anim.SetFloat("moveSpeed", moveSpeed * nextSceneSpeed);
 
-		yield return new WaitForSeconds(0.5f);
+		yield return new WaitForSeconds(0.75f);
 		canMove = movingToNextScene = invulnerable = false;
 	}
 
