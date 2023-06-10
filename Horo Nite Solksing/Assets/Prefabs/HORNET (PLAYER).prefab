@@ -610,6 +610,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   canvas: {fileID: 2578220128907752182}
   origSortOrder: 0
+  canvas2: {fileID: 0}
+  origSortOrder2: 0
 --- !u!1 &236188339956881194
 GameObject:
   m_ObjectHideFlags: 0
@@ -1540,7 +1542,7 @@ ParticleSystem:
     startSpeed:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 3
+      scalar: 2
       minScalar: 1
       maxCurve:
         serializedVersion: 2
@@ -16954,6 +16956,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   canvas: {fileID: 106109964530842489}
   origSortOrder: 0
+  canvas2: {fileID: 0}
+  origSortOrder2: 0
 --- !u!1 &2689765759359443425
 GameObject:
   m_ObjectHideFlags: 0
@@ -34500,6 +34504,8 @@ MonoBehaviour:
   extraHpMasks:
   - {fileID: 5116291158968895187}
   - {fileID: 3088768862464785581}
+  rosaries: 0
+  rosariesTxt: {fileID: 0}
   atkDmg: 0a000000080000000d00000009000000
   gossamerDmg: 4
   stabDmg: 30
@@ -34547,7 +34553,7 @@ MonoBehaviour:
   wallSlideTrailPsLeft: {fileID: 4550467043369855768}
   moveSpeed: 5
   jumpDashForce: 10
-  jumpForce: 5
+  jumpForce: 6
   fallSpeed: 2
   fallGrav: 1.15
   risingForce: 10
@@ -34561,14 +34567,18 @@ MonoBehaviour:
   ledgeCheckPos: {fileID: 5491880763718416450}
   wallCheckPos: {fileID: 5491880765103290502}
   ledgeGrabDist: 0.3
-  jumpMaxTimer: 0.5
+  jumpMaxTimer: 0.4
   groundCheck: {fileID: 5491880765153924470}
   closeToGroundCheck: {fileID: 1071892234939139619}
   groundCheckSize: {x: 0.35, y: 0.2}
   closeToGroundCheckSize: {x: 0.3, y: 1}
+  waterCheckSize: {x: 0.4, y: 1}
   whatIsGround:
     serializedVersion: 2
     m_Bits: 8
+  whatIsWater:
+    serializedVersion: 2
+    m_Bits: 16
   wallCheck: {fileID: 5491880764684567191}
   wallCheckSize: {x: 0.2, y: 0.85}
   wallSlideSpeed: 1.5
@@ -57815,7 +57825,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: -100
   m_Sprite: {fileID: 21300000, guid: 63ec1f644e5ca42b995d679581a91367, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.2}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.4}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -64035,7 +64045,7 @@ ParticleSystem:
     startSpeed:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 3
+      scalar: 2
       minScalar: 1
       maxCurve:
         serializedVersion: 2
@@ -75630,8 +75640,8 @@ ParticleSystem:
     startSpeed:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 3
-      minScalar: 1
+      scalar: 2
+      minScalar: 1.5
       maxCurve:
         serializedVersion: 2
         m_Curve:

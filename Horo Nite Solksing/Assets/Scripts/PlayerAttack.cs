@@ -39,6 +39,7 @@ public class PlayerAttack : MonoBehaviour
 
 	private void OnTriggerEnter2D(Collider2D other) 
 	{
+		bool hitSomething = false;
 		if (gameObject.CompareTag("Finish") && other.CompareTag("EnemyAttack"))
 		{
 			if (parryEffect != null)
@@ -63,14 +64,15 @@ public class PlayerAttack : MonoBehaviour
 					alreadyHit.Add(other.gameObject);
 			}
 			Enemy target = other.GetComponent<Enemy>();
-			Vector2 temp = (other.transform.position - transform.position).normalized;
-			float angleZ = 
-				Mathf.Atan2(Mathf.Abs(temp.y), temp.x) * Mathf.Rad2Deg;
 
 			if (target != null) 
 			{
+				hitSomething = true;
 				if (!target.inParryState)
 				{
+					Vector2 temp = (other.transform.position - transform.position).normalized;
+					float angleZ = 
+						Mathf.Atan2(Mathf.Abs(temp.y), temp.x) * Mathf.Rad2Deg;
 					Instantiate(
 						strikePs, 
 						other.transform.position, 
@@ -82,20 +84,31 @@ public class PlayerAttack : MonoBehaviour
 				if (isRushAttack)
 					dmg = p.rushDmg;
 
-				// stronger special
-				if ((isStabAttack || isGossamerStorm || isRushAttack) && p.crestNum == 1)
-					dmg = Mathf.RoundToInt(dmg * 1.25f);
-				// weaker special
-				else if ((isStabAttack || isGossamerStorm || isRushAttack) && p.crestNum == 2)
-					dmg = (int) (dmg * 0.75f);
-				else if ((isStabAttack || isGossamerStorm || isRushAttack) && p.crestNum == 3)
-					dmg = (int) (dmg * 0.85f);
+				if (isStabAttack || isGossamerStorm || isRushAttack)
+				{
+					switch (p.crestNum)
+					{
+						// stronger special
+						case 1:
+							dmg = Mathf.RoundToInt(dmg * 1.25f);
+							break;
+						// weaker special
+						case 2:
+							dmg = Mathf.RoundToInt(dmg * 0.75f);
+							break;
+						case 3:
+							dmg = Mathf.RoundToInt(dmg * 0.85f);
+							break;
+					}
+				}
+
 				target.TakeDamage(
 					dmg, 
 					isGossamerStorm ? transform : null,
 					new Vector2(p.model.localScale.x * forceDir.x, forceDir.y),
 					force
 				);
+
 				if (isShawAttack)
 					p.ShawRetreat(isDashAttack);
 				else if (isRisingAttack)
@@ -117,15 +130,16 @@ public class PlayerAttack : MonoBehaviour
 				else
 					alreadyHit.Add(other.gameObject);
 			}
-			Enemy target = other.GetComponent<Enemy>();
-			Vector2 temp = (other.transform.position - transform.position).normalized;
-			float angleZ = 
-				Mathf.Atan2(Mathf.Abs(temp.y), temp.x) * Mathf.Rad2Deg;
 
+			Enemy target = other.GetComponent<Enemy>();
 			if (target != null) 
 			{
+				hitSomething = true;
 				if (!target.inParryState)
 				{
+					Vector2 temp = (other.transform.position - transform.position).normalized;
+					float angleZ = 
+						Mathf.Atan2(Mathf.Abs(temp.y), temp.x) * Mathf.Rad2Deg;
 					Instantiate(
 						strikePs, 
 						other.transform.position, 
@@ -168,7 +182,47 @@ public class PlayerAttack : MonoBehaviour
 				// 	p.Recoil();
 			}
 		}
-		else if (other.CompareTag("Ground") && hasRecoil && !p.justParried)
+		if (other.CompareTag("Breakable"))
+		{
+			BreakableWall target = other.GetComponent<BreakableWall>();
+			if (target != null)
+			{
+				hitSomething = true;
+				int dmg = !isStabAttack ? (!isGossamerStorm ? p.atkDmg[p.crestNum] : p.gossamerDmg) : p.stabDmg;
+				if (isRushAttack)
+					dmg = p.rushDmg;
+
+				if (isStabAttack || isGossamerStorm || isRushAttack)
+				{
+					switch (p.crestNum)
+					{
+						// stronger special
+						case 1:
+							dmg = Mathf.RoundToInt(dmg * 1.25f);
+							break;
+						// weaker special
+						case 2:
+							dmg = Mathf.RoundToInt(dmg * 0.75f);
+							break;
+						case 3:
+							dmg = Mathf.RoundToInt(dmg * 0.85f);
+							break;
+					}
+				}
+
+				target.Damage(dmg);
+				
+				if (isShawAttack)
+					p.ShawRetreat(isDashAttack);
+				else if (isRisingAttack)
+					p.RisingAtkRetreat();
+				else if (hasRecoil && !p.justParried)
+					p.Recoil();
+				else if (!hitSomething && hasRecoil && !p.justParried)
+					p.Recoil();
+			}
+		}
+		if (!hitSomething && other.CompareTag("Ground") && hasRecoil && !p.justParried)
 			p.Recoil();
 	}
 }

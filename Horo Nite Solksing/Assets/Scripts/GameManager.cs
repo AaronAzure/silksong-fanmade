@@ -15,8 +15,10 @@ public class GameManager : MonoBehaviour
 	[field: SerializeField] public bool easyMode {get; private set;}
 	[field: SerializeField] public float invincibilityDuration {get; private set;}
 	[field: SerializeField] public HashSet<string> roomCleared;
-	[field: SerializeField] public HashSet<string>  enemiesDefeated;
+	[field: SerializeField] public HashSet<string> enemiesDefeated;
 	[field: SerializeField] public HashSet<string> bossCleared;
+	[field: SerializeField] public HashSet<string> destroyedStuff;
+	[field: SerializeField] public string firstScene="Scene1";
 
 
 	void Awake()
@@ -37,6 +39,13 @@ public class GameManager : MonoBehaviour
 		invincibilityDuration = easyMode ? 1.25f : 0.5f;
 	}
 
+	public void SetFirstSceneName()
+	{
+		firstScene = SceneManager.GetActiveScene().name;
+	}
+
+	// todo --------------------------------------------------------------------
+	// todo ----------------------- Enemies ------------------------------------
 	public void RegisterNameToEnemiesDefeated(string name)
 	{
 		if (enemiesDefeated == null)
@@ -59,6 +68,8 @@ public class GameManager : MonoBehaviour
 		enemiesDefeated.Clear();
 	}
 
+	// todo --------------------------------------------------------------------
+	// todo ------------------------ Arenas ------------------------------------
 	public void RegisterRoomClearedList(string name)
 	{
 		if (roomCleared == null)
@@ -82,6 +93,33 @@ public class GameManager : MonoBehaviour
 		roomCleared.Clear();
 	}
 
+	// todo --------------------------------------------------------------------
+	// todo ------------------------ Destroyed ---------------------------------
+	public void RegisterDestroyedList(string name)
+	{
+		if (destroyedStuff == null)
+			destroyedStuff = new HashSet<string>();
+
+		if (!destroyedStuff.Contains(SceneManager.GetActiveScene().name + " " + name))
+			destroyedStuff.Add(SceneManager.GetActiveScene().name + " " + name);
+	}
+	public bool CheckDestroyedList(string name)
+	{
+		if (destroyedStuff == null)
+			destroyedStuff = new HashSet<string>();
+
+		return destroyedStuff.Contains(SceneManager.GetActiveScene().name + " " + name);
+	}
+	public void ClearDestroyedList()
+	{
+		if (destroyedStuff == null)
+			destroyedStuff = new HashSet<string>();
+
+		destroyedStuff.Clear();
+	}
+
+	// todo --------------------------------------------------------------------
+	// todo ------------------------ Bosses ------------------------------------
 	public void RegisterBossClearedList(string name)
 	{
 		if (bossCleared == null)
@@ -105,6 +143,16 @@ public class GameManager : MonoBehaviour
 		bossCleared.Clear();
 	}
 
+
+	// todo --------------------------------------------------------------------
+	private void ClearAllHashsets()
+	{
+		ClearBossClearedList();
+		ClearEnemiesDefeated();
+		ClearRoomClearedList();
+		ClearDestroyedList();
+	}
+
 	public void Restart()
 	{
 		StartCoroutine( RestartCo() );
@@ -121,11 +169,9 @@ public class GameManager : MonoBehaviour
 			PlayerControls.Instance.DestroyItself();
 
 		yield return new WaitForSecondsRealtime(0.5f);
-		GameManager.Instance.ClearBossClearedList();
-		GameManager.Instance.ClearEnemiesDefeated();
-		GameManager.Instance.ClearRoomClearedList();
+		ClearAllHashsets();
 
-		AsyncOperation loadingOperation = SceneManager.LoadSceneAsync("Scene1");
+		AsyncOperation loadingOperation = SceneManager.LoadSceneAsync(firstScene);
 		Time.timeScale = 1;
 		float loadTime = 0;
 		// wait for scene to load
@@ -221,9 +267,7 @@ public class GameManager : MonoBehaviour
 			PlayerControls.Instance.DestroyItself();
 
 		yield return new WaitForSecondsRealtime(0.5f);
-		GameManager.Instance.ClearBossClearedList();
-		GameManager.Instance.ClearEnemiesDefeated();
-		GameManager.Instance.ClearRoomClearedList();
+		ClearAllHashsets();
 
 		AsyncOperation loadingOperation = SceneManager.LoadSceneAsync("0TitleScreen");
 		Time.timeScale = 1;

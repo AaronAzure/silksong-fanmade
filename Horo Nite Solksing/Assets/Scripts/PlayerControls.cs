@@ -25,6 +25,8 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] int hp;
 	[SerializeField] GameObject[] extraHp;
 	[SerializeField] GameObject[] extraHpMasks;
+	[SerializeField] int rosaries;
+	[SerializeField] TextMeshProUGUI rosariesTxt;
 	public int[] atkDmg={10,8,15,10};
 	public int gossamerDmg=5;
 	public int stabDmg=30;
@@ -54,7 +56,7 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] float jumpForce=10;
 	[SerializeField] float fallSpeed=3;
 	[SerializeField] float fallGrav=1.2f;
-	private bool isFalling;
+	// private bool isFalling;
 	[SerializeField] float risingForce=10;
 	[SerializeField] Vector2 wallJumpForce;
 	private float origGrav;
@@ -74,6 +76,7 @@ public class PlayerControls : MonoBehaviour
 	private bool isGrounded;
 	private bool isCloseToGround;
 	private bool jumpRegistered;
+	private bool inWater;
 	private bool isPogoing;
 	private bool isPaused;
 	private bool isPauseMenu1;
@@ -102,7 +105,9 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] Transform closeToGroundCheck;
 	[SerializeField] Vector2 groundCheckSize;
 	[SerializeField] Vector2 closeToGroundCheckSize;
+	[SerializeField] Vector2 waterCheckSize;
 	[SerializeField] LayerMask whatIsGround;
+	[SerializeField] LayerMask whatIsWater;
 	[SerializeField] Transform wallCheck;
 	[SerializeField] Vector2 wallCheckSize;
 	[SerializeField] float wallSlideSpeed=2;
@@ -318,7 +323,11 @@ public class PlayerControls : MonoBehaviour
 	void Awake()
 	{
 		if (Instance == null)
+		{
 			Instance = this;
+			if (GameManager.Instance != null)
+				GameManager.Instance.SetFirstSceneName();
+		}
 		else
 			Destroy(gameObject);
 		DontDestroyOnLoad(gameObject);
@@ -417,25 +426,6 @@ public class PlayerControls : MonoBehaviour
 		yield return null;
 		isPaused = false;
 		pauseCo = null;
-	}
-
-	private void OnDrawGizmosSelected() 
-	{
-		if (closeToGroundCheck != null)
-		{
-			Gizmos.color = Color.yellow;
-			Gizmos.DrawCube(closeToGroundCheck.position, closeToGroundCheckSize);
-		}
-		// if (ledgeCheckPos != null)
-		// {
-		// 	Gizmos.color = Color.green;
-		// 	Gizmos.DrawLine(ledgeCheckPos.position, ledgeCheckPos.position + new Vector3(model.localScale.x * ledgeGrabDist, 0));
-		// }
-		// if (wallCheckPos != null)
-		// {
-		// 	Gizmos.color = Color.yellow;
-		// 	Gizmos.DrawLine(wallCheckPos.position, wallCheckPos.position + new Vector3(model.localScale.x * ledgeGrabDist, 0));
-		// }
 	}
 
 	private string ConvertToTime(TimeSpan time)
@@ -582,6 +572,7 @@ public class PlayerControls : MonoBehaviour
 					rb.velocity = new Vector2(moveDir * dashSpeed, rb.velocity.y);
 
 				CheckIsGrounded();
+				CheckIsInWater();
 				CheckIsWalledWhistShaw();
 				if (atkDir == 2 && (isGrounded || isWallSliding))
 				{
@@ -597,6 +588,7 @@ public class PlayerControls : MonoBehaviour
 
 				CheckIsCloseToGround();
 				CheckIsGrounded();
+				CheckIsInWater();
 				CheckIsWalled();
 
 				// Dash
@@ -928,6 +920,11 @@ public class PlayerControls : MonoBehaviour
 			model.localScale = new Vector3(-1, 1, 1);
 	}
 
+	void CheckIsInWater()
+	{
+		inWater = Physics2D.OverlapBox(model.position, waterCheckSize, 0, whatIsWater);
+		Debug.Log("<color=cyan>" + (inWater ? "In water" : "NOT") + "</color>");
+	}
 	void CheckIsGrounded()
 	{
 		isGrounded = Physics2D.OverlapBox(groundCheck.position, groundCheckSize, 0, whatIsGround);
@@ -2075,7 +2072,7 @@ public class PlayerControls : MonoBehaviour
 		isWallJumping = false;
 		canMoveBegin = canMoveHorz = canMove = false;
 		this.newScenePos = transform.position = newScenePos;
-		stuckToNewScene = true;
+		if (movingVertically) stuckToNewScene = true;
 		gm.transitionAnim.SetTrigger("reset");
 
 		CheckForCacoon();
@@ -2098,7 +2095,7 @@ public class PlayerControls : MonoBehaviour
 		}
 
 		yield return new WaitForSeconds(0.5f);
-		stuckToNewScene = false;
+		if (movingVertically) stuckToNewScene = false;
 		canMove = true;
 
 		if (movingVertically && movingVerticallyJumping)
@@ -2331,6 +2328,8 @@ public class PlayerControls : MonoBehaviour
 	{
 		collectedCacoon = true;
 		gm.Restart();
+		if (UiMouseSupport.Instance != null)
+			UiMouseSupport.Instance.RevertToOriginalSortingOrder();
 	}
 	public void REMAP_CONTROLS()
 	{
