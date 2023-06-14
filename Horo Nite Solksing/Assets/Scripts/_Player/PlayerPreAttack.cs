@@ -24,5 +24,10 @@ public class PlayerPreAttack : MonoBehaviour
 			done = true;
 			p.ShawRetreat(false);
 		}
+		else if (!done && other.CompareTag("Breakable"))
+		{
+			done = true;
+			p.ShawRetreat(false);
+		}
 	}
 }

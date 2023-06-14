@@ -48,7 +48,7 @@ public class PlayerHitbox : MonoBehaviour
 		}
 		if (other.CompareTag("Breakable"))
 		{
-			BreakableWall target = other.GetComponent<BreakableWall>();
+			Breakable target = other.GetComponent<Breakable>();
 			if (target != null) 
 			{
 				target.Damage(dmg);

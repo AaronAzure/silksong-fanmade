@@ -2,17 +2,80 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Breakable : MonoBehaviour
+public abstract class Breakable : MonoBehaviour
 {
+	[SerializeField] protected Animator anim;
+	[field: SerializeField] public bool hasRecoil {get; private set;}=true;
+	[field: SerializeField] public bool hasShawRecoil {get; private set;}=true;
+	[SerializeField] protected int hp;
+	[SerializeField] protected ParticleSystem dmgFx;
+	[SerializeField] protected int minEmit=25;
+	[SerializeField] protected int maxEmit=35;
+	[SerializeField] protected GameObject destroyedObj;
+
+	[Space] [SerializeField] protected Animator[] revealAnims;
+	[SerializeField] protected Collider2D col;
+	protected GameManager gm;
+
+
     // Start is called before the first frame update
     void Start()
     {
-        
+        CallChildOnStart();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    protected virtual void CallChildOnStart()
+	{
+
+	}
+
+	public void Damage(int dmg)
+	{
+		CallChildOnDamage(dmg);
+	}
+
+    protected virtual void CallChildOnDamage(int dmg)
+	{
+		if (hp > 0)
+		{
+			hp -= dmg;
+			if (dmgFx != null)
+			{
+				dmgFx.Emit(Random.Range(minEmit, maxEmit+1));
+			}
+			if (hp > 0 && anim != null)
+			{
+				anim.SetTrigger("damage");
+			}
+			if (hp <= 0)
+			{
+				// Destroyed VFX
+				if (destroyedObj != null)
+				{
+					destroyedObj.SetActive(true);
+				}
+				// Don't respawn
+				if (gm != null)
+				{
+					gm.RegisterDestroyedList(name);
+				}
+				// Reveal any secrets
+				if (revealAnims != null)
+				{
+					foreach (Animator revealAnim in revealAnims)
+						revealAnim.SetTrigger("reveal");
+				}
+				// Disable colision
+				if (col != null)
+				{
+					col.enabled = false;
+				}
+				// Else, destroy itself
+				else
+				{
+					Destroy(gameObject);
+				}
+			}
+		}
+	}
 }

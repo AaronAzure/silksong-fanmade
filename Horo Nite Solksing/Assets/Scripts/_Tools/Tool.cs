@@ -112,7 +112,7 @@ public abstract class Tool : MonoBehaviour
 	}
 	protected virtual void CallChildOnBreakableHit(Collider2D other)
 	{
-		BreakableWall target = other.GetComponent<BreakableWall>();
+		Breakable target = other.GetComponent<Breakable>();
 		if (target != null) 
 		{
 			target.Damage(

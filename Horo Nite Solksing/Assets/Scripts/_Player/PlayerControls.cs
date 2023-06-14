@@ -152,6 +152,7 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] Sprite emptySpoolSpr;
 	[SerializeField] GameObject cacoonObj;
 	[SerializeField] GameObject deathAnimObj;
+	[SerializeField] GameObject areaCanvas;
 
 
 	[Space] [Header("Sound effects")]
@@ -210,6 +211,7 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] SawBlade sawBlade;
 
 	[Space] [SerializeField] Transform toolSummonPos;
+	[SerializeField] GameObject toolGaugeUi;
 	[SerializeField] Tool[] tools;
 	[SerializeField] Tool tool1;
 	[SerializeField] Tool tool2;
@@ -489,7 +491,10 @@ public class PlayerControls : MonoBehaviour
 		{
 			// close inventory
 			if (isPauseMenu1 && (player.GetButtonDown("No") || player.GetButtonDown("Minus")))
+			{
 				pauseAnim.SetTrigger("close");
+				toolGaugeUi.SetActive(tool1 != null);
+			}
 			// close Pause
 			if (!isPauseMenu1 && canExitPause2Menu && (player.GetButtonDown("No") || player.GetButtonDown("Start")))
 				pause2Anim.SetTrigger("close");
@@ -2134,6 +2139,7 @@ public class PlayerControls : MonoBehaviour
 
 		yield return new WaitForSeconds(0.75f);
 		started = canMove = movingToNextScene = invulnerable = false;
+		areaCanvas.SetActive(true);
 	}
 
 

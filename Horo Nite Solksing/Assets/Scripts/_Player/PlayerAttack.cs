@@ -184,7 +184,7 @@ public class PlayerAttack : MonoBehaviour
 		}
 		if (other.CompareTag("Breakable"))
 		{
-			BreakableWall target = other.GetComponent<BreakableWall>();
+			Breakable target = other.GetComponent<Breakable>();
 			if (target != null)
 			{
 				hitSomething = true;
@@ -212,13 +212,13 @@ public class PlayerAttack : MonoBehaviour
 
 				target.Damage(dmg);
 				
-				if (isShawAttack)
+				if (target.hasShawRecoil && isShawAttack && !isDashAttack)
 					p.ShawRetreat(isDashAttack);
-				else if (isRisingAttack)
+				else if (target.hasShawRecoil && isRisingAttack)
 					p.RisingAtkRetreat();
-				else if (hasRecoil && !p.justParried)
+				else if (target.hasRecoil && hasRecoil && !p.justParried)
 					p.Recoil();
-				else if (!hitSomething && hasRecoil && !p.justParried)
+				else if (target.hasRecoil && !hitSomething && hasRecoil && !p.justParried)
 					p.Recoil();
 			}
 		}
