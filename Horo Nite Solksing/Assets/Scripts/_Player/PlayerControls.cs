@@ -276,6 +276,7 @@ public class PlayerControls : MonoBehaviour
 
 	private bool invulnerable;
 	private float nextSceneSpeed;
+	[HideInInspector] public bool started = true;
 	private bool movingToNextScene;
 	private bool movingVertically;	// jumping or falling through new scene 
 	private bool movingVerticallyJumping;
@@ -315,6 +316,7 @@ public class PlayerControls : MonoBehaviour
 	float t2;
     Vector3 startPosition;
     Vector3 newScenePos;
+    public int exitPointInd {get; private set;}=-1;
 	private bool stuckToNewScene;
 	private Transform stunLockPos;
     float stunLockTime=0.5f;
@@ -923,7 +925,7 @@ public class PlayerControls : MonoBehaviour
 	void CheckIsInWater()
 	{
 		inWater = Physics2D.OverlapBox(model.position, waterCheckSize, 0, whatIsWater);
-		Debug.Log("<color=cyan>" + (inWater ? "In water" : "NOT") + "</color>");
+		// Debug.Log("<color=cyan>" + (inWater ? "In water" : "NOT") + "</color>");
 	}
 	void CheckIsGrounded()
 	{
@@ -1688,7 +1690,8 @@ public class PlayerControls : MonoBehaviour
 				// jumping up to new scene
 				movingVerticallyJumping = n.transform.position.y - self.position.y > 0;
 			}
-			StartCoroutine( MoveToNextScene(n.newSceneName, n.newScenePos) );
+			exitPointInd = n.exitIndex;
+			StartCoroutine( MoveToNextSceneCo(n.newSceneName) );
 		}
 		if (!isFinished && other.CompareTag("Goal"))
 		{
@@ -2046,7 +2049,7 @@ public class PlayerControls : MonoBehaviour
 	}
 
 
-	IEnumerator MoveToNextScene(string newSceneName, Vector2 newScenePos)
+	IEnumerator MoveToNextSceneCo(string newSceneName)
 	{
 		canMoveBegin = canMove = movingToNextScene = invulnerable = true;
 		if (movingVerticallyJumping)
@@ -2059,15 +2062,24 @@ public class PlayerControls : MonoBehaviour
 
 		yield return new WaitForSeconds(0.25f);
 		AsyncOperation loadingOperation = SceneManager.LoadSceneAsync(newSceneName);
-		float loadTime = 0;
+		// float loadTime = 0;
 		rb.velocity = Vector2.zero;
 
 		// wait for scene to load
-		while (!loadingOperation.isDone && loadTime < 5)
-		{
-			loadTime += Time.deltaTime;
-			yield return null;
-		}
+		// while (!loadingOperation.isDone && loadTime < 5)
+		// {
+		// 	loadTime += Time.deltaTime;
+		// 	yield return null;
+		// }
+	}
+
+	public void MoveOutOfNewScene(Vector2 newScenePos)
+	{
+		StartCoroutine( MoveOutOfNewSceneCo(newScenePos) );
+	}
+
+	IEnumerator MoveOutOfNewSceneCo(Vector2 newScenePos)
+	{
 		isCountingTime = true;
 		isWallJumping = false;
 		canMoveBegin = canMoveHorz = canMove = false;
@@ -2110,7 +2122,7 @@ public class PlayerControls : MonoBehaviour
 
 	IEnumerator MoveOutOfStart()
 	{
-		canMove = movingToNextScene = invulnerable = true;
+		started = canMove = movingToNextScene = invulnerable = true;
 		nextSceneSpeed = (model.localScale.x > 0) ? 1 : -1;
 		canMove = isCountingTime = false;
 
@@ -2121,7 +2133,7 @@ public class PlayerControls : MonoBehaviour
 		anim.SetFloat("moveSpeed", moveSpeed * nextSceneSpeed);
 
 		yield return new WaitForSeconds(0.75f);
-		canMove = movingToNextScene = invulnerable = false;
+		started = canMove = movingToNextScene = invulnerable = false;
 	}
 
 

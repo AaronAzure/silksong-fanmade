@@ -43,6 +43,7 @@ public abstract class Enemy : MonoBehaviour
 	
 	[Space] [Header("Platformer Related")]
 	[SerializeField] protected bool isSmart; // if attacked face direction;
+	[SerializeField] protected bool isStupid; // if attacked face direction;
 	[SerializeField] protected bool controlledByAnim;
 	[SerializeField] protected bool cannotTakeKb;
 	[SerializeField] protected bool cannotTakeDmg;
@@ -52,8 +53,8 @@ public abstract class Enemy : MonoBehaviour
 	[SerializeField] float runSpeed=5;
 	[SerializeField] Transform groundDetect;
 	[SerializeField] Transform wallDetect;
-	[SerializeField] float groundDistDetect=0.5f;
-	[SerializeField] float wallDistDetect=1;
+	[SerializeField] float groundDistDetect=1f;
+	[SerializeField] float wallDistDetect=0.5f;
 	[SerializeField] LayerMask whatIsPlayer;
 	[SerializeField] LayerMask whatIsGround;
 	[SerializeField] LayerMask finalMask;
@@ -67,9 +68,10 @@ public abstract class Enemy : MonoBehaviour
 	[SerializeField] Vector2 groundCheckSize;
 
 	
-	[Space] protected CurrentAction currentAction=0;
+	[Space] [SerializeField] protected CurrentAction currentAction=0;
 	private float idleCounter=0;
 	[SerializeField] float idleTotalCounter=5;
+	[SerializeField] bool immediateFlip;
 	[SerializeField] [Range(-1,1)] int initDir=-1;
 	protected int nextDir;
 	protected Coroutine jumpCo;
@@ -189,6 +191,7 @@ public abstract class Enemy : MonoBehaviour
 			inArea.SwapParent(transform);
 			gameObject.SetActive(false);
 		}
+		Debug.Log($"initDir = {initDir}, nextDir = {nextDir}");
     }
 
 	public virtual void FixedUpdate()
@@ -203,8 +206,11 @@ public abstract class Enemy : MonoBehaviour
 		else
 			AttackingAction();
 
-		inSight = PlayerInSight();
-		KeepLookingForPlayer();
+		if (!isStupid)
+		{
+			inSight = PlayerInSight();
+			KeepLookingForPlayer();
+		}
 
 		if (!isFlying)
 		{
@@ -537,7 +543,7 @@ public abstract class Enemy : MonoBehaviour
 	protected void WalkAround()
 	{
 		idleCounter += Time.fixedDeltaTime;
-		if (idleCounter > idleTotalCounter)
+		if (!immediateFlip && idleCounter > idleTotalCounter)
 		{
 			idleCounter = 0;
 			currentAction = currentAction + nextDir;
@@ -547,10 +553,20 @@ public abstract class Enemy : MonoBehaviour
 				nextDir = 1;
 		}
 		// stop moving if about to walk into wall or off cliff
-		else if (!inSight && currentAction != 0 && CheckSurrounding())
+		else if (isGrounded && !inSight && currentAction != 0 && CheckSurrounding())
 		{
-			idleCounter = 0;
-			currentAction = CurrentAction.none;
+			if (immediateFlip)
+			{
+				if (currentAction == CurrentAction.right)
+					currentAction = CurrentAction.left;
+				else if (currentAction == CurrentAction.left)
+					currentAction = CurrentAction.right;
+			}
+			else
+			{
+				idleCounter = 0;
+				currentAction = CurrentAction.none;
+			}
 		}
 
 		if (receivingKb)

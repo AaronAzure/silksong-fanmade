@@ -10,7 +10,6 @@ public class Stuart : Enemy
 
 	protected override void CallChildOnStart()
 	{
-		// base.CallChildOnStart();
 		StartCoroutine( ToggleJump() );
 	}
 

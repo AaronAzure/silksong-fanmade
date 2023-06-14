@@ -46,6 +46,18 @@ public class PlayerHitbox : MonoBehaviour
 				}
 			}
 		}
+		if (other.CompareTag("Breakable"))
+		{
+			BreakableWall target = other.GetComponent<BreakableWall>();
+			if (target != null) 
+			{
+				target.Damage(dmg);
+				if (isSawBlade && sawBlade != null)
+				{
+					sawBlade.HitEnemy();
+				}
+			}
+		}
 	}
 
 

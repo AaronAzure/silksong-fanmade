@@ -74,6 +74,14 @@ public abstract class Tool : MonoBehaviour
 					CallChildOnHit();
 				}
 			}
+			if (other.CompareTag("Breakable"))
+			{
+				CallChildOnBreakableHit(other);
+				if (destroyOnEnemyHit)
+				{
+					CallChildOnHit();
+				}
+			}
 		}
 	}
 
@@ -99,6 +107,16 @@ public abstract class Tool : MonoBehaviour
 				dmg, 
 				transform, kbDir, 
 				force
+			);
+		}
+	}
+	protected virtual void CallChildOnBreakableHit(Collider2D other)
+	{
+		BreakableWall target = other.GetComponent<BreakableWall>();
+		if (target != null) 
+		{
+			target.Damage(
+				dmg
 			);
 		}
 	}
