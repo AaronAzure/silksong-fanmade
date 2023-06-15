@@ -7,6 +7,7 @@ public abstract class Breakable : MonoBehaviour
 	[SerializeField] protected Animator anim;
 	[field: SerializeField] public bool hasRecoil {get; private set;}=true;
 	[field: SerializeField] public bool hasShawRecoil {get; private set;}=true;
+	[field: SerializeField] public bool canBeHit {get; private set;}=true;
 	[SerializeField] protected int hp;
 	[SerializeField] protected ParticleSystem dmgFx;
 	[SerializeField] protected int minEmit=25;
@@ -14,6 +15,7 @@ public abstract class Breakable : MonoBehaviour
 	[SerializeField] protected GameObject destroyedObj;
 
 	[Space] [SerializeField] protected Animator[] revealAnims;
+	[SerializeField] protected Breakable[] breakables;
 	[SerializeField] protected Collider2D col;
 	protected GameManager gm;
 
@@ -31,7 +33,8 @@ public abstract class Breakable : MonoBehaviour
 
 	public void Damage(int dmg)
 	{
-		CallChildOnDamage(dmg);
+		if (canBeHit)
+			CallChildOnDamage(dmg);
 	}
 
     protected virtual void CallChildOnDamage(int dmg)
@@ -65,6 +68,13 @@ public abstract class Breakable : MonoBehaviour
 					foreach (Animator revealAnim in revealAnims)
 						revealAnim.SetTrigger("reveal");
 				}
+				// Reveal any secrets
+				if (breakables != null)
+				{
+					foreach (Breakable breakable in breakables)
+						if (breakable != null)
+							breakable.EnableCanBeHit();
+				}
 				// Disable colision
 				if (col != null)
 				{
@@ -77,5 +87,15 @@ public abstract class Breakable : MonoBehaviour
 				}
 			}
 		}
+	}
+
+	public void EnableCanBeHit()
+	{
+		StartCoroutine( EnableCanBeHitCo() );
+	}
+	private IEnumerator EnableCanBeHitCo()
+	{
+		yield return new WaitForSeconds(0.5f);
+		canBeHit = true;
 	}
 }

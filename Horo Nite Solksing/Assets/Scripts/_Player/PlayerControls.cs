@@ -25,7 +25,9 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] int hp;
 	[SerializeField] GameObject[] extraHp;
 	[SerializeField] GameObject[] extraHpMasks;
-	[SerializeField] int rosaries;
+	[SerializeField] int nRosaries;
+	[SerializeField] ParticleSystem rosaryCollectPs;
+	private int oldRosaries;
 	[SerializeField] TextMeshProUGUI rosariesTxt;
 	public int[] atkDmg={10,8,15,10};
 	public int gossamerDmg=5;
@@ -442,6 +444,16 @@ public class PlayerControls : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
+		if (rosariesTxt != null)
+		{
+			if (nRosaries != oldRosaries)
+			{
+				oldRosaries = nRosaries;
+				rosariesTxt.text = nRosaries.ToString();
+			}
+		}
+
+
 		if (isFinished && !replaying)
 		{
 			if (finTime < 3.25f)
@@ -2294,6 +2306,16 @@ public class PlayerControls : MonoBehaviour
 	public int IncreaseKills()
 	{
 		return ++nKilled;
+	}
+
+	public void GainCurrency(int x)
+	{
+		nRosaries += x;
+		if (x > 0 && rosaryCollectPs != null)
+		{
+			rosaryCollectPs.Emit(2);
+		}
+		nRosaries = Mathf.Max(0, nRosaries);
 	}
 
 

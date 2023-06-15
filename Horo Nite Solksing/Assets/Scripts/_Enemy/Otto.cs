@@ -24,7 +24,8 @@ public class Otto : Enemy
     protected override void IdleAction()
 	{
 		FlyAround();
-			anim.SetFloat("moveSpeed", 1);
+		anim.SetFloat("moveSpeed", 1);
+		
 		if (chase)
 		{
 			chase = false;

@@ -191,7 +191,7 @@ public abstract class Enemy : MonoBehaviour
 			inArea.SwapParent(transform);
 			gameObject.SetActive(false);
 		}
-		Debug.Log($"initDir = {initDir}, nextDir = {nextDir}");
+		// Debug.Log($"initDir = {initDir}, nextDir = {nextDir}");
     }
 
 	public virtual void FixedUpdate()
