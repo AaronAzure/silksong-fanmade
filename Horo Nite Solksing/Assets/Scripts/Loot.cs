@@ -4,15 +4,20 @@ using UnityEngine;
 
 public class Loot : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    [SerializeField] int value=5;
+	[SerializeField] Rosary rosary;
+	[SerializeField] float xForce=8;
+	[SerializeField] float yForce=8;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+	public void SpawnLoot()
+	{
+		for (int i=0 ; i<value ; i++)
+		{
+			var o = Instantiate(rosary, transform.position, Quaternion.identity);
+			o.rb.AddForce(new Vector2(
+				Random.Range(-xForce, xForce), 
+				yForce
+			), ForceMode2D.Impulse);
+		}
+	}
 }

@@ -115,6 +115,7 @@ Transform:
   - {fileID: 1572559680932854438}
   - {fileID: 1572559682082748581}
   - {fileID: 1572559680920057666}
+  - {fileID: 625404276881965521}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -133,15 +134,18 @@ MonoBehaviour:
   anim: {fileID: 0}
   <hasRecoil>k__BackingField: 1
   <hasShawRecoil>k__BackingField: 1
+  <canBeHit>k__BackingField: 1
   hp: 1
   dmgFx: {fileID: 0}
   minEmit: 25
   maxEmit: 35
   destroyedObj: {fileID: 0}
   revealAnims: []
+  breakables: []
   col: {fileID: 0}
   openStateObj: {fileID: 1572559680920057665}
   closedStateObj: {fileID: 1572559682082748580}
+  loot: {fileID: 1030514177344750993}
 --- !u!50 &6227192879194212861
 Rigidbody2D:
   serializedVersion: 4
@@ -644,3 +648,50 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!1 &8483555932546302168
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 625404276881965521}
+  - component: {fileID: 1030514177344750993}
+  m_Layer: 3
+  m_Name: LOOT
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &625404276881965521
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8483555932546302168}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -0.2, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1572559680840855541}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1030514177344750993
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8483555932546302168}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63c7b77180fb34acc93eee939dbfc652, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  value: 5
+  rosary: {fileID: 6128387865865937862, guid: 014b4766ecfaf47029dd734a70c89a84, type: 3}
+  xForce: 8
+  yForce: 8

@@ -6,6 +6,7 @@ public class Chest : Breakable
 {
 	[SerializeField] GameObject openStateObj;
 	[SerializeField] GameObject closedStateObj;
+	[SerializeField] Loot loot;
 
 
 	protected override void CallChildOnDamage(int dmg)
@@ -17,6 +18,10 @@ public class Chest : Breakable
 		if (closedStateObj != null)
 		{
 			closedStateObj.SetActive(false);
+		}
+		if (loot != null)
+		{
+			loot.SpawnLoot();
 		}
 		Destroy(this);
 	}
