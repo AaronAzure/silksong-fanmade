@@ -15,15 +15,15 @@ public class OnTriggerTest : MonoBehaviour
 			master = obj.transform;
 	}
 
-	public void SwapParent(Transform o, bool thisIsParent=true)
+	public void SwapParent(bool thisIsParent=true)
 	{
 		if (!thisIsParent)
-			o.parent = null;
-		transform.parent = thisIsParent ? null : o;
+			master.parent = null;
+		transform.parent = thisIsParent ? null : master;
 		if (thisIsParent)
 		{
-			transform.position = o.position;
-			o.parent = transform;
+			transform.position = master.position;
+			master.parent = transform;
 		}
 	}
 
@@ -32,7 +32,7 @@ public class OnTriggerTest : MonoBehaviour
 		if (obj != null && other.CompareTag("MainCamera"))	
 		{
 			obj.SetActive(true);	
-			SwapParent(master, false);
+			SwapParent(false);
 		}
 	}
 
@@ -41,7 +41,7 @@ public class OnTriggerTest : MonoBehaviour
 		if (obj != null && other.CompareTag("MainCamera2"))	
 		{
 			obj.SetActive(false);
-			SwapParent(master, true);
+			SwapParent(true);
 		}
 	}
 }

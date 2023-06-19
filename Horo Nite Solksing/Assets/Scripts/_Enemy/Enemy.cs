@@ -16,7 +16,7 @@ public abstract class Enemy : MonoBehaviour
 
 
 	[Space] [SerializeField] DmgPopup dmgPopup;
-	[SerializeField] OnTriggerTest inArea;
+	[SerializeField] protected OnTriggerTest inArea;
 
 
 	[Space] [SerializeField] protected int staggerCount=150;
@@ -158,6 +158,11 @@ public abstract class Enemy : MonoBehaviour
 	protected virtual void CallChildOnHurtAfter() { }
 	protected virtual void CallChildOnDeath() { }
 	protected virtual void CallChildOnParry() { }
+	protected virtual void CallChildOnInAreaSwap() 
+	{ 
+		inArea.SwapParent();
+		gameObject.SetActive(false);
+	}
 
 
 	public void RoomEnter()
@@ -199,8 +204,7 @@ public abstract class Enemy : MonoBehaviour
 
 		if (room == null && inArea != null)
 		{
-			inArea.SwapParent(transform);
-			gameObject.SetActive(false);
+			CallChildOnInAreaSwap();
 		}
 		// Debug.Log($"initDir = {initDir}, nextDir = {nextDir}");
     }

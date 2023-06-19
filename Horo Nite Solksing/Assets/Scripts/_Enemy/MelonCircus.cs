@@ -6,9 +6,12 @@ public class MelonCircus : Enemy
 {
 	private float momentumSpeed;
 	[SerializeField] GameObject melonBallObj;
+	[SerializeField] Animator ballAnim;
+	private bool chased=true;
 
 
-	protected override void CallChildOnStart()
+
+	private void OnEnable()
 	{
 		if (melonBallObj != null)
 		{
@@ -17,14 +20,38 @@ public class MelonCircus : Enemy
 		}
 	}
 
+
+	protected override void CallChildOnFixedUpdate()
+	{
+		if (ballAnim != null)
+		{
+			ballAnim.SetFloat("moveSpeed", Mathf.Abs(rb.velocity.x));
+		}
+	}
+
+	protected override void CallChildOnInAreaSwap()
+	{
+		inArea.SwapParent();
+		melonBallObj.SetActive(false);
+	}
+
     protected override void IdleAction()
 	{
 		WalkAround();
+		if (chased && anim != null)
+		{
+			chased = false;
+			anim.SetFloat("moveSpeed", 1);
+		}
 	}
-
 
 	protected override void AttackingAction()
 	{
+		if (!chased && anim != null)
+		{
+			chased = true;
+			anim.SetFloat("moveSpeed", chaseSpeed * 2);
+		}
 		if (isGrounded)
 			ChasePlayer();
 		// cannot change direction whilst falling
