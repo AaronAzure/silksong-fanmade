@@ -5303,6 +5303,7 @@ GameObject:
   - component: {fileID: 3863455304976629544}
   - component: {fileID: 3863455304976629545}
   - component: {fileID: 3863455304976629557}
+  - component: {fileID: 1404207912}
   m_Layer: 0
   m_Name: Aaron GAME MANAGER (rewired)
   m_TagString: Untagged
@@ -7031,6 +7032,26 @@ MonoBehaviour:
   <showDmg>k__BackingField: 0
   <easyMode>k__BackingField: 0
   <invincibilityDuration>k__BackingField: 0.5
+  firstScene: Scene1
+  rewiredInput: {fileID: 3863455304976629545}
+--- !u!114 &1404207912
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3863455304976629558}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 307e2fe016d34e8438488ad3bf56abd2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isEnabled: 1
+  loadDataOnStart: 1
+  loadJoystickAssignments: 1
+  loadKeyboardAssignments: 1
+  loadMouseAssignments: 1
+  playerPrefsKeyPrefix: RewiredSaveData
 --- !u!1 &5917572539383318040
 GameObject:
   m_ObjectHideFlags: 0
