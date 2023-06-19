@@ -7,6 +7,7 @@ public abstract class Breakable : MonoBehaviour
 	[SerializeField] protected Animator anim;
 	[field: SerializeField] public bool hasRecoil {get; private set;}=true;
 	[field: SerializeField] public bool hasShawRecoil {get; private set;}=true;
+	[field: SerializeField] public bool hasDashRecoil {get; private set;}=true;
 	[field: SerializeField] public bool canBeHit {get; private set;}=true;
 	[SerializeField] protected int hp;
 	[SerializeField] protected ParticleSystem dmgFx;
@@ -16,6 +17,7 @@ public abstract class Breakable : MonoBehaviour
 
 	[Space] [SerializeField] protected Animator[] revealAnims;
 	[SerializeField] protected Breakable[] breakables;
+	[SerializeField] protected GameObject[] extraTiles;
 	[SerializeField] protected Collider2D col;
 	protected GameManager gm;
 
@@ -68,12 +70,18 @@ public abstract class Breakable : MonoBehaviour
 					foreach (Animator revealAnim in revealAnims)
 						revealAnim.SetTrigger("reveal");
 				}
-				// Reveal any secrets
+				// Enable secret chest can be hit
 				if (breakables != null)
 				{
 					foreach (Breakable breakable in breakables)
 						if (breakable != null)
 							breakable.EnableCanBeHit();
+				}
+				// Hide Extra Tiles 
+				if (extraTiles != null)
+				{
+					foreach (GameObject extraTile in extraTiles)
+							extraTile.SetActive(false);
 				}
 				// Disable colision
 				if (col != null)

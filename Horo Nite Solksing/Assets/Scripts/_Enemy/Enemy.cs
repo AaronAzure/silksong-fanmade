@@ -29,16 +29,21 @@ public abstract class Enemy : MonoBehaviour
 	[SerializeField] SpriteRenderer[] sprites;
 	[SerializeField] protected Animator anim;
 	[SerializeField] protected Rigidbody2D rb;
-	[SerializeField] Collider2D col;
+	[SerializeField] protected Collider2D col;
+	[SerializeField] protected Collider2D col2;
 	
 
 	[Space][SerializeField] protected GameObject closeRangeFinder;
 	[SerializeField] protected GameObject distRangeFinder;
 
 
-	[SerializeField] protected Material defaultMat;
 	[SerializeField] protected Material dmgMat;
+	[SerializeField] protected Material defaultMat;
 	[SerializeField] SortingGroup sortGroup;
+
+	
+	[Space] [SerializeField] Loot loot;
+	[SerializeField] int nLoot=1;
 
 	
 	[Space] [Header("Platformer Related")]
@@ -47,25 +52,25 @@ public abstract class Enemy : MonoBehaviour
 	[SerializeField] protected bool controlledByAnim;
 	[SerializeField] protected bool cannotTakeKb;
 	[SerializeField] protected bool cannotTakeDmg;
-	[SerializeField] float moveSpeed=2.5f;
+	[SerializeField] protected float moveSpeed=2.5f;
 	[SerializeField] protected float chaseSpeed=7.5f;
 	[SerializeField] protected float jumpForce=10f;
-	[SerializeField] float runSpeed=5;
-	[SerializeField] Transform groundDetect;
-	[SerializeField] Transform wallDetect;
-	[SerializeField] float groundDistDetect=1f;
-	[SerializeField] float wallDistDetect=0.5f;
-	[SerializeField] LayerMask whatIsPlayer;
-	[SerializeField] LayerMask whatIsGround;
-	[SerializeField] LayerMask finalMask;
+	[SerializeField] protected float maxSpeed=5;
+	[field: SerializeField] protected Transform groundDetect;
+	[field: SerializeField] protected Transform wallDetect;
+	[field: SerializeField] protected float groundDistDetect=1f;
+	[field: SerializeField] protected float wallDistDetect=0.5f;
+	[field: SerializeField] protected  LayerMask whatIsPlayer;
+	[field: SerializeField] protected  LayerMask whatIsGround;
+	[field: SerializeField] protected  LayerMask finalMask;
 	[SerializeField] protected bool isGrounded;
 	[SerializeField] bool isFlying;
 	[SerializeField] bool cannotTakeYKb;
 	[SerializeField] protected bool idleActionOnly;
 	protected bool beenHurt;
 	protected bool receivingKb;
-	[SerializeField] Transform groundCheck;
-	[SerializeField] Vector2 groundCheckSize;
+	[field: SerializeField] protected Transform groundCheck;
+	[field: SerializeField] protected Vector2 groundCheckSize;
 
 	
 	[Space] [SerializeField] protected CurrentAction currentAction=0;
@@ -76,7 +81,7 @@ public abstract class Enemy : MonoBehaviour
 	protected int nextDir;
 	protected Coroutine jumpCo;
 	protected Coroutine hurtCo;
-	private bool died;
+	protected bool died;
 	// protected RaycastHit2D playerInfo;
 	// protected RaycastHit2D groundInfo;
 	// protected RaycastHit2D wallInfo;
@@ -132,6 +137,12 @@ public abstract class Enemy : MonoBehaviour
 		{
 			Gizmos.color = Color.yellow;
 			Gizmos.DrawLine(wallDetect.position, wallDetect.position + new Vector3(model.localScale.x * wallDistDetect, 0));
+		}
+		if (groundCheck != null)
+		{
+			Gizmos.color = Color.magenta;
+			Gizmos.DrawWireCube(groundCheck.position, groundCheckSize);
+			// Gizmos.DrawLine(wallDetect.position, wallDetect.position + new Vector3(model.localScale.x * wallDistDetect, 0));
 		}
 	}
 
@@ -261,7 +272,7 @@ public abstract class Enemy : MonoBehaviour
 		}
 	}
 
-	protected bool CheckSurrounding()
+	protected virtual bool CheckSurrounding()
 	{
 		RaycastHit2D groundInfo = Physics2D.Linecast(
 			groundDetect.position, 
@@ -314,7 +325,7 @@ public abstract class Enemy : MonoBehaviour
 		return (playerInfo.collider != null);
 	}
 
-	protected void CheckIsGrounded()
+	protected virtual void CheckIsGrounded()
 	{
 		isGrounded = Physics2D.OverlapBox(groundCheck.position, groundCheckSize, 0, whatIsGround);
 		if (anim != null) anim.SetBool("isGrounded", isGrounded);
@@ -434,6 +445,10 @@ public abstract class Enemy : MonoBehaviour
 	void Died(bool shake)
 	{
 		StopAllCoroutines();
+		if (loot != null)
+		{
+			loot.SpawnLoot(nLoot);
+		}
 		if (closeRangeFinder != null) Destroy(closeRangeFinder);
 		if (distRangeFinder != null) Destroy(distRangeFinder);
 		if (inArea != null) 
@@ -452,7 +467,8 @@ public abstract class Enemy : MonoBehaviour
 			room.Defeated();
 		if (stringEffectObj != null)
 			stringEffectObj.transform.parent = null;
-		col.enabled = false;
+		if (col != null) col.enabled = false;
+		if (col2 != null) col2.enabled = false;
 		this.gameObject.layer = 5;
 		rb.velocity = Vector2.zero;
 		rb.gravityScale = 1;
@@ -481,7 +497,8 @@ public abstract class Enemy : MonoBehaviour
 		FacePlayer();
 		spawningIn = true;
 		anim.SetBool("spawningIn", true);
-		col.enabled = false;
+		if (col != null) col.enabled = false;
+		if (col2 != null) col2.enabled = false;
 	}
 
 	public void SHOW_MODEL()
@@ -636,7 +653,7 @@ public abstract class Enemy : MonoBehaviour
 		}
 	}
 
-	protected void ChasePlayer()
+	protected virtual void ChasePlayer()
 	{
 		int playerDir = (target.self.position.x - self.position.x > 0) ? 1 : -1;
 		FacePlayer( playerDir );

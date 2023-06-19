@@ -5,7 +5,7 @@ using UnityEngine;
 public class Rosary : MonoBehaviour
 {
 	[SerializeField] int value=1;
-	// [SerializeField] GameObject visualVfx;
+	public SpriteRenderer sr;
 	public Rigidbody2D rb;
 	
     private void OnTriggerEnter2D(Collider2D other) 

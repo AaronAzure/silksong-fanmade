@@ -214,6 +214,8 @@ public class PlayerAttack : MonoBehaviour
 				
 				if (target.hasShawRecoil && isShawAttack && !isDashAttack)
 					p.ShawRetreat(isDashAttack);
+				else if (target.hasDashRecoil && isShawAttack && isDashAttack)
+					p.ShawRetreat(isDashAttack);
 				else if (target.hasShawRecoil && isRisingAttack)
 					p.RisingAtkRetreat();
 				else if (target.hasRecoil && hasRecoil && !p.justParried)

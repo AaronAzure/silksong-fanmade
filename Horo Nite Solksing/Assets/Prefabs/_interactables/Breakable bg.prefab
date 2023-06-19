@@ -76,12 +76,16 @@ MonoBehaviour:
   anim: {fileID: 0}
   <hasRecoil>k__BackingField: 0
   <hasShawRecoil>k__BackingField: 1
+  <hasDashRecoil>k__BackingField: 0
+  <canBeHit>k__BackingField: 1
   hp: 0
   dmgFx: {fileID: 0}
   minEmit: 25
   maxEmit: 35
   destroyedObj: {fileID: 0}
   revealAnims: []
+  breakables: []
+  extraTiles: []
   col: {fileID: 3731349465680278573}
   visualObj: {fileID: 3731349466138554289}
   dmgVfxObj: {fileID: 3731349466514674734}
@@ -176,7 +180,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: -200
+  m_SortingOrder: -10
   m_Sprite: {fileID: -6802676756930550973, guid: 5f3c0d1b7eb814174b5fbe3fc0462dda, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -199,6 +203,7 @@ GameObject:
   - component: {fileID: 3731349466514674723}
   - component: {fileID: 3731349466514674732}
   - component: {fileID: 3731349466514674733}
+  - component: {fileID: 3798917850191980635}
   m_Layer: 0
   m_Name: Particle System
   m_TagString: Untagged
@@ -5059,3 +5064,14 @@ ParticleSystemRenderer:
   m_Mesh2: {fileID: 0}
   m_Mesh3: {fileID: 0}
   m_MaskInteraction: 0
+--- !u!210 &3798917850191980635
+SortingGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3731349466514674734}
+  m_Enabled: 1
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: -9

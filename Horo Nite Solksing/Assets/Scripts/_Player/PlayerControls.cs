@@ -846,7 +846,6 @@ public class PlayerControls : MonoBehaviour
 			{
 				if (canMove)
 				{
-					Debug.Log("vertical - moving");
 					rb.velocity = new Vector2(
 						NewSceneJumpMovement(), 
 						movingVerticallyJumping ? jumpForce : rb.velocity.y
@@ -854,7 +853,6 @@ public class PlayerControls : MonoBehaviour
 				}
 				else
 				{
-					Debug.Log("vertical - still");
 					rb.velocity = new Vector2(0, 0);
 				}
 			}
@@ -863,7 +861,6 @@ public class PlayerControls : MonoBehaviour
 			{
 				if (canMove)
 				{
-					Debug.Log("horizontal - moving");
 					rb.velocity = new Vector2(
 						nextSceneSpeed * activeMoveSpeed, 
 						rb.velocity.y
@@ -871,7 +868,6 @@ public class PlayerControls : MonoBehaviour
 				}
 				else
 				{
-					Debug.Log("horizontal - still");
 					rb.velocity = new Vector2(0, rb.velocity.y);
 				}
 			}
@@ -2314,6 +2310,8 @@ public class PlayerControls : MonoBehaviour
 		if (x > 0 && rosaryCollectPs != null)
 		{
 			rosaryCollectPs.Emit(2);
+			var main = rosaryCollectPs.shape;
+			main.rotation = new Vector3(0,0,UnityEngine.Random.Range(30,90));
 		}
 		nRosaries = Mathf.Max(0, nRosaries);
 	}

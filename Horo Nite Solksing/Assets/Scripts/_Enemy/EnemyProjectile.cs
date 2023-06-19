@@ -12,7 +12,10 @@ public class EnemyProjectile : MonoBehaviour
 	private bool isGrounded;
 	private bool thrown;
 	[SerializeField] bool canBreak;
+	[SerializeField] bool breakOnPlayerHit;
 	[SerializeField] GameObject breakVfx;
+
+	[Space] [SerializeField] bool rotateInDir;
 
 	private void Start() 
 	{
@@ -29,6 +32,11 @@ public class EnemyProjectile : MonoBehaviour
 	{
 		if (isGrounded)
 			Deactivate();
+		if (rotateInDir)
+		{
+			float angle = Mathf.Atan2(rb.velocity.y, rb.velocity.x) * Mathf.Rad2Deg;
+			transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+		}
 		// Debug.Log(rb.velocity);	
 	}
 
@@ -47,17 +55,18 @@ public class EnemyProjectile : MonoBehaviour
 			isGrounded = true;
 			if (canBreak)
 			{
-				breakVfx.transform.parent = null;
+				if (breakVfx != null)
+					breakVfx.transform.parent = null;
 				Destroy(gameObject);
 			}
 		}
+		if (breakOnPlayerHit && other.gameObject.CompareTag("Player"))
+		{
+			if (breakVfx != null)
+				breakVfx.transform.parent = null;
+			Destroy(gameObject);
+		}
 	}
-
-	// private void OnCollisionExit2D(Collision2D other) 
-	// {
-	// 	if (other.gameObject.CompareTag("Ground"))
-	// 		isGrounded = false;
-	// }
 
 	private void OnTriggerEnter2D(Collider2D other) 
 	{
@@ -68,7 +77,8 @@ public class EnemyProjectile : MonoBehaviour
 		{
 			if (canBreak)
 			{
-				breakVfx.transform.parent = null;
+				if (breakVfx != null)
+					breakVfx.transform.parent = null;
 				Destroy(gameObject);
 			}
 			int x = (other.transform.position.x - transform.position.x > 0) ? -1 : 1;
@@ -78,5 +88,11 @@ public class EnemyProjectile : MonoBehaviour
 			);
 			Deactivate();
 		}	
+		if (breakOnPlayerHit && other.CompareTag("Player"))
+		{
+			if (breakVfx != null)
+				breakVfx.transform.parent = null;
+			Destroy(gameObject);
+		}
 	}
 }
