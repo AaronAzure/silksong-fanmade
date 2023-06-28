@@ -17,13 +17,16 @@ public class OnTriggerTest : MonoBehaviour
 
 	public void SwapParent(bool thisIsParent=true)
 	{
-		if (!thisIsParent)
-			master.parent = null;
-		transform.parent = thisIsParent ? null : master;
-		if (thisIsParent)
+		if (master != null)
 		{
-			transform.position = master.position;
-			master.parent = transform;
+			if (!thisIsParent)
+				master.parent = null;
+			transform.parent = thisIsParent ? null : master;
+			if (thisIsParent)
+			{
+				transform.position = master.position;
+				master.parent = transform;
+			}
 		}
 	}
 

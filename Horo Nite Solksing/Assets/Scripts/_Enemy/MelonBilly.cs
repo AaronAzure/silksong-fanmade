@@ -66,14 +66,22 @@ public class MelonBilly : Enemy
 
 	protected override void CallChildOnDeath()
 	{
-		upsideDown = false;
-		flippableObj.localScale = Vector3.one;
+		if (upsideDown && flippableObj != null)
+		{
+			upsideDown = false;
+			flippableObj.localScale = Vector3.one;
+			flippableObj.localPosition = Vector3.zero;
+		}
 	}
 
 	protected void DropDown()
 	{
-		upsideDown = false;
-		flippableObj.localScale = Vector3.one;
+		if (upsideDown && flippableObj != null)
+		{
+			upsideDown = false;
+			flippableObj.localScale = Vector3.one;
+			flippableObj.localPosition = Vector3.zero;
+		}
 		rb.gravityScale = 1;
 	}
 }

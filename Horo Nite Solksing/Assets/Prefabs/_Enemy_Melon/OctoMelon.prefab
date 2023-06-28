@@ -192,6 +192,7 @@ MonoBehaviour:
   anim: {fileID: 1983884778921445858}
   rb: {fileID: 1376537067151301455}
   col: {fileID: 1376537066910156642}
+  col2: {fileID: 0}
   closeRangeFinder: {fileID: 0}
   distRangeFinder: {fileID: 8280079970757899613}
   dmgMat: {fileID: 2100000, guid: 432135ab22bc84106b4fe0a466cbb4d4, type: 2}
@@ -202,12 +203,12 @@ MonoBehaviour:
   isSmart: 1
   isStupid: 0
   controlledByAnim: 0
-  cannotTakeKb: 0
+  cannotTakeKb: 1
   cannotTakeDmg: 0
   moveSpeed: 0
   chaseSpeed: 5
   jumpForce: 10
-  runSpeed: 5
+  maxSpeed: 5
   groundDetect: {fileID: 9114477566536772447}
   wallDetect: {fileID: 1351233206461515513}
   groundDistDetect: 1

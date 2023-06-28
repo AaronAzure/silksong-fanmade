@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 1679674020449486591}
   m_Layer: 7
   m_Name: CircusBall
-  m_TagString: Enemy
+  m_TagString: Bouncy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5350,6 +5350,7 @@ MonoBehaviour:
   offset: 30
   melonBallObj: {fileID: 1517385774734940620}
   ballAnim: {fileID: 1307366715844961093}
+  inAttackAnim: 0
 --- !u!95 &8759415686820625224
 Animator:
   serializedVersion: 3
@@ -5964,7 +5965,11 @@ PrefabInstance:
     - target: {fileID: -6476307897703417713, guid: cf08518ce21db420c8a42646d6199dc6, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 7831628364070566423, guid: cf08518ce21db420c8a42646d6199dc6, type: 3}
+      objectReference: {fileID: 634633777242544808, guid: cf08518ce21db420c8a42646d6199dc6, type: 3}
+    - target: {fileID: -6476307897703417713, guid: cf08518ce21db420c8a42646d6199dc6, type: 3}
+      propertyPath: m_WasSpriteAssigned
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: -6100856624854326418, guid: cf08518ce21db420c8a42646d6199dc6, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.010892268
@@ -6051,7 +6056,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -3541213336297743702, guid: cf08518ce21db420c8a42646d6199dc6, type: 3}
       propertyPath: m_Bounds.m_Center.x
-      value: 0.0005600676
+      value: 0.0005600825
       objectReference: {fileID: 0}
     - target: {fileID: -3541213336297743702, guid: cf08518ce21db420c8a42646d6199dc6, type: 3}
       propertyPath: m_Bounds.m_Center.y
@@ -6059,7 +6064,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -3541213336297743702, guid: cf08518ce21db420c8a42646d6199dc6, type: 3}
       propertyPath: m_Bounds.m_Extent.x
-      value: 0.07938997
+      value: 0.07938996
       objectReference: {fileID: 0}
     - target: {fileID: -3541213336297743702, guid: cf08518ce21db420c8a42646d6199dc6, type: 3}
       propertyPath: m_Bounds.m_Extent.y
@@ -6191,19 +6196,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1736517356127855767, guid: cf08518ce21db420c8a42646d6199dc6, type: 3}
       propertyPath: m_Bounds.m_Center.x
-      value: -0.00000006146729
+      value: -0.00000007264316
       objectReference: {fileID: 0}
     - target: {fileID: 1736517356127855767, guid: cf08518ce21db420c8a42646d6199dc6, type: 3}
       propertyPath: m_Bounds.m_Center.y
-      value: 0.000000022351742
+      value: 0.000000052154064
       objectReference: {fileID: 0}
     - target: {fileID: 1736517356127855767, guid: cf08518ce21db420c8a42646d6199dc6, type: 3}
       propertyPath: m_Bounds.m_Extent.x
-      value: 0.030000022
+      value: 0.030000035
       objectReference: {fileID: 0}
     - target: {fileID: 1736517356127855767, guid: cf08518ce21db420c8a42646d6199dc6, type: 3}
       propertyPath: m_Bounds.m_Extent.y
-      value: 0.050000004
+      value: 0.049999982
       objectReference: {fileID: 0}
     - target: {fileID: 3399959499553979435, guid: cf08518ce21db420c8a42646d6199dc6, type: 3}
       propertyPath: m_LocalRotation.w
@@ -6227,19 +6232,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3696566463133877457, guid: cf08518ce21db420c8a42646d6199dc6, type: 3}
       propertyPath: m_Bounds.m_Center.x
-      value: 0.000000029802322
+      value: 0.000000044703484
       objectReference: {fileID: 0}
     - target: {fileID: 3696566463133877457, guid: cf08518ce21db420c8a42646d6199dc6, type: 3}
       propertyPath: m_Bounds.m_Center.y
-      value: -0.00021512806
+      value: -0.00021506101
       objectReference: {fileID: 0}
     - target: {fileID: 3696566463133877457, guid: cf08518ce21db420c8a42646d6199dc6, type: 3}
       propertyPath: m_Bounds.m_Extent.x
-      value: 0.094999984
+      value: 0.09499998
       objectReference: {fileID: 0}
     - target: {fileID: 3696566463133877457, guid: cf08518ce21db420c8a42646d6199dc6, type: 3}
       propertyPath: m_Bounds.m_Extent.y
-      value: 0.034785002
+      value: 0.034785017
       objectReference: {fileID: 0}
     - target: {fileID: 4325173646380593052, guid: cf08518ce21db420c8a42646d6199dc6, type: 3}
       propertyPath: m_LocalRotation.w

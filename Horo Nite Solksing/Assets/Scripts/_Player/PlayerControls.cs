@@ -1547,7 +1547,7 @@ public class PlayerControls : MonoBehaviour
 		}
 	}
 
-	public void ShawRetreat(bool dashStrike=false)
+	public void ShawRetreat(bool dashStrike=false, float multiplier=1)
 	{
 		isJumping = false;
 		jumpTimer = 0;
@@ -1556,7 +1556,7 @@ public class PlayerControls : MonoBehaviour
 			case 0:
 				anim.SetBool("isAttacking", false);
 				rb.velocity = Vector2.zero;
-				rb.AddForce( new Vector2(-moveDir * shawForce, shawForce), ForceMode2D.Impulse);
+				rb.AddForce( new Vector2(-moveDir * shawForce * multiplier, shawForce * multiplier), ForceMode2D.Impulse);
 				StartCoroutine( RegainControlCo(0.1f) );
 				break;
 			case 1:
@@ -1564,13 +1564,13 @@ public class PlayerControls : MonoBehaviour
 				{
 					anim.SetBool("isAttacking", false);
 					rb.velocity = Vector2.zero;
-					rb.AddForce( new Vector2(-moveDir * shawForce, shawForce), ForceMode2D.Impulse);
+					rb.AddForce( new Vector2(-moveDir * shawForce * multiplier, shawForce * multiplier), ForceMode2D.Impulse);
 					StartCoroutine( RegainControlCo(0.1f) );
 				}
 				else
 				{
 					rb.velocity = new Vector2(rb.velocity.x , 0);
-					rb.AddForce( new Vector2(0, shawForce), ForceMode2D.Impulse);
+					rb.AddForce( new Vector2(0, shawForce * multiplier), ForceMode2D.Impulse);
 				}
 				break;
 			case 2:
@@ -1580,7 +1580,7 @@ public class PlayerControls : MonoBehaviour
 				rb.velocity = Vector2.zero;
 				anim.SetFloat("pogoing", 1);
 				isPogoing = true;
-				rb.AddForce( new Vector2(0, shawForce), ForceMode2D.Impulse);
+				rb.AddForce( new Vector2(0, shawForce * multiplier), ForceMode2D.Impulse);
 				// StartCoroutine( RegainControlCo(0.1f, false, true) );
 				StartCoroutine( SwoopCo(0.2f) );
 				// StartCoroutine( PogoCo(0.25f) );
@@ -1590,7 +1590,7 @@ public class PlayerControls : MonoBehaviour
 				rb.velocity = Vector2.zero;
 				anim.SetFloat("pogoing", 1);
 				isPogoing = true;
-				rb.AddForce( new Vector2(0, shawForce), ForceMode2D.Impulse);
+				rb.AddForce( new Vector2(0, shawForce * multiplier), ForceMode2D.Impulse);
 				// StartCoroutine( RegainControlCo(0.1f, false, true) );
 				StartCoroutine( SwoopCo(0.2f) );
 				// StartCoroutine( PogoCo(0.25f) );
@@ -1598,21 +1598,21 @@ public class PlayerControls : MonoBehaviour
 				break;
 		}
 	}
-	public void Recoil()
+	public void Recoil(float multiplier=1)
 	{
 		rb.velocity = Vector2.zero;
 		isDashing = false;
 		jumpDashed = false;
 
-		rb.AddForce( new Vector2(-moveDir * recoilForce, 0), ForceMode2D.Impulse);
+		rb.AddForce( new Vector2(-moveDir * recoilForce * multiplier, 0), ForceMode2D.Impulse);
 		StartCoroutine( RegainControlCo(0.1f) );
 	}
-	public void RisingAtkRetreat()
+	public void RisingAtkRetreat(float multiplier=1)
 	{
 		// anim.SetBool("isAttacking", false);
 		rb.velocity = new Vector2(0, rb.velocity.y);
 
-		rb.AddForce( new Vector2(-moveDir * risingRecoilForce, 0), ForceMode2D.Impulse);
+		rb.AddForce( new Vector2(-moveDir * risingRecoilForce * multiplier, 0), ForceMode2D.Impulse);
 		StartCoroutine( RegainControlCo(0.1f) );
 	}
 
@@ -1639,7 +1639,7 @@ public class PlayerControls : MonoBehaviour
 		cantRotate2 = false;
 		shawEffectObj.SetActive(false);
 	}
-	IEnumerator PogoCo(float duration)
+	IEnumerator PogoCo(float duration, float multiplier=1)
 	{
 		isInvincible = true;
 		noControl = true;
@@ -1649,7 +1649,7 @@ public class PlayerControls : MonoBehaviour
 
 		yield return new WaitForSeconds(0.05f);
 		rb.velocity = new Vector2(rb.velocity.x, 0);
-		rb.AddForce( new Vector2(0, shawForce), ForceMode2D.Impulse);
+		rb.AddForce( new Vector2(0, shawForce * multiplier), ForceMode2D.Impulse);
 		noControl = false;
 
 		yield return new WaitForSeconds(duration);

@@ -121,6 +121,24 @@ public class PlayerAttack : MonoBehaviour
 					p.SetSilk(1);
 			}
 		}
+		if (other.CompareTag("Bouncy"))
+		{
+			if (ensureSingleHit)
+			{
+				if (alreadyHit.Contains(other.gameObject))
+					return;
+				else
+					alreadyHit.Add(other.gameObject);
+			}
+			Enemy target = other.GetComponent<Enemy>();
+
+			if (isShawAttack)
+				p.ShawRetreat(isDashAttack, 2);
+			else if (isRisingAttack)
+				p.RisingAtkRetreat(2);
+			else if (hasRecoil && !p.justParried)
+				p.Recoil(2);
+		}
 		if (other.CompareTag("SpecialEnemy"))
 		{
 			if (ensureSingleHit)
