@@ -73,6 +73,13 @@ public class MelonWinged : Enemy
 		if (melonObj != null)
 		{
 			FacePlayer();
+			if (GameManager.Instance.hardMode)
+			{
+				var obj3 = Instantiate(melonObj, spawnPos.position, Quaternion.identity);
+				obj3.rb.AddForce( new Vector2(horzForce / 2, throwForce), ForceMode2D.Impulse);
+				var obj4 = Instantiate(melonObj, spawnPos.position, Quaternion.identity);
+				obj4.rb.AddForce( new Vector2(-horzForce / 2, throwForce), ForceMode2D.Impulse);
+			}
 			var obj = Instantiate(melonObj, spawnPos.position, Quaternion.identity);
 			obj.rb.AddForce( new Vector2(0, throwForce), ForceMode2D.Impulse);
 			var obj1 = Instantiate(melonObj, spawnPos.position, Quaternion.identity);

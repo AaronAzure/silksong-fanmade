@@ -413,7 +413,9 @@ public class PlayerControls : MonoBehaviour
 		}
 
 		if (startWalkingIn)
-			StartCoroutine( MoveOutOfStart() );
+			StartCoroutine( MoveOutOfStartCo() );
+		else
+			StartCoroutine( StartCo() );
 
 		MusicManager m = MusicManager.Instance;
 		m.PlayMusic(m.bgMusic, m.bgMusicVol);
@@ -2139,7 +2141,7 @@ public class PlayerControls : MonoBehaviour
 		canMoveHorz = canMove = movingToNextScene = invulnerable = false;
 	}
 
-	IEnumerator MoveOutOfStart()
+	IEnumerator MoveOutOfStartCo()
 	{
 		started = canMove = movingToNextScene = invulnerable = true;
 		nextSceneSpeed = (model.localScale.x > 0) ? 1 : -1;
@@ -2152,6 +2154,13 @@ public class PlayerControls : MonoBehaviour
 		anim.SetFloat("moveSpeed", moveSpeed * nextSceneSpeed);
 
 		yield return new WaitForSeconds(0.75f);
+		started = canMove = movingToNextScene = invulnerable = false;
+		areaCanvas.SetActive(true);
+	}
+
+	IEnumerator StartCo()
+	{
+		yield return new WaitForSeconds(0.5f);
 		started = canMove = movingToNextScene = invulnerable = false;
 		areaCanvas.SetActive(true);
 	}

@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
 	[field: SerializeField] public GameObject backdropUi {get; private set;}
 	[field: SerializeField] public bool showDmg {get; private set;}
 	[field: SerializeField] public bool easyMode {get; private set;}
+	[field: SerializeField] public bool hardMode {get; private set;}
 	[field: SerializeField] public float invincibilityDuration {get; private set;}=0.75f;
 	[field: SerializeField] public HashSet<string> roomCleared;
 	[field: SerializeField] public HashSet<string> enemiesDefeated;

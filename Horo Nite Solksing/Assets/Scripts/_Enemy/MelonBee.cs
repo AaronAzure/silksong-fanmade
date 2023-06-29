@@ -15,26 +15,29 @@ public class MelonBee : Enemy
 
 	protected override void AttackingAction()
 	{
-		if (canChaseAnim)
+		if (!receivingKb)
 		{
-			Vector2 dir = (target.self.position - transform.position).normalized;
-			rb.AddForce(dir * chaseSpeed * 5, ForceMode2D.Force);
-			rb.velocity = new Vector2(
-				Mathf.Clamp(rb.velocity.x, -chaseSpeed, chaseSpeed),
-				Mathf.Clamp(rb.velocity.y, -chaseSpeed, chaseSpeed)
-			);
-
-			// chasing
-			FacePlayer();
-			if (!chase)
+			if (canChaseAnim)
 			{
-				chase = true;
-				anim.SetFloat("moveSpeed", chaseSpeed);
+				Vector2 dir = (target.self.position - transform.position).normalized;
+				rb.AddForce(dir * chaseSpeed * 5, ForceMode2D.Force);
+				rb.velocity = new Vector2(
+					Mathf.Clamp(rb.velocity.x, -chaseSpeed, chaseSpeed),
+					Mathf.Clamp(rb.velocity.y, -chaseSpeed, chaseSpeed)
+				);
+
+				// chasing
+				FacePlayer();
+				if (!chase)
+				{
+					chase = true;
+					anim.SetFloat("moveSpeed", chaseSpeed);
+				}
 			}
-		}
-		else
-		{
-			rb.velocity = Vector2.zero;
+			else
+			{
+				rb.velocity = Vector2.zero;
+			}
 		}
 
 		// if (closeDistTimer > closeDistTotal)

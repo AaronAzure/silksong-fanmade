@@ -373,8 +373,8 @@ MonoBehaviour:
   controlledByAnim: 0
   cannotTakeKb: 0
   cannotTakeDmg: 0
-  moveSpeed: 1
-  chaseSpeed: 2
+  moveSpeed: 1.5
+  chaseSpeed: 2.5
   jumpForce: 10
   maxSpeed: 5
   groundDetect: {fileID: 9114477566536772447}
@@ -420,7 +420,7 @@ MonoBehaviour:
   closeDistTimer: 0
   closeDistTotal: 1
   spawnPos: {fileID: 866723071297563330}
-  throwForce: 5
+  throwForce: 6
   horzForce: 3
   melonObj: {fileID: 2073651827027483644}
 --- !u!95 &5659826354831324653
@@ -659,7 +659,7 @@ ParticleSystem:
   serializedVersion: 7
   lengthInSec: 1
   simulationSpeed: 1
-  stopAction: 0
+  stopAction: 2
   cullingMode: 0
   ringBufferMode: 0
   ringBufferLoopRange: {x: 0, y: 1}
@@ -5538,7 +5538,7 @@ Transform:
   m_GameObject: {fileID: 6828718920114714375}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.8, y: 0.8, z: 1}
+  m_LocalScale: {x: 0.7, y: 0.7, z: 1}
   m_Children:
   - {fileID: 1695083769285923609}
   - {fileID: 1120234784308736671}

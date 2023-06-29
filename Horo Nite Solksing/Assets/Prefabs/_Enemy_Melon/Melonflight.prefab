@@ -259,6 +259,13 @@ MonoBehaviour:
   - {fileID: 8166597412696331022}
   - {fileID: 8806868824021725658}
   anim: {fileID: 3219864685213907636}
+  hasJumpVelocityAnim: 0
+  hasIsGroundedAnim: 0
+  hasIsMovingAnim: 0
+  hasIsDeadAnim: 1
+  hasSpawnAnim: 1
+  hasSpawningInAnim: 1
+  hasMoveSpeedAnim: 0
   rb: {fileID: 1376537067151301455}
   col: {fileID: 1376537066910156642}
   col2: {fileID: 0}
@@ -310,8 +317,8 @@ MonoBehaviour:
   cannotAtk: 0
   activated: 0
   inParryState: 0
-  silkEffectObj: {fileID: 7056141771011346426, guid: fb1f8aab62db342b48719794d38c90d1, type: 3}
   bloodEffectObj: {fileID: 7056141771011346426, guid: 80b9547a3f3f744689ac71dfe20b6e50, type: 3}
+  silkEffectObj: {fileID: 7056141771011346426, guid: fb1f8aab62db342b48719794d38c90d1, type: 3}
   stringEffectObj: {fileID: 1629200900604851618}
   alert: {fileID: 0}
   room: {fileID: 0}
