@@ -90,14 +90,14 @@ public class PlayerAttack : MonoBehaviour
 					{
 						// stronger special
 						case 1:
-							dmg = Mathf.RoundToInt(dmg * 1.25f);
+							dmg = Mathf.RoundToInt(dmg * 1.3f);
 							break;
 						// weaker special
 						case 2:
-							dmg = Mathf.RoundToInt(dmg * 0.75f);
+							dmg = Mathf.RoundToInt(dmg * 0.6f);
 							break;
 						case 3:
-							dmg = Mathf.RoundToInt(dmg * 0.85f);
+							dmg = Mathf.RoundToInt(dmg * 0.8f);
 							break;
 					}
 				}
@@ -174,13 +174,13 @@ public class PlayerAttack : MonoBehaviour
 					switch (p.crestNum)
 					{
 						case 1:
-							dmg = Mathf.RoundToInt(dmg * 1.25f);
+							dmg = Mathf.RoundToInt(dmg * 1.3f);
 							break;
 						case 2:
-							dmg = Mathf.RoundToInt(dmg * 0.75f);
+							dmg = Mathf.RoundToInt(dmg * 0.6f);
 							break;
 						case 3:
-							dmg = Mathf.RoundToInt(dmg * 0.85f);
+							dmg = Mathf.RoundToInt(dmg * 0.8f);
 							break;
 					}
 				}
@@ -216,14 +216,14 @@ public class PlayerAttack : MonoBehaviour
 					{
 						// stronger special
 						case 1:
-							dmg = Mathf.RoundToInt(dmg * 1.25f);
+							dmg = Mathf.RoundToInt(dmg * 1.3f);
 							break;
 						// weaker special
 						case 2:
-							dmg = Mathf.RoundToInt(dmg * 0.75f);
+							dmg = Mathf.RoundToInt(dmg * 0.6f);
 							break;
 						case 3:
-							dmg = Mathf.RoundToInt(dmg * 0.85f);
+							dmg = Mathf.RoundToInt(dmg * 0.8f);
 							break;
 					}
 				}

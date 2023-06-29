@@ -237,21 +237,32 @@ MonoBehaviour:
   - {fileID: 4064578534024027063}
   - {fileID: 246728532750805465}
   anim: {fileID: 3619112516294287899}
+  hasJumpVelocityAnim: 1
+  hasIsGroundedAnim: 1
+  hasIsMovingAnim: 1
+  hasIsDeadAnim: 1
+  hasSpawnAnim: 1
+  hasSpawningInAnim: 1
+  hasMoveSpeedAnim: 1
   rb: {fileID: 1376537067151301455}
   col: {fileID: 1889948937526212634}
+  col2: {fileID: 0}
   closeRangeFinder: {fileID: 8706497404105101907}
   distRangeFinder: {fileID: 6415627392250083116}
-  defaultMat: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
   dmgMat: {fileID: 2100000, guid: 432135ab22bc84106b4fe0a466cbb4d4, type: 2}
+  defaultMat: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
   sortGroup: {fileID: 5245184835238437582}
+  loot: {fileID: 0}
+  nLoot: 1
   isSmart: 1
+  isStupid: 0
   controlledByAnim: 0
   cannotTakeKb: 0
   cannotTakeDmg: 0
   moveSpeed: 1
   chaseSpeed: 2.5
   jumpForce: 10
-  runSpeed: 5
+  maxSpeed: 5
   groundDetect: {fileID: 9114477566536772447}
   wallDetect: {fileID: 1351233206461515513}
   groundDistDetect: 0.5
@@ -271,7 +282,9 @@ MonoBehaviour:
   idleActionOnly: 0
   groundCheck: {fileID: 7452915362852078129}
   groundCheckSize: {x: 0, y: 0}
+  currentAction: 0
   idleTotalCounter: 2
+  immediateFlip: 0
   initDir: 1
   target: {fileID: 0}
   alwaysInRange: 0
@@ -282,8 +295,8 @@ MonoBehaviour:
   cannotAtk: 0
   activated: 0
   inParryState: 0
-  silkEffectObj: {fileID: 7056141771011346426, guid: fb1f8aab62db342b48719794d38c90d1, type: 3}
   bloodEffectObj: {fileID: 7056141771011346426, guid: 80b9547a3f3f744689ac71dfe20b6e50, type: 3}
+  silkEffectObj: {fileID: 7056141771011346426, guid: fb1f8aab62db342b48719794d38c90d1, type: 3}
   stringEffectObj: {fileID: 3851442501121447009}
   alert: {fileID: 4215765334170310324}
   room: {fileID: 0}
@@ -479,7 +492,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2319638538108290990}
   m_Layer: 7
-  m_Name: GameObject
+  m_Name: PROJECTILE PREFAB HOLDER
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -114,6 +114,12 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] Vector2 wallCheckSize;
 	[SerializeField] float wallSlideSpeed=2;
 
+	
+	[field: SerializeField] public Transform aboveTarget {get; private set;}
+	[field: SerializeField] public Transform leftTarget {get; private set;}
+	[field: SerializeField] public Transform rightTarget {get; private set;}
+
+
 	[Space] [SerializeField] Transform ceilingCheck;
 	[SerializeField] Vector2 ceilingCheckSize;
 

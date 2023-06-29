@@ -28,8 +28,16 @@ public abstract class Enemy : MonoBehaviour
 	[SerializeField] protected Transform model;
 	[SerializeField] SpriteRenderer[] sprites;
 	[SerializeField] protected Animator anim;
-	[SerializeField] protected Rigidbody2D rb;
-	[SerializeField] protected Collider2D col;
+	[SerializeField] protected bool hasJumpVelocityAnim=true;
+	[SerializeField] protected bool hasIsGroundedAnim=true;
+	[SerializeField] protected bool hasIsMovingAnim=true;
+	[SerializeField] protected bool hasIsDeadAnim=true;
+	[SerializeField] protected bool hasSpawnAnim=true;
+	[SerializeField] protected bool hasSpawningInAnim=true;
+	[SerializeField] protected bool hasMoveSpeedAnim=true;
+	
+	[Space] [SerializeField] protected Rigidbody2D rb;
+	[SerializeField] [Tooltip("Model")] protected Collider2D col;
 	[SerializeField] protected Collider2D col2;
 	
 
@@ -82,13 +90,11 @@ public abstract class Enemy : MonoBehaviour
 	protected Coroutine jumpCo;
 	protected Coroutine hurtCo;
 	protected bool died;
-	// protected RaycastHit2D playerInfo;
-	// protected RaycastHit2D groundInfo;
-	// protected RaycastHit2D wallInfo;
 
 
 	[Space] [Header("Target Related")]
 	public PlayerControls target;
+	protected Transform targetDest;
 	public bool alwaysInRange;
 	public bool inRange; // player in area
 	public bool inSight; // player in line of sight within area
@@ -107,8 +113,8 @@ public abstract class Enemy : MonoBehaviour
 
 
 	[Space] [Header("Particle Effect Objs")]
-	[SerializeField] GameObject silkEffectObj;
 	[SerializeField] GameObject bloodEffectObj;
+	[SerializeField] GameObject silkEffectObj;
 	[SerializeField] GameObject stringEffectObj;
 	[SerializeField] GameObject alert;
 
@@ -231,7 +237,7 @@ public abstract class Enemy : MonoBehaviour
 		{
 			CheckIsGrounded();
 
-			if (!isGrounded && anim != null)
+			if (hasJumpVelocityAnim && !isGrounded && anim != null)
 				anim.SetFloat("jumpVelocity", rb.velocity.y);
 		}
 
@@ -332,7 +338,7 @@ public abstract class Enemy : MonoBehaviour
 	protected virtual void CheckIsGrounded()
 	{
 		isGrounded = Physics2D.OverlapBox(groundCheck.position, groundCheckSize, 0, whatIsGround);
-		if (anim != null) anim.SetBool("isGrounded", isGrounded);
+		if (hasIsGroundedAnim && anim != null) anim.SetBool("isGrounded", isGrounded);
 	}
 
 	protected virtual void IdleAction() {  }
@@ -357,7 +363,7 @@ public abstract class Enemy : MonoBehaviour
 		{
 			if (hp > 0 && hurtCo != null)
 				StopCoroutine(hurtCo);
-			hurtCo = StartCoroutine( TakeDamageCo(dmg, opponent, forceDir, force, canShake) );
+			hurtCo = StartCoroutine( TakeDamageCo(dmg, opponent, forceDir, force * 1.2f, canShake) );
 		}
 	}
 
@@ -478,7 +484,7 @@ public abstract class Enemy : MonoBehaviour
 		rb.gravityScale = 1;
 		this.enabled = false;
 		// if (alert != null) alert.SetActive( false );
-		if (anim != null)
+		if (hasIsDeadAnim && anim != null)
 			anim.SetBool("isDead", true);
 		sortGroup.sortingOrder = -1000 + PlayerControls.Instance.IncreaseKills();
 
@@ -495,12 +501,14 @@ public abstract class Enemy : MonoBehaviour
 	{
 		summoned = true;
 		Debug.Log("spawning in");
-		if (anim != null) anim.SetTrigger("spawn");
+		if (hasSpawnAnim && anim != null) 
+			anim.SetTrigger("spawn");
 		if (PlayerControls.Instance != null)
 			target = PlayerControls.Instance;
 		FacePlayer();
 		spawningIn = true;
-		anim.SetBool("spawningIn", true);
+		if (hasSpawningInAnim && anim != null) 
+			anim.SetBool("spawningIn", true);
 		if (col != null) col.enabled = false;
 		if (col2 != null) col2.enabled = false;
 	}
@@ -515,7 +523,8 @@ public abstract class Enemy : MonoBehaviour
 		if (!died)
 			col.enabled = true;
 		spawningIn = false;
-		anim.SetBool("spawningIn", false);
+		if (hasSpawningInAnim && anim != null)
+			anim.SetBool("spawningIn", false);
 	}
 
 	private void OnTriggerEnter2D(Collider2D other) 
@@ -592,29 +601,29 @@ public abstract class Enemy : MonoBehaviour
 
 		if (receivingKb)
 		{
-			if (anim != null) anim.SetBool("isMoving", false);
+			if (hasIsMovingAnim && anim != null) anim.SetBool("isMoving", false);
 		}
 		else if (currentAction == CurrentAction.left)
 		{
 			rb.velocity = new Vector2(-moveSpeed, rb.velocity.y);
-			if (anim != null) anim.SetBool("isMoving", true);
+			if (hasIsMovingAnim && anim != null) anim.SetBool("isMoving", true);
 			model.localScale = new Vector3(-1,1,1);
 
 		}
 		else if (currentAction == CurrentAction.none)
 		{
 			rb.velocity = new Vector2(0, rb.velocity.y);
-			if (anim != null) anim.SetBool("isMoving", false);
+			if (hasIsMovingAnim && anim != null) anim.SetBool("isMoving", false);
 
 		}
 		else if (currentAction == CurrentAction.right)
 		{
 			rb.velocity = new Vector2(moveSpeed, rb.velocity.y);
-			if (anim != null) anim.SetBool("isMoving", true);
+			if (hasIsMovingAnim && anim != null) anim.SetBool("isMoving", true);
 			model.localScale = new Vector3(1,1,1);
 
 		}
-		if (!isFlying && anim != null)
+		if (hasMoveSpeedAnim && !isFlying && anim != null)
 			anim.SetFloat("moveSpeed", rb.velocity.x);
 	}
 
@@ -672,9 +681,10 @@ public abstract class Enemy : MonoBehaviour
 		
 		if (anim != null) 
 		{
-			if (!isFlying)
+			if (hasMoveSpeedAnim && !isFlying)
 				anim.SetFloat("moveSpeed", rb.velocity.x);
-			anim.SetBool("isMoving", true);
+			if (hasIsMovingAnim)
+				anim.SetBool("isMoving", true);
 		}
 	}
 

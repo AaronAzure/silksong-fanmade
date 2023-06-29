@@ -129,7 +129,7 @@ GameObject:
   - component: {fileID: 1248326090283420467}
   - component: {fileID: 7695218857849479814}
   m_Layer: 7
-  m_Name: Melon_Bee
+  m_Name: Melonflight
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -143,7 +143,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1376537067151301443}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.735909, y: -0.49575698, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1376537066910156643}
@@ -261,6 +261,7 @@ MonoBehaviour:
   anim: {fileID: 3219864685213907636}
   rb: {fileID: 1376537067151301455}
   col: {fileID: 1376537066910156642}
+  col2: {fileID: 0}
   closeRangeFinder: {fileID: 0}
   distRangeFinder: {fileID: 7496133052882791808}
   dmgMat: {fileID: 2100000, guid: 432135ab22bc84106b4fe0a466cbb4d4, type: 2}
@@ -276,7 +277,7 @@ MonoBehaviour:
   moveSpeed: 1
   chaseSpeed: 2
   jumpForce: 10
-  runSpeed: 5
+  maxSpeed: 5
   groundDetect: {fileID: 9114477566536772447}
   wallDetect: {fileID: 1351233206461515513}
   groundDistDetect: 0
