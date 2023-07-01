@@ -91,6 +91,7 @@ public class MelonWinged : Enemy
 
 	protected override void CallChildOnInSight()
 	{
+		currentAction = CurrentAction.none;
 		anim.SetBool("isChasing", true);
 	}
 	protected override void CallChildOnLostSight()

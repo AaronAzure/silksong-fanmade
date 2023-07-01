@@ -69,6 +69,11 @@ public class MelonCircus : Enemy
 		}
 	}
 
+	protected override void CallChildOnInSight()
+	{
+		currentAction = CurrentAction.none;
+	}
+
 	protected override void CallChildOnHurt(int dmg, Vector2 forceDir)
 	{
 		momentumSpeed = 0;

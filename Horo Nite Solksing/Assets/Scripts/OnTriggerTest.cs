@@ -7,6 +7,8 @@ public class OnTriggerTest : MonoBehaviour
     [SerializeField] GameObject obj;
     private Transform master;
 
+	[Space] [SerializeField] bool alwaysActive;
+
 	private void OnEnable() 
 	{
 		if (obj == null)

@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 
 public class GameManager : MonoBehaviour
 {
@@ -11,6 +13,8 @@ public class GameManager : MonoBehaviour
 	[field: SerializeField] public GameObject remapUi {get; private set;}
 	[field: SerializeField] public GameObject remapCanvasUi {get; private set;}
 	[field: SerializeField] public GameObject backdropUi {get; private set;}
+	private float vignetteOrigValue;
+	[field: SerializeField] public float vignetteMaxValue {get; private set;}=0.55f;
 	[field: SerializeField] public bool showDmg {get; private set;}
 	[field: SerializeField] public bool easyMode {get; private set;}
 	[field: SerializeField] public bool hardMode {get; private set;}
@@ -288,4 +292,31 @@ public class GameManager : MonoBehaviour
 	// 	if (!isPaused)
 	// 		Time.timeScale = 1;
 	// }
+	public void Vignette()
+	{
+		StartCoroutine( VignetteCo() );
+	}
+
+	private IEnumerator VignetteCo()
+	{
+		if (VignetteScript.Instance != null && VignetteScript.Instance.vignette != null)
+		{
+			vignetteOrigValue = VignetteScript.Instance.vignette.smoothness.value;
+			VignetteScript.Instance.vignette.smoothness.value = vignetteMaxValue;
+
+			float dif = (vignetteMaxValue - vignetteOrigValue)/30;
+			for (int i=0 ; i<30; i++)
+			{
+				yield return new WaitForSeconds(0.01667f);
+				if (VignetteScript.Instance != null && VignetteScript.Instance.vignette != null)
+				{
+					VignetteScript.Instance.vignette.smoothness.value -= dif;
+				}
+			}
+			if (VignetteScript.Instance != null && VignetteScript.Instance.vignette != null)
+			{
+				VignetteScript.Instance.vignette.smoothness.value = vignetteOrigValue;
+			}
+		}
+	}
 }

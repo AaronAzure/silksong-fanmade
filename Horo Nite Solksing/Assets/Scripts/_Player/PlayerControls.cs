@@ -1776,6 +1776,7 @@ public class PlayerControls : MonoBehaviour
 		}
 		MusicManager.Instance.PlayHurtSFX();
 		MusicManager.Instance.SoftenBgMusic();
+		gm.Vignette();
 		if (hunterSpinObj != null) hunterSpinObj.SetActive(false);
 
 		anim.SetBool("isHurt", true);
@@ -1788,8 +1789,8 @@ public class PlayerControls : MonoBehaviour
 		if (hp != 0)
 		{
 			CinemachineShake.Instance.ShakeCam(15, 0.25f);
-			if (hp > 1 || (hasShield && hp == 1 && shieldHp > 0))
-				animeLinesAnim.SetTrigger("dmg");
+			// if (hp > 1 || (hasShield && hp == 1 && shieldHp > 0))
+			// 	animeLinesAnim.SetTrigger("dmg");
 		}
 		anim.SetBool("isSkillAttacking", false);
 		anim.SetBool("isGossamerStorm", false);

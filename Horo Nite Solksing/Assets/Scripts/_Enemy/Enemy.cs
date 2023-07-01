@@ -26,6 +26,7 @@ public abstract class Enemy : MonoBehaviour
 
 	[Space] public Transform self;
 	[SerializeField] protected Transform model;
+	[SerializeField] protected Transform eyes;
 	[SerializeField] SpriteRenderer[] sprites;
 	[SerializeField] protected Animator anim;
 	[SerializeField] protected bool hasJumpVelocityAnim=true;
@@ -43,9 +44,10 @@ public abstract class Enemy : MonoBehaviour
 
 	[Space][SerializeField] protected GameObject closeRangeFinder;
 	[SerializeField] protected GameObject distRangeFinder;
+	[SerializeField] protected GameObject superCloseRangeFinder;
 
 
-	[SerializeField] protected Material dmgMat;
+	[Space] [SerializeField] protected Material dmgMat;
 	[SerializeField] protected Material defaultMat;
 	[SerializeField] SortingGroup sortGroup;
 
@@ -82,10 +84,11 @@ public abstract class Enemy : MonoBehaviour
 
 	
 	[Space] [SerializeField] protected CurrentAction currentAction=0;
-	private float idleCounter=0;
+	protected float idleCounter=0;
 	[SerializeField] float idleTotalCounter=5;
 	[SerializeField] bool immediateFlip;
 	[SerializeField] [Range(-1,1)] int initDir=-1;
+	[SerializeField] protected bool stillAttacking;
 	protected int nextDir;
 	protected Coroutine jumpCo;
 	protected Coroutine hurtCo;
@@ -99,6 +102,7 @@ public abstract class Enemy : MonoBehaviour
 	public bool inRange; // player in area
 	public bool inSight; // player in line of sight within area
 	public bool isClose; // player in close area
+	public bool isSuperClose; // player in close area
 	protected bool cannotRotate;
 	protected float moveDir;
 	protected bool attackingPlayer;
@@ -116,7 +120,6 @@ public abstract class Enemy : MonoBehaviour
 	[SerializeField] GameObject bloodEffectObj;
 	[SerializeField] GameObject silkEffectObj;
 	[SerializeField] GameObject stringEffectObj;
-	[SerializeField] GameObject alert;
 
 
 	[Space] [Header("Room Related")]
@@ -126,6 +129,7 @@ public abstract class Enemy : MonoBehaviour
 
 
 	[Space] [Header("Debug")]
+	[SerializeField] GameObject alert;
 	[SerializeField] float offset=30;
 
 
@@ -164,6 +168,8 @@ public abstract class Enemy : MonoBehaviour
 	protected virtual void CallChildOnHurtAfter() { }
 	protected virtual void CallChildOnDeath() { }
 	protected virtual void CallChildOnParry() { }
+	public virtual void CallChildOnSuperClose() { }
+
 	protected virtual void CallChildOnInAreaSwap() 
 	{ 
 		inArea.SwapParent();
@@ -222,7 +228,7 @@ public abstract class Enemy : MonoBehaviour
 		CallChildOnEarlyUpdate();
 		if (spawningIn || controlledByAnim) return;
 
-		if ((idleActionOnly || !attackingPlayer) && !alwaysInRange)
+		if ((idleActionOnly || !attackingPlayer) && !alwaysInRange && !stillAttacking)
 			IdleAction();
 		else
 			AttackingAction();
@@ -249,7 +255,11 @@ public abstract class Enemy : MonoBehaviour
 	{
 		if (target == null || (!inRange && !alwaysInRange)) return false;
 		
-		RaycastHit2D playerInfo = Physics2D.Linecast(self.position, target.self.position, finalMask);
+		RaycastHit2D playerInfo = Physics2D.Linecast(
+			(eyes != null) ? eyes.position : self.position, 
+			target.self.position, 
+			finalMask
+		);
 		bool canSeePlayer = (playerInfo.collider != null && playerInfo.collider.gameObject.CompareTag("Player"));
 		if (canSeePlayer)
 		{
@@ -270,7 +280,7 @@ public abstract class Enemy : MonoBehaviour
 
 	void KeepLookingForPlayer()
 	{
-		if (!inSight && attackingPlayer)
+		if (!inSight && attackingPlayer && !alwaysInRange)
 		{
 			searchCounter += Time.fixedDeltaTime;
 			if (searchCounter > maxSearchTime)
@@ -461,6 +471,7 @@ public abstract class Enemy : MonoBehaviour
 		}
 		if (closeRangeFinder != null) Destroy(closeRangeFinder);
 		if (distRangeFinder != null) Destroy(distRangeFinder);
+		if (superCloseRangeFinder != null) Destroy(superCloseRangeFinder);
 		if (inArea != null) 
 		{
 			transform.parent = null;
@@ -577,6 +588,15 @@ public abstract class Enemy : MonoBehaviour
 		{
 			idleCounter = 0;
 			currentAction = currentAction + nextDir;
+			if (currentAction == CurrentAction.none)
+			{
+				// looking right
+				if (model.localScale.x > 0)
+					currentAction = CurrentAction.right;
+				// looking left
+				else
+					currentAction = CurrentAction.left;
+			}
 			if (currentAction == CurrentAction.right)
 				nextDir = -1;
 			else if (currentAction == CurrentAction.left)

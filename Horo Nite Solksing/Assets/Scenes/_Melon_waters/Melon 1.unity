@@ -5027,7 +5027,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2849848003328689910, guid: 0e0e6e30a359d4211979a49ad75770fa, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -6.3870296
+      value: -6.3924294
       objectReference: {fileID: 0}
     - target: {fileID: 2849848003328689910, guid: 0e0e6e30a359d4211979a49ad75770fa, type: 3}
       propertyPath: m_LocalPosition.y
@@ -19141,6 +19141,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1775898052}
   - component: {fileID: 1775898051}
+  - component: {fileID: 1775898053}
   m_Layer: 0
   m_Name: POST PROCESSING DEFAULT
   m_TagString: Untagged
@@ -19179,6 +19180,19 @@ Transform:
   m_Father: {fileID: 224489978}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1775898053
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1775898050}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 623e58f10a4034b00b78eb9077591aa1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  vignette: {fileID: 0}
 --- !u!1 &1798731784
 GameObject:
   m_ObjectHideFlags: 0
