@@ -403,6 +403,7 @@ MonoBehaviour:
   idleTotalCounter: 2
   immediateFlip: 0
   initDir: -1
+  stillAttacking: 0
   target: {fileID: 0}
   alwaysInRange: 0
   inRange: 0
@@ -4301,7 +4302,7 @@ ParticleSystem:
     m_Dampen:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 0
+      scalar: 0.4
       minScalar: 0
       maxCurve:
         serializedVersion: 2

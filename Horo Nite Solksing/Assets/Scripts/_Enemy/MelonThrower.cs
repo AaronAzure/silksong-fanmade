@@ -13,7 +13,8 @@ public class MelonThrower : Enemy
 	[SerializeField] float capHorzForce=10;
 	[SerializeField] float capVertForce=10;
 
-	[Space] [SerializeField] bool isBackDashing;
+	[Space] [SerializeField] bool isScouting;
+	[SerializeField] bool isBackDashing;
 	private bool justBackDashed;
 	[SerializeField] float backDashSpeed=3f;
 	[field: SerializeField] protected Transform groundBehindDetect;
@@ -49,6 +50,10 @@ public class MelonThrower : Enemy
 
 	protected override void AttackingAction()
 	{
+		if (isScouting)
+		{
+			AttackStrategy();
+		}
 		if (keepFacingPlayer)
 		{
 			FacePlayer();
@@ -91,7 +96,7 @@ public class MelonThrower : Enemy
 		}
 	}
 
-	public void ATTACK_STRATEGY()
+	public void AttackStrategy()
 	{
 		if (isSuperClose && CheckBehindForGround() && !CheckBehindForWall())
 		{

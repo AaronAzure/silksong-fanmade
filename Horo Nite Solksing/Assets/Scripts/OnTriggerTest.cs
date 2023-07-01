@@ -23,11 +23,13 @@ public class OnTriggerTest : MonoBehaviour
 		{
 			if (!thisIsParent)
 				master.parent = null;
-			transform.parent = thisIsParent ? null : master;
+			if (master != null)
+				transform.parent = thisIsParent ? null : master;
 			if (thisIsParent)
 			{
 				transform.position = master.position;
-				master.parent = transform;
+				if (master != null)
+					master.parent = transform;
 			}
 		}
 	}

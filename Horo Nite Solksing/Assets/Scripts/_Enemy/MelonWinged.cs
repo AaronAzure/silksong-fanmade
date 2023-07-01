@@ -5,6 +5,7 @@ using UnityEngine;
 public class MelonWinged : Enemy
 {
     private bool chase;
+	[SerializeField] bool alertAnim;
 	[SerializeField] bool attackingAnim;
 	[SerializeField] float closeDistTimer;
 	[SerializeField] float closeDistTotal=1;
@@ -33,7 +34,7 @@ public class MelonWinged : Enemy
 	{
 		if (!receivingKb)
 		{
-			if (!attackingAnim)
+			if (!attackingAnim && !alertAnim)
 			{
 				Vector2 dir = (targetDest.position - transform.position).normalized;
 				rb.AddForce(dir * chaseSpeed * 5, ForceMode2D.Force);
