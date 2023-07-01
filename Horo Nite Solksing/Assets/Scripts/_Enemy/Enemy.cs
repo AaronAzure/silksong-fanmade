@@ -644,7 +644,7 @@ public abstract class Enemy : MonoBehaviour
 
 		}
 		if (hasMoveSpeedAnim && !isFlying && anim != null)
-			anim.SetFloat("moveSpeed", rb.velocity.x);
+			anim.SetFloat("moveSpeed", Mathf.Abs(rb.velocity.x));
 	}
 
 	protected void FlyAround()
@@ -702,7 +702,7 @@ public abstract class Enemy : MonoBehaviour
 		if (anim != null) 
 		{
 			if (hasMoveSpeedAnim && !isFlying)
-				anim.SetFloat("moveSpeed", rb.velocity.x);
+				anim.SetFloat("moveSpeed", Mathf.Abs(rb.velocity.x));
 			if (hasIsMovingAnim)
 				anim.SetBool("isMoving", true);
 		}
