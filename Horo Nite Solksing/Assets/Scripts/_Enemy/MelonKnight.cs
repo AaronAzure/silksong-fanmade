@@ -11,6 +11,7 @@ public class MelonKnight : Enemy
 	[Space] [SerializeField] float closeCounter;
 	[SerializeField] float closeLimit=1f;
 	[SerializeField] float atkMomentum=3f;
+	[SerializeField] bool chasingAnim;
 	[SerializeField] bool lungeAnim;
 	[SerializeField] bool inAtkAnim;
 
@@ -65,19 +66,24 @@ public class MelonKnight : Enemy
 					anim.SetTrigger("attack");
 				}
 			}
+			if (!isSuperClose && closeCounter > 0)
+			{
+				closeCounter -= (Time.fixedDeltaTime/2);
+			}
 			
 			// chasing and not shield
 			if (!isSuperClose)
 			{
-				ChasePlayer();
+				if (chasingAnim)
+					ChasePlayer();
 				if (usedShield)
 				{
-					anim.SetFloat("moveSpeed", chaseSpeed);
+					// anim.SetFloat("moveSpeed", chaseSpeed);
 					UseShield(false);
 				}
 			}
 			// shielding and not chasing
-			else if (!receivingKb)
+			else if (!chasingAnim && !receivingKb)
 			{
 				rb.velocity = new Vector2(0, rb.velocity.y);
 				if (!usedShield)
@@ -103,8 +109,10 @@ public class MelonKnight : Enemy
 	{
 		if (!sighted)
 		{
+			rb.velocity = new Vector2(0, rb.velocity.y);
 			sighted = true;
 			currentAction = CurrentAction.none;
+			anim.SetTrigger("alert");
 			anim.SetBool("isChasing", true);
 		}
 	}

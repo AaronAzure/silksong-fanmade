@@ -68,6 +68,8 @@ public class PlayerAttack : MonoBehaviour
 			if (target != null) 
 			{
 				hitSomething = true;
+
+				// receive normal attack
 				if (!target.inParryState)
 				{
 					Vector2 temp = (other.transform.position - transform.position).normalized;
@@ -111,6 +113,16 @@ public class PlayerAttack : MonoBehaviour
 					// simple attack
 					if (!isStabAttack && !isGossamerStorm && !isRushAttack)
 						p.SetSilk(1);
+				}
+				// blocked
+				else
+				{
+					target.TakeDamage(
+						0, 
+						null,
+						new Vector2(p.model.localScale.x * forceDir.x, forceDir.y),
+						force
+					);
 				}
 
 				// recoil
