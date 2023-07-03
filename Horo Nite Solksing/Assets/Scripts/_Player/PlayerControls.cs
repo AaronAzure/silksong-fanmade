@@ -76,6 +76,7 @@ public class PlayerControls : MonoBehaviour
 	private bool isWallJumping;
 
 	private bool isGrounded;
+	private bool isPlatformed;
 	private bool isCloseToGround;
 	private bool jumpRegistered;
 	private bool inWater;
@@ -109,6 +110,7 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] Vector2 closeToGroundCheckSize;
 	[SerializeField] Vector2 waterCheckSize;
 	[SerializeField] LayerMask whatIsGround;
+	[SerializeField] LayerMask whatIsPlatform;
 	[SerializeField] LayerMask whatIsWater;
 	[SerializeField] Transform wallCheck;
 	[SerializeField] Vector2 wallCheckSize;
@@ -950,7 +952,11 @@ public class PlayerControls : MonoBehaviour
 	}
 	void CheckIsGrounded()
 	{
-		isGrounded = Physics2D.OverlapBox(groundCheck.position, groundCheckSize, 0, whatIsGround);
+		isPlatformed = Physics2D.OverlapBox(groundCheck.position, groundCheckSize, 0, whatIsPlatform);
+		if (isPlatformed)
+			isGrounded = true;
+		else
+			isGrounded = Physics2D.OverlapBox(groundCheck.position, groundCheckSize, 0, whatIsGround);
 		if (dustTrailPs != null)
 		{
 			if (isDustTrailPlaying && !isGrounded)
@@ -958,7 +964,7 @@ public class PlayerControls : MonoBehaviour
 				isDustTrailPlaying = false;
 				dustTrailPs.Stop(false, ParticleSystemStopBehavior.StopEmitting);
 			}
-			else if (!isDustTrailPlaying && isGrounded)
+			else if (!isDustTrailPlaying && isGrounded && !isPlatformed)
 			{
 				isDustTrailPlaying = true;
 				dustTrailPs.Play();
@@ -985,7 +991,7 @@ public class PlayerControls : MonoBehaviour
 	void CheckIsCloseToGround()
 	{
 		isCloseToGround = Physics2D.OverlapBox(
-			closeToGroundCheck.position, closeToGroundCheckSize, 0, whatIsGround
+			closeToGroundCheck.position, closeToGroundCheckSize, 0, whatIsGround | whatIsPlatform
 		);
 	}
 	void CheckIsWalled()

@@ -365,6 +365,7 @@ public abstract class Enemy : MonoBehaviour
 				return;
 			prevAtk = currAtk;
 		}
+		// block attack when facing player
 		if (inParryState && canParry && FacingPlayer())
 		{
 			CallChildOnParry();

@@ -78,47 +78,48 @@ public class PlayerAttack : MonoBehaviour
 						other.transform.position, 
 						Quaternion.Euler(0,0,angleZ + offset * temp.x)
 					);
-				}
-				
-				int dmg = !isStabAttack ? (!isGossamerStorm ? p.atkDmg[p.crestNum] : p.gossamerDmg) : p.stabDmg;
-				if (isRushAttack)
-					dmg = p.rushDmg;
 
-				if (isStabAttack || isGossamerStorm || isRushAttack)
-				{
-					switch (p.crestNum)
+					int dmg = !isStabAttack ? (!isGossamerStorm ? p.atkDmg[p.crestNum] : p.gossamerDmg) : p.stabDmg;
+					if (isRushAttack)
+						dmg = p.rushDmg;
+					if (isStabAttack || isGossamerStorm || isRushAttack)
 					{
-						// stronger special
-						case 1:
-							dmg = Mathf.RoundToInt(dmg * 1.3f);
-							break;
-						// weaker special
-						case 2:
-							dmg = Mathf.RoundToInt(dmg * 0.6f);
-							break;
-						case 3:
-							dmg = Mathf.RoundToInt(dmg * 0.8f);
-							break;
+						switch (p.crestNum)
+						{
+							// stronger special
+							case 1:
+								dmg = Mathf.RoundToInt(dmg * 1.3f);
+								break;
+							// weaker special
+							case 2:
+								dmg = Mathf.RoundToInt(dmg * 0.6f);
+								break;
+							case 3:
+								dmg = Mathf.RoundToInt(dmg * 0.8f);
+								break;
+						}
 					}
+
+					target.TakeDamage(
+						dmg, 
+						isGossamerStorm ? transform : null,
+						new Vector2(p.model.localScale.x * forceDir.x, forceDir.y),
+						force
+					);
+
+
+					// simple attack
+					if (!isStabAttack && !isGossamerStorm && !isRushAttack)
+						p.SetSilk(1);
 				}
 
-				target.TakeDamage(
-					dmg, 
-					isGossamerStorm ? transform : null,
-					new Vector2(p.model.localScale.x * forceDir.x, forceDir.y),
-					force
-				);
-
+				// recoil
 				if (isShawAttack)
 					p.ShawRetreat(isDashAttack);
 				else if (isRisingAttack)
 					p.RisingAtkRetreat();
 				else if (hasRecoil && !p.justParried)
 					p.Recoil();
-
-				// simple attack
-				if (!isStabAttack && !isGossamerStorm && !isRushAttack)
-					p.SetSilk(1);
 			}
 		}
 		if (other.CompareTag("Bouncy"))

@@ -90,13 +90,25 @@ public class MelonWinged : Enemy
 		}
 	}
 
+
+	private bool sighted;
 	protected override void CallChildOnInSight()
 	{
-		currentAction = CurrentAction.none;
-		anim.SetBool("isChasing", true);
+		if (!sighted)
+		{
+			currentAction = CurrentAction.none;
+			sighted = true;
+			anim.SetBool("isChasing", true);
+		}
+
 	}
 	protected override void CallChildOnLostSight()
 	{
-		anim.SetBool("isChasing", false);
+		if (sighted)
+		{
+			idleCounter = 0;
+			sighted = false;
+			anim.SetBool("isChasing", false);
+		}
 	}
 }

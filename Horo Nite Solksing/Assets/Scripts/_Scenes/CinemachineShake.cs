@@ -25,7 +25,7 @@ public class CinemachineShake : MonoBehaviour
 
 	public void ShakeCam(float intensity, float duration, float freq=0, bool forever=false)
 	{
-		if (bmcp != null)
+		if (bmcp != null && intensity > bmcp.m_AmplitudeGain)
 		{
 			bmcp.m_AmplitudeGain = startingIntensity = intensity;
 			bmcp.m_FrequencyGain = freq;
