@@ -107,7 +107,7 @@ public abstract class Enemy : MonoBehaviour
 	protected float moveDir;
 	protected bool attackingPlayer;
 	protected float searchCounter;
-	protected float maxSearchTime=2;
+	[SerializeField] protected float maxSearchTime=2;
 	[SerializeField] protected bool spawningIn; // set by animation
 	private bool summoned;
 	public bool cannotAtk;
@@ -276,6 +276,17 @@ public abstract class Enemy : MonoBehaviour
 			(model.localScale.x > 0 && target.transform.position.x - self.position.x > 0) 
 			|| (model.localScale.x < 0 && target.transform.position.x - self.position.x < 0)
 		);
+	}
+
+	protected float DistanceToPlayer(bool includeYDist=false)
+	{
+		return includeYDist ? 
+			Vector2.Distance(target.transform.position, self.position) : 
+			Mathf.Abs(target.transform.position.x - self.position.x);
+	}
+	protected float DirectionToPlayer()
+	{
+		return target.transform.position.x - self.position.x;
 	}
 
 	void KeepLookingForPlayer()

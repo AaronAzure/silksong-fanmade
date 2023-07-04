@@ -304,6 +304,8 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] bool infiniteHp;
 	[SerializeField] bool infiniteSilk;
 	[SerializeField] bool canParry=true;
+	[SerializeField] bool calcHeight;
+	private float peakHeight=-9999;
 	private float shawDir=-0.85f;
 	[SerializeField] string savedScene="Scene1";
 	[SerializeField] Vector2 savedPos;
@@ -460,6 +462,16 @@ public class PlayerControls : MonoBehaviour
 			{
 				oldRosaries = nRosaries;
 				rosariesTxt.text = nRosaries.ToString();
+			}
+		}
+
+		if (calcHeight)
+		{
+			float temp = transform.position.y;
+			if (temp > peakHeight)
+			{
+				peakHeight = temp;
+				Debug.Log($"height = <color=cyan>{peakHeight}</color>");
 			}
 		}
 
@@ -2134,7 +2146,7 @@ public class PlayerControls : MonoBehaviour
 			soulLeakPs.Play();
 		}
 
-		yield return new WaitForSeconds(0.5f);
+		yield return new WaitForSeconds(movingVertically ? 0.125f: 0.5f);
 		if (movingVertically) stuckToNewScene = false;
 		canMove = true;
 
