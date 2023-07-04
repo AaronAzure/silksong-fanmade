@@ -109,8 +109,11 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] Vector2 groundCheckSize;
 	[SerializeField] Vector2 closeToGroundCheckSize;
 	[SerializeField] Vector2 waterCheckSize;
+	[SerializeField] LayerMask whatIsPlayer;
+	private int whatIsPlayerValue;
 	[SerializeField] LayerMask whatIsGround;
 	[SerializeField] LayerMask whatIsPlatform;
+	private int whatIsPlatformValue;
 	[SerializeField] LayerMask whatIsWater;
 	[SerializeField] Transform wallCheck;
 	[SerializeField] Vector2 wallCheckSize;
@@ -375,6 +378,9 @@ public class PlayerControls : MonoBehaviour
 		healingPs.transform.parent = null;
 		bloodBurstPs.transform.parent = null;
 		cacoonObj.transform.parent = null;
+
+		whatIsPlayerValue = LayerMask.NameToLayer("Player");
+		whatIsPlatformValue = LayerMask.NameToLayer("Platform");
 
 		DontDestroyOnLoad(cacoonObj);
 		FullRestore(); // starting
@@ -1174,13 +1180,12 @@ public class PlayerControls : MonoBehaviour
 		anim.SetBool("isAttacking", false);
 		usingSkill = true;
 
-		// this.atkDir = atkDir;
-		// this.skillDir = atkDir;
 		CancelDash();
 		jumpDashed = false;
 		rb.gravityScale = 0;
 		rb.velocity = Vector2.zero;
 
+		// stabby stabby strike
 		if (skillDir == 0)
 		{
 			if (!infiniteSilk) SetSilk(-skillStabCost);
@@ -1204,8 +1209,8 @@ public class PlayerControls : MonoBehaviour
 			if (!infiniteSilk) SetSilk(-skillGossamerCost);
 			anim.SetBool("isSkillAttacking", true);
 			anim.SetFloat("skillDir", skillDir);
+			Physics2D.IgnoreLayerCollision(whatIsPlayerValue, whatIsPlatformValue, true);
 			shawSound.Play();
-			// adimaSound.Play();
 
 			yield return new WaitForSeconds(0.1666f);
 			SkillAttackEffect();
@@ -1213,6 +1218,7 @@ public class PlayerControls : MonoBehaviour
 			yield return new WaitForSeconds(0.25f);
 			anim.SetBool("isSkillAttacking", false);
 			usingSkill = false;
+			Physics2D.IgnoreLayerCollision(whatIsPlayerValue, whatIsPlatformValue, false);
 			rb.gravityScale = 1;
 
 			atkCo = null;
@@ -2067,6 +2073,7 @@ public class PlayerControls : MonoBehaviour
 		anim.SetBool("isDead", false);
 		anim.SetBool("isHurt", false);
 		anim.SetBool("isStunLock", false);
+		Physics2D.IgnoreLayerCollision(whatIsPlayerValue, whatIsPlatformValue, false);
 		beenHurt = false;
 		if (soulLeakPs != null) soulLeakPs.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
 		MusicManager.Instance.PlayMusic(MusicManager.Instance.bgMusic, MusicManager.Instance.bgMusicVol);
@@ -2137,7 +2144,6 @@ public class PlayerControls : MonoBehaviour
 		if (hp > 1 && soulLeakShortPs != null)
 		{
 			soulLeakShortPs.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-			// soulLeakShortPs.Play();
 		}
 		if ((!hasShield && hp == 1) || (hasShield && shieldHp == 0 && hp == 1))
 		{

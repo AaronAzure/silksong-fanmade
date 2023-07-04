@@ -408,6 +408,7 @@ MonoBehaviour:
   cannotAtk: 0
   activated: 0
   inParryState: 0
+  isShielding: 0
   bloodEffectObj: {fileID: 8111511875740990820}
   silkEffectObj: {fileID: 480897141148569458}
   stringEffectObj: {fileID: 1629200900604851618}
@@ -941,6 +942,18 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1376537067151301452}
     m_Modifications:
+    - target: {fileID: 1379232005320295030, guid: cb2d203c791de404c84fa270c81b21cc, type: 3}
+      propertyPath: m_Size.x
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1379232005320295030, guid: cb2d203c791de404c84fa270c81b21cc, type: 3}
+      propertyPath: m_Size.y
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1379232005320295030, guid: cb2d203c791de404c84fa270c81b21cc, type: 3}
+      propertyPath: m_Offset.y
+      value: 1.2
+      objectReference: {fileID: 0}
     - target: {fileID: 1661461387032087366, guid: cb2d203c791de404c84fa270c81b21cc, type: 3}
       propertyPath: obj
       value: 

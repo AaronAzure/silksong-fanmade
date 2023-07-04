@@ -6,7 +6,8 @@ public class PlayerAttack : MonoBehaviour
 	[SerializeField] PlayerControls p;
 	[SerializeField] Vector2 forceDir;
 	[SerializeField] float force=5;
-	[SerializeField] bool hasRecoil;
+	[SerializeField] bool canGoThruShield;
+	[Space] [SerializeField] bool hasRecoil;
 	[SerializeField] bool isShawAttack;
 	[SerializeField] bool isDashAttack;
 	[SerializeField] bool isRisingAttack;
@@ -70,7 +71,7 @@ public class PlayerAttack : MonoBehaviour
 				hitSomething = true;
 
 				// receive normal attack
-				if (!target.inParryState)
+				if (!target.inParryState && !target.isShielding)
 				{
 					Vector2 temp = (other.transform.position - transform.position).normalized;
 					float angleZ = 
@@ -80,50 +81,41 @@ public class PlayerAttack : MonoBehaviour
 						other.transform.position, 
 						Quaternion.Euler(0,0,angleZ + offset * temp.x)
 					);
-
-					int dmg = !isStabAttack ? (!isGossamerStorm ? p.atkDmg[p.crestNum] : p.gossamerDmg) : p.stabDmg;
-					if (isRushAttack)
-						dmg = p.rushDmg;
-					if (isStabAttack || isGossamerStorm || isRushAttack)
-					{
-						switch (p.crestNum)
-						{
-							// stronger special
-							case 1:
-								dmg = Mathf.RoundToInt(dmg * 1.3f);
-								break;
-							// weaker special
-							case 2:
-								dmg = Mathf.RoundToInt(dmg * 0.6f);
-								break;
-							case 3:
-								dmg = Mathf.RoundToInt(dmg * 0.8f);
-								break;
-						}
-					}
-
-					target.TakeDamage(
-						dmg, 
-						isGossamerStorm ? transform : null,
-						new Vector2(p.model.localScale.x * forceDir.x, forceDir.y),
-						force
-					);
-
-
-					// simple attack
-					if (!isStabAttack && !isGossamerStorm && !isRushAttack)
-						p.SetSilk(1);
 				}
-				// blocked
-				else
+
+				int dmg = !isStabAttack ? (!isGossamerStorm ? p.atkDmg[p.crestNum] : p.gossamerDmg) : p.stabDmg;
+				if (isRushAttack)
+					dmg = p.rushDmg;
+				if (isStabAttack || isGossamerStorm || isRushAttack)
 				{
-					target.TakeDamage(
-						0, 
-						null,
-						new Vector2(p.model.localScale.x * forceDir.x, forceDir.y),
-						force
-					);
+					switch (p.crestNum)
+					{
+						// stronger special
+						case 1:
+							dmg = Mathf.RoundToInt(dmg * 1.3f);
+							break;
+						// weaker special
+						case 2:
+							dmg = Mathf.RoundToInt(dmg * 0.6f);
+							break;
+						case 3:
+							dmg = Mathf.RoundToInt(dmg * 0.8f);
+							break;
+					}
 				}
+
+				target.TakeDamage(
+					dmg, 
+					isGossamerStorm ? transform : null,
+					new Vector2(p.model.localScale.x * forceDir.x, forceDir.y),
+					force, true, true, !canGoThruShield
+				);
+
+
+				// simple attack
+				if (!isStabAttack && !isRushAttack && !isGossamerStorm && 
+					!target.inParryState && (canGoThruShield || !target.isShielding))
+					p.SetSilk(1);
 
 				// recoil
 				if (isShawAttack)

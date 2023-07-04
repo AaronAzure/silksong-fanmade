@@ -44,13 +44,13 @@ public class MelonKnight : Enemy
 	
 	protected override void AttackingAction()
 	{
-		if (!usedShield)
+		if (!usedShield && isGrounded)
 		{
 			UseShield(true);
 		}
 		if (!inAtkAnim)
 		{
-			if (inParryState)
+			if (isShielding)
 			{
 				anim.SetFloat(
 					"shieldDir", 
@@ -86,7 +86,7 @@ public class MelonKnight : Enemy
 			else if (!chasingAnim && !receivingKb)
 			{
 				rb.velocity = new Vector2(0, rb.velocity.y);
-				if (!usedShield)
+				if (!usedShield && !isGrounded)
 				{
 					anim.SetFloat("moveSpeed", 1);
 					UseShield(true);

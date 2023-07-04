@@ -113,6 +113,7 @@ public abstract class Enemy : MonoBehaviour
 	public bool cannotAtk;
 	public bool activated;
 	public bool inParryState;
+	public bool isShielding;
 
 
 
@@ -168,6 +169,7 @@ public abstract class Enemy : MonoBehaviour
 	protected virtual void CallChildOnHurtAfter() { }
 	protected virtual void CallChildOnDeath() { }
 	protected virtual void CallChildOnParry() { }
+	protected virtual void CallChildOnShielded() { }
 	public virtual void CallChildOnSuperClose() { }
 
 	protected virtual void CallChildOnInAreaSwap() 
@@ -368,7 +370,7 @@ public abstract class Enemy : MonoBehaviour
 
 	private GameObject prevAtk;
 	public void TakeDamage(int dmg, Transform opponent, Vector2 forceDir, 
-		float force, bool canShake=true, bool canParry=true, GameObject currAtk=null)
+		float force, bool canShake=true, bool canParry=true, bool canBlock=true, GameObject currAtk=null)
 	{
 		if (currAtk != null)
 		{
@@ -378,6 +380,10 @@ public abstract class Enemy : MonoBehaviour
 		}
 		// block attack when facing player
 		if (inParryState && canParry && FacingPlayer())
+		{
+			CallChildOnParry();
+		}
+		else if (isShielding && canBlock && FacingPlayer())
 		{
 			CallChildOnParry();
 		}

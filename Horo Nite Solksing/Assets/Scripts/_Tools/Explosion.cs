@@ -46,6 +46,7 @@ public class Explosion : Tool
 				force,
 				false,
 				false,
+				false,
 				gameObject
 			);
 		}
