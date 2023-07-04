@@ -10,7 +10,7 @@ public class ExitPoint : MonoBehaviour
     void Start()
     {
         PlayerControls p = PlayerControls.Instance;
-		if (p != null && !p.started)
+		if (p != null && !p.started && p.loadExitPoint)
 		{
 			if (exitPoints == null)
 				p.MoveOutOfNewScene(Vector2.zero);

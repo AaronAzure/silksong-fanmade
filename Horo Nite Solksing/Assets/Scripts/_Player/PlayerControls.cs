@@ -291,7 +291,8 @@ public class PlayerControls : MonoBehaviour
 
 	private bool invulnerable;
 	private float nextSceneSpeed;
-	[HideInInspector] public bool started = true;
+	[HideInInspector] public bool started=true;
+	[HideInInspector] public bool loadExitPoint=true;
 	private bool movingToNextScene;
 	private bool movingVertically;	// jumping or falling through new scene 
 	private bool movingVerticallyJumping;
@@ -2024,6 +2025,7 @@ public class PlayerControls : MonoBehaviour
 		CinemachineShake.Instance.ShakeCam(8f, 5f, 0.8f, true);
 		MusicManager.Instance.PlayMusic(null);
 		isDead = true;
+		loadExitPoint = false;
 		nKilled = 0;
 		rb.velocity = Vector2.zero;
 		rb.gravityScale = 0;
@@ -2056,6 +2058,7 @@ public class PlayerControls : MonoBehaviour
 		if (deathAnimObj != null)
 			deathAnimObj.SetActive(false);
 		gm.transitionAnim.SetFloat("speed", 1);
+		loadExitPoint = true;
 
 		if (!saveDeath)
 		{
@@ -2129,6 +2132,7 @@ public class PlayerControls : MonoBehaviour
 	{
 		isCountingTime = true;
 		isWallJumping = false;
+		isWallSliding = false;
 		canMoveBegin = canMoveHorz = canMove = false;
 		this.newScenePos = transform.position = newScenePos;
 		if (movingVertically) stuckToNewScene = true;

@@ -34843,8 +34843,8 @@ MonoBehaviour:
   moveSpeed: 5
   jumpDashForce: 10
   jumpForce: 7
-  fallSpeed: 4
-  fallGrav: 1.2
+  fallSpeed: -4
+  fallGrav: 1.3
   risingForce: 10
   wallJumpForce: {x: 4, y: 8}
   needToRestObj: {fileID: 4518672902730830674}
@@ -34862,12 +34862,12 @@ MonoBehaviour:
   groundCheckSize: {x: 0.35, y: 0.2}
   closeToGroundCheckSize: {x: 0.3, y: 1}
   waterCheckSize: {x: 0.4, y: 1}
-  whatIsGround:
-    serializedVersion: 2
-    m_Bits: 8
   whatIsPlayer:
     serializedVersion: 2
     m_Bits: 64
+  whatIsGround:
+    serializedVersion: 2
+    m_Bits: 8
   whatIsPlatform:
     serializedVersion: 2
     m_Bits: 16384
