@@ -14,6 +14,11 @@ public class VineKnight : Enemy
 	[SerializeField] float atkTimer;
 	[SerializeField] float atkTimerLimit=2f;
 
+	[Space] [SerializeField] bool isBackDashing;
+	private bool justBackDashed;
+	[SerializeField] float backDashSpeed=3f;
+	[field: SerializeField] protected Transform groundBehindDetect;
+
 		
 	protected override void CallChildOnStart()
 	{
@@ -21,6 +26,28 @@ public class VineKnight : Enemy
 		if (gm != null && gm.easyMode)
 			trapOffset = 2;
 	}
+
+	// return true if there is ground
+	protected virtual bool CheckBehindForGround()
+	{
+		RaycastHit2D groundInfo = Physics2D.Linecast(
+			groundBehindDetect.position, 
+			groundBehindDetect.position + new Vector3(0, -groundDistDetect), 
+			whatIsGround
+		);
+		return (groundInfo.collider != null);
+	}
+	// return true if there is wall behind
+	protected virtual bool CheckBehindForWall()
+	{
+		RaycastHit2D wallInfo = Physics2D.Linecast(
+			eyes.position, 
+			groundBehindDetect.position, 
+			whatIsGround
+		);
+		return (wallInfo.collider != null);
+	}
+
 
 	private bool sighted;
 	protected override void CallChildOnInSight()
@@ -56,7 +83,7 @@ public class VineKnight : Enemy
 
 	protected override void AttackingAction()
 	{
-		if (!stillAttacking && !inAlertAnim)
+		if (!isBackDashing && !stillAttacking && !inAlertAnim)
 		{
 			if (!isSuperClose && !receivingKb)
 			{
@@ -75,13 +102,31 @@ public class VineKnight : Enemy
 			
 			if (!inAlertAnim)
 				atkTimer += Time.fixedDeltaTime;
-			if (atkTimer > atkTimerLimit)
+			if (isSuperClose && atkTimer < 0.5f && CheckBehindForGround() && !CheckBehindForWall())
+			{
+				atkTimer = 0.5f;
+				anim.SetTrigger("backDash");
+			}
+			else if (atkTimer > atkTimerLimit)
 			{
 				atkTimer = 0;
 				anim.SetBool("isMoving", false);
 				anim.SetBool("isClose", isSuperClose);
 				anim.SetTrigger("attack");
 			}
+		}
+		else if (isBackDashing && !receivingKb)
+		{
+			justBackDashed = true;
+			if (CheckBehindForGround())
+				rb.velocity = new Vector2(model.localScale.x * -backDashSpeed, rb.velocity.y);
+			else
+				rb.velocity = new Vector2(0, rb.velocity.y);
+		}
+		else if (justBackDashed)
+		{
+			justBackDashed = false;
+			rb.velocity = new Vector2(0, rb.velocity.y);
 		}
 		else if (!receivingKb)
 		{
