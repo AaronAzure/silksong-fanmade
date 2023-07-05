@@ -74,7 +74,7 @@ public class MelonKnight : Enemy
 			// chasing and not shield
 			if (!isSuperClose)
 			{
-				if (chasingAnim)
+				if (chasingAnim && isGrounded && !receivingKb)
 					ChasePlayer();
 				if (usedShield)
 				{
@@ -83,7 +83,7 @@ public class MelonKnight : Enemy
 				}
 			}
 			// shielding and not chasing
-			else if (!chasingAnim && !receivingKb)
+			else if (!chasingAnim)
 			{
 				rb.velocity = new Vector2(0, rb.velocity.y);
 				if (!usedShield && !isGrounded)

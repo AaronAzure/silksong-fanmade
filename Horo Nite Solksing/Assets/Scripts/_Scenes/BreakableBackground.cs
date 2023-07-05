@@ -8,6 +8,7 @@ public class BreakableBackground : Breakable
 	[SerializeField] GameObject visualObj;
 	[SerializeField] GameObject hitboxObj;
 	[SerializeField] GameObject dmgVfxObj;
+	[SerializeField] bool destoryAfter;
 
 	protected override void CallChildOnStart() { }
 
@@ -29,5 +30,13 @@ public class BreakableBackground : Breakable
 		{
 			dmgVfxObj.SetActive(true);
 		}
+		if (destoryAfter)
+			StartCoroutine( DestroyCo() );
+	}
+
+	IEnumerator DestroyCo()
+	{
+		yield return new WaitForSeconds(3);
+		Destroy(gameObject);
 	}
 }

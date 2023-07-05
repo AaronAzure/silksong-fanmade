@@ -9,12 +9,84 @@ public class VineKnight : Enemy
 	[SerializeField] GameObject vineTrapObj;
 	[SerializeField] float trapOffset=1.5f;
 
+	
+	[SerializeField] bool inAlertAnim;
+	[SerializeField] float atkTimer;
+	[SerializeField] float atkTimerLimit=2f;
+
 		
 	protected override void CallChildOnStart()
 	{
 		gm = GameManager.Instance;
 		if (gm != null && gm.easyMode)
 			trapOffset = 2;
+	}
+
+	private bool sighted;
+	protected override void CallChildOnInSight()
+	{
+		if (!sighted)
+		{
+			sighted = true;
+			atkTimer = 0;
+			rb.velocity = new Vector2(0, rb.velocity.y);
+			currentAction = CurrentAction.none;
+			anim.SetFloat("moveSpeed",2);
+			anim.SetBool("isMoving", false);
+			anim.SetTrigger("alert");
+			anim.SetBool("isChasing", true);
+		}
+	}
+
+	protected override void CallChildOnLostSight()
+	{
+		if (sighted)
+		{
+			anim.SetFloat("moveSpeed",1);
+			sighted = false;
+			idleCounter = 0;
+			anim.SetBool("isChasing", false);
+		}
+	}
+
+	protected override void IdleAction()
+	{
+		WalkAround();
+	}
+
+	protected override void AttackingAction()
+	{
+		if (!stillAttacking && !inAlertAnim)
+		{
+			if (!isSuperClose && !receivingKb)
+			{
+				if (isGrounded)
+					ChasePlayer();
+				else
+					MoveInPrevDirection();
+			}
+			else if (!receivingKb)
+			{
+				rb.velocity = new Vector2(0, rb.velocity.y);
+				anim.SetBool("isMoving", false);
+			}
+
+			FacePlayer();
+			
+			if (!inAlertAnim)
+				atkTimer += Time.fixedDeltaTime;
+			if (atkTimer > atkTimerLimit)
+			{
+				atkTimer = 0;
+				anim.SetBool("isMoving", false);
+				anim.SetBool("isClose", isSuperClose);
+				anim.SetTrigger("attack");
+			}
+		}
+		else if (!receivingKb)
+		{
+			rb.velocity = new Vector2(0, rb.velocity.y);
+		}
 	}
 
 	private void OnDrawGizmosSelected() 
