@@ -726,6 +726,7 @@ public class PlayerControls : MonoBehaviour
 				else if (isWallSliding)
 					Flip();
 				anim.SetBool("isAirDash", true);
+				anim.SetFloat("moveSpeed", 1);
 				airDashed = true;
 			}
 				
