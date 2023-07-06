@@ -386,7 +386,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1376537067151301443, guid: 0a4daa4a9087845d88c0f6ebc5de9eba, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1376537067151301452, guid: 0a4daa4a9087845d88c0f6ebc5de9eba, type: 3}
       propertyPath: m_RootOrder
@@ -432,6 +432,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2922501824295804921, guid: 0a4daa4a9087845d88c0f6ebc5de9eba, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.417
+      objectReference: {fileID: 0}
+    - target: {fileID: 2922501824295804927, guid: 0a4daa4a9087845d88c0f6ebc5de9eba, type: 3}
+      propertyPath: ropeSegLen
+      value: 0.481
+      objectReference: {fileID: 0}
+    - target: {fileID: 6075949199832574002, guid: 0a4daa4a9087845d88c0f6ebc5de9eba, type: 3}
+      propertyPath: melonFlail
+      value: 
+      objectReference: {fileID: 2066167223}
     - target: {fileID: 7424583608485614762, guid: 0a4daa4a9087845d88c0f6ebc5de9eba, type: 3}
       propertyPath: m_Sprite
       value: 
@@ -37113,6 +37125,17 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &2066167223 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2922501824295804927, guid: 0a4daa4a9087845d88c0f6ebc5de9eba, type: 3}
+  m_PrefabInstance: {fileID: 25589370}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5163e104b5b7b4ed0b346a88798720ed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2079145451
 GameObject:
   m_ObjectHideFlags: 0

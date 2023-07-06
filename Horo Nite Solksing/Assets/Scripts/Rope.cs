@@ -7,13 +7,19 @@ public class Rope : MonoBehaviour
 		private LineRenderer lineRenderer;
 		private List<RopeSegment> ropeSegments = new List<RopeSegment>();
 		[SerializeField] [Range(0f,1f)] float ropeSegLen = 0.25f;
+		private int origSegmentLength;
 		[SerializeField] [Range(0,100)] int segmentLength = 35;
 		[SerializeField] float lineWidth = 0.1f;
 		private float counter;
 		public Transform tailPos;
+		public Transform target;
 		public Vector2 startPos;
 		public Vector2 endPos;
+		public float dir;
 		[SerializeField] bool isSimulating=true;
+		public bool isRetracting;
+		private float retractTimer;
+		[SerializeField] float retractSpeed=0.1f;
 
 		
 		[Space] [Header("Funny")] 
@@ -30,13 +36,13 @@ public class Rope : MonoBehaviour
 
 		void OnEnable()
 		{
+			origSegmentLength = segmentLength;
 			// Vector2 ropeStartPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-			Vector2 ropeStartPoint = (transform.position);
-			float xDif = ((endPos.x - (transform.position.x)) / segmentLength);
-			float yDif = ((endPos.y - (transform.position.y)) / segmentLength);
+			Vector2 ropeStartPoint = Vector2.zero;
+			float xDif = ((target.position.x - (transform.position.x)) / (segmentLength)) * dir * 2;
+			float yDif = ((target.position.y - (transform.position.y)) / (segmentLength));
 
-			if (this.ropeSegments != null)
-				this.ropeSegments.Clear();
+			retractSpeed = 0.5f / segmentLength;
 
 			for (int i = 0; i < segmentLength; i++)
 			{
@@ -52,6 +58,13 @@ public class Rope : MonoBehaviour
 					ropeStartPoint.y += yDif;
 				}
 			}
+		}
+
+		private void OnDisable() 
+		{
+			this.ropeSegments.Clear();
+			segmentLength = origSegmentLength;
+			isRetracting = false;
 		}
 
 		private void OnDrawGizmosSelected() 
@@ -86,6 +99,19 @@ public class Rope : MonoBehaviour
 		{
 			if (isSimulating)
 				this.Simulate();
+
+			if (isRetracting)
+			{
+				retractTimer += Time.fixedDeltaTime;
+				if (retractTimer > retractSpeed)
+				{
+					retractTimer = 0;
+					if (segmentLength > 0)
+						segmentLength--;
+					else
+						gameObject.SetActive(false);
+				}
+			}
 		}
 
 		private void Simulate()

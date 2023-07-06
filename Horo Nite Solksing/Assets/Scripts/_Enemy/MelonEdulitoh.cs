@@ -13,6 +13,15 @@ public class MelonEdulitoh : Enemy
 	
 	[Space] [SerializeField] Transform spawnPos;
 	[SerializeField] Rope melonFlail;
+	[SerializeField] bool lockDirectionAnim;
+
+	protected override void CallChildOnStart()
+	{
+		if (melonFlail != null)
+		{
+			melonFlail.target = target.self;
+		}
+	}
 
 	protected override void IdleAction()
 	{
@@ -31,7 +40,7 @@ public class MelonEdulitoh : Enemy
 			if (!attackingAnim && !alertAnim)
 			{
 				RaycastHit2D targetInfo = Physics2D.Raycast(
-					transform.position, 
+					target.self.position, 
 					new Vector2((PlayerIsToTheRight() ? -1 : 1), 0.5f),  
 					distToPlayer,
 					whatIsGround
@@ -48,7 +57,8 @@ public class MelonEdulitoh : Enemy
 				);
 
 				// chasing
-				FacePlayer();
+				if (lockDirectionAnim)
+					FacePlayer();
 				if (!chase)
 				{
 					chase = true;
@@ -99,9 +109,18 @@ public class MelonEdulitoh : Enemy
 	{
 		if (melonFlail != null)
 		{
+			melonFlail.endPos = target.self.position;
+			melonFlail.dir = model.transform.localScale.x > 0 ? 1 : -1;
 			melonFlail.gameObject.SetActive(false);
 			melonFlail.gameObject.SetActive(true);
-			melonFlail.endPos = target.self.position;
+		}
+	}
+
+	public void _RETRACT_MELON_FLAIL()
+	{
+		if (melonFlail != null)
+		{
+			melonFlail.isRetracting = true;
 		}
 	}
 }

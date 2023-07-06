@@ -79,7 +79,7 @@ public class PlayerControls : MonoBehaviour
 
 	private bool isGrounded;
 	private bool isPlatformed;
-	private bool isCloseToGround;
+	// private bool isCloseToGround;
 	private bool jumpRegistered;
 	private bool inWater;
 	private bool isPogoing;
@@ -108,10 +108,12 @@ public class PlayerControls : MonoBehaviour
 	[Space] [SerializeField] float jumpMaxTimer=0.5f;
 	private float coyoteTimer;
 	[SerializeField] float coyoteThreshold=0.1f;
+	private float jumpBufferTimer;
+	[SerializeField] float jumpBufferThreshold=0.2f;
 	[SerializeField] Transform groundCheck;
-	[SerializeField] Transform closeToGroundCheck;
+	// [SerializeField] Transform closeToGroundCheck;
 	[SerializeField] Vector2 groundCheckSize;
-	[SerializeField] Vector2 closeToGroundCheckSize;
+	// [SerializeField] Vector2 closeToGroundCheckSize;
 	[SerializeField] Vector2 waterCheckSize;
 	[SerializeField] LayerMask whatIsPlayer;
 	private int whatIsPlayerValue;
@@ -638,7 +640,7 @@ public class PlayerControls : MonoBehaviour
 				if (!isGrounded)
 					anim.SetFloat("jumpVelocity", rb.velocity.y);
 
-				CheckIsCloseToGround();
+				// CheckIsCloseToGround();
 				CheckIsGrounded();
 				CoyoteTimeMechanic();
 				CheckIsInWater();
@@ -791,14 +793,20 @@ public class PlayerControls : MonoBehaviour
 	void JumpMechanic()
 	{
 		// First Frame of Jump
-		if (isCloseToGround && player.GetButtonDown("Jump"))
+		if (player.GetButtonDown("Jump"))
 		{
+			jumpBufferTimer = 0;
 			jumpRegistered = true;
 		}
+		if (jumpRegistered && jumpBufferTimer < jumpBufferThreshold)
+		{
+			jumpBufferTimer += Time.fixedDeltaTime;
+		}
 		// First Frame of Jump
-		if (!isJumping && (jumpRegistered || player.GetButtonDown("Jump")) && coyoteTimer < coyoteThreshold)
+		if (!isJumping && jumpBufferTimer < jumpBufferThreshold && coyoteTimer < coyoteThreshold)
 		{
 			jumpRegistered = false;
+			jumpBufferTimer = 0;
 			Jump();
 		}
 		// Released jump button
@@ -944,7 +952,7 @@ public class PlayerControls : MonoBehaviour
 		{
 			if (!inAtkState)
 			{
-				anim.SetFloat("moveSpeed", x != 0 ? x * activeMoveSpeed : 1);
+				anim.SetFloat("moveSpeed", x != 0 ? Mathf.Abs(x * activeMoveSpeed) : 1);
 			}
 			if (!isGrounded && !inShawAtk && !isJumping && !isWallJumping && rb.velocity.y < fallSpeed)
 				rb.gravityScale = fallGrav;
@@ -1028,12 +1036,12 @@ public class PlayerControls : MonoBehaviour
 		if (isGrounded && anim.GetBool("isAirDash")) 
 			anim.SetBool("isAirDash", false);
 	}
-	void CheckIsCloseToGround()
-	{
-		isCloseToGround = Physics2D.OverlapBox(
-			closeToGroundCheck.position, closeToGroundCheckSize, 0, whatIsGround | whatIsPlatform
-		);
-	}
+	// void CheckIsCloseToGround()
+	// {
+	// 	isCloseToGround = Physics2D.OverlapBox(
+	// 		closeToGroundCheck.position, closeToGroundCheckSize, 0, whatIsGround | whatIsPlatform
+	// 	);
+	// }
 	void CheckIsWalled()
 	{
 		isWallSliding = Physics2D.OverlapBox(wallCheck.position, wallCheckSize, 0, whatIsGround) && !isGrounded && moveX != 0;
