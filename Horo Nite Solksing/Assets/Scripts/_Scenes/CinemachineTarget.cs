@@ -14,6 +14,7 @@ public class CinemachineTarget : MonoBehaviour
 		if (cm != null)
 		{
 			cm.m_Follow = PlayerControls.Instance.model;
+			// cm.m_Follow = PlayerControls.Instance.camTarget;
 			// cm.m_Follow = GameObject.Find("HORNET (PLAYER)/Model").transform;
 		}
     }

@@ -47,6 +47,7 @@ public class PlayerControls : MonoBehaviour
 	[Space] [Header("Platformer")]
 	[SerializeField] Rigidbody2D rb;
 	public Transform model;
+	public Transform camTarget;
 
 	[Space] [SerializeField] ParticleSystem dustTrailPs;
 	[SerializeField] ParticleSystem wallSlideTrailPsRight;
@@ -57,6 +58,7 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] float jumpDashForce=10;
 	[SerializeField] float jumpForce=10;
 	[SerializeField] float fallSpeed=3;
+	[SerializeField] float fallClampSpeed=-10f;
 	[SerializeField] float fallGrav=1.2f;
 	// private bool isFalling;
 	[SerializeField] float risingForce=10;
@@ -104,6 +106,8 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] float ledgeGrabDist=0.3f;
 
 	[Space] [SerializeField] float jumpMaxTimer=0.5f;
+	private float coyoteTimer;
+	[SerializeField] float coyoteThreshold=0.1f;
 	[SerializeField] Transform groundCheck;
 	[SerializeField] Transform closeToGroundCheck;
 	[SerializeField] Vector2 groundCheckSize;
@@ -620,6 +624,7 @@ public class PlayerControls : MonoBehaviour
 					rb.velocity = new Vector2(moveDir * dashSpeed, rb.velocity.y);
 
 				CheckIsGrounded();
+				CoyoteTimeMechanic();
 				CheckIsInWater();
 				CheckIsWalledWhistShaw();
 				if (atkDir == 2 && (isGrounded || isWallSliding))
@@ -636,6 +641,7 @@ public class PlayerControls : MonoBehaviour
 
 				CheckIsCloseToGround();
 				CheckIsGrounded();
+				CoyoteTimeMechanic();
 				CheckIsInWater();
 				CheckIsWalled();
 
@@ -791,7 +797,7 @@ public class PlayerControls : MonoBehaviour
 			jumpRegistered = true;
 		}
 		// First Frame of Jump
-		if (isGrounded && !isJumping && jumpRegistered)
+		if (!isJumping && (jumpRegistered || player.GetButtonDown("Jump")) && coyoteTimer < coyoteThreshold)
 		{
 			jumpRegistered = false;
 			Jump();
@@ -799,7 +805,10 @@ public class PlayerControls : MonoBehaviour
 		// Released jump button
 		else if (player.GetButtonUp("Jump") || CheckIsCeiling())
 		{
+			if (isJumping)
+				rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.75f);
 			jumpRegistered = isJumping = false;
+			coyoteTimer = coyoteThreshold;
 		}
 		// Holding jump button
 		else if (isJumping && player.GetButton("Jump"))
@@ -868,6 +877,10 @@ public class PlayerControls : MonoBehaviour
 
 	void Move()
 	{
+		// clamp fall speed
+		if (rb.velocity.y < fallClampSpeed)
+			rb.velocity = new Vector2(rb.velocity.x, fallClampSpeed);
+			
 		// cutscene
 		if (movingToNextScene)
 		{
@@ -965,10 +978,17 @@ public class PlayerControls : MonoBehaviour
 			model.localScale = new Vector3(-1, 1, 1);
 	}
 
+	void CoyoteTimeMechanic()
+	{
+		if (isGrounded)
+			coyoteTimer = 0;
+		else
+			coyoteTimer += Time.fixedDeltaTime;
+	}
+
 	void CheckIsInWater()
 	{
 		inWater = Physics2D.OverlapBox(model.position, waterCheckSize, 0, whatIsWater);
-		// Debug.Log("<color=cyan>" + (inWater ? "In water" : "NOT") + "</color>");
 	}
 	void CheckIsGrounded()
 	{
@@ -977,6 +997,7 @@ public class PlayerControls : MonoBehaviour
 			isGrounded = true;
 		else
 			isGrounded = Physics2D.OverlapBox(groundCheck.position, groundCheckSize, 0, whatIsGround);
+
 		if (dustTrailPs != null)
 		{
 			if (isDustTrailPlaying && !isGrounded)

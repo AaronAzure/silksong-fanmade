@@ -100,7 +100,7 @@ public class VineKnight : Enemy
 
 			FacePlayer();
 			
-			if (!inAlertAnim)
+			if (inRange && !inAlertAnim)
 				atkTimer += Time.fixedDeltaTime;
 			if (isSuperClose && atkTimer < 0.5f && CheckBehindForGround() && !CheckBehindForWall())
 			{

@@ -290,6 +290,10 @@ public abstract class Enemy : MonoBehaviour
 	{
 		return target.transform.position.x - self.position.x;
 	}
+	protected bool PlayerIsToTheRight()
+	{
+		return (target.transform.position.x - self.position.x) > 0;
+	}
 
 	void KeepLookingForPlayer()
 	{
