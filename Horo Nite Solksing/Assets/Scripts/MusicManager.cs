@@ -9,6 +9,9 @@ public class MusicManager : MonoBehaviour
 	public AudioSource bgMusic;
 	[field: SerializeField] public float bgMusicVol {get; private set;}
 
+	[Space] public AudioSource melonBgMusic;
+	[field: SerializeField] public float melonBgMusicVol {get; private set;}
+
 	[Space] public AudioSource bossMusic;
 	[field: SerializeField] public float bossMusicVol {get; private set;}
 

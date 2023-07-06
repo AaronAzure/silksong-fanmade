@@ -432,8 +432,7 @@ public class PlayerControls : MonoBehaviour
 		else
 			StartCoroutine( StartCo() );
 
-		MusicManager m = MusicManager.Instance;
-		m.PlayMusic(m.bgMusic, m.bgMusicVol);
+		PlayBackgroundMusic();
 	}
 
 	bool CanControl()
@@ -2101,7 +2100,7 @@ public class PlayerControls : MonoBehaviour
 		Physics2D.IgnoreLayerCollision(whatIsPlayerValue, whatIsPlatformValue, false);
 		beenHurt = false;
 		if (soulLeakPs != null) soulLeakPs.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-		MusicManager.Instance.PlayMusic(MusicManager.Instance.bgMusic, MusicManager.Instance.bgMusicVol);
+		PlayBackgroundMusic();
 		FullRestore();	// respawn
 		SetSilk(-silkMeter);
 		hurtCo = null;
@@ -2347,6 +2346,15 @@ public class PlayerControls : MonoBehaviour
 		if (parryCo != null) StopCoroutine( ParryCo() );
 		Time.timeScale = 0;
 		parryCo = StartCoroutine( ParryCo() );
+	}
+
+	public void PlayBackgroundMusic()
+	{
+		MusicManager m = MusicManager.Instance;
+		if (SceneManager.GetActiveScene().name.StartsWith("Melon"))
+			m.PlayMusic(m.melonBgMusic, m.melonBgMusicVol);
+		else
+			m.PlayMusic(m.bgMusic, m.bgMusicVol);
 	}
 
 	public IEnumerator ParryCo()
