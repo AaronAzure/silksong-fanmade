@@ -7,13 +7,15 @@ public class MelonEdulitoh : Enemy
 	private bool chase;
 	[SerializeField] float distToPlayer=3;
 	[SerializeField] bool alertAnim;
-	[SerializeField] bool attackingAnim;
 	[SerializeField] float closeDistTimer;
 	[SerializeField] float closeDistTotal=1;
 	
-	[Space] [SerializeField] Transform spawnPos;
+	[Space] [SerializeField] Transform gripPos;
 	[SerializeField] Rope melonFlail;
+	[SerializeField] float flailReach=5f;
 	[SerializeField] bool lockDirectionAnim;
+	private Vector2 destPos;
+	[SerializeField] bool stillPreping;
 
 	protected override void CallChildOnStart()
 	{
@@ -35,9 +37,21 @@ public class MelonEdulitoh : Enemy
 
 	protected override void AttackingAction()
 	{
+		if (!lockDirectionAnim)
+			FacePlayer();
 		if (!receivingKb)
 		{
-			if (!attackingAnim && !alertAnim)
+			if (!alertAnim)
+			{
+				Vector2 dir = ((Vector3) destPos - transform.position).normalized;
+				rb.AddForce(dir * chaseSpeed * 5, ForceMode2D.Force);
+				rb.velocity = new Vector2(
+					Mathf.Clamp(rb.velocity.x, -chaseSpeed, chaseSpeed),
+					Mathf.Clamp(rb.velocity.y, -chaseSpeed, chaseSpeed)
+				);
+			}
+
+			if (!stillAttacking && !alertAnim)
 			{
 				RaycastHit2D targetInfo = Physics2D.Raycast(
 					target.self.position, 
@@ -45,20 +59,11 @@ public class MelonEdulitoh : Enemy
 					distToPlayer,
 					whatIsGround
 				);
-				Vector2 dest = (targetInfo.collider != null) ? 
+				destPos = (targetInfo.collider != null) ? 
 					targetInfo.point : 
 					new Vector2((PlayerIsToTheRight() ? -1 : 1), 0.5f) * distToPlayer + (Vector2) target.self.position;
-
-				Vector2 dir = ((Vector3) dest - transform.position).normalized;
-				rb.AddForce(dir * chaseSpeed * 5, ForceMode2D.Force);
-				rb.velocity = new Vector2(
-					Mathf.Clamp(rb.velocity.x, -chaseSpeed, chaseSpeed),
-					Mathf.Clamp(rb.velocity.y, -chaseSpeed, chaseSpeed)
-				);
-
+					
 				// chasing
-				if (lockDirectionAnim)
-					FacePlayer();
 				if (!chase)
 				{
 					chase = true;
@@ -70,7 +75,7 @@ public class MelonEdulitoh : Enemy
 					rb.velocity = Vector2.zero;
 					anim.SetTrigger("attack");
 				}
-				else if (isClose)
+				else if (!stillPreping && isClose)
 					closeDistTimer += Time.fixedDeltaTime;
 				else if (closeDistTimer > 0)
 					closeDistTimer -= (Time.fixedDeltaTime * 0.5f);
@@ -109,10 +114,37 @@ public class MelonEdulitoh : Enemy
 	{
 		if (melonFlail != null)
 		{
-			melonFlail.endPos = target.self.position;
+			Vector2 dir = (target.self.position - gripPos.position).normalized;
+			RaycastHit2D targetInfo = Physics2D.Raycast(
+				gripPos.position, 
+				dir,  
+				flailReach,
+				whatIsGround
+			);
+			
+			// missed
+			if (targetInfo.collider == null)
+			{
+				melonFlail.skipStuckState = true;
+				anim.Play("melon_edulitoh_attack_anim", -1, 0.75f);
+				melonFlail.endPos = gripPos.position + (Vector3) (dir * flailReach);
+			}
+			// ht something
+			else
+			{
+				melonFlail.endPos = targetInfo.point;
+			}
 			melonFlail.dir = model.transform.localScale.x > 0 ? 1 : -1;
 			melonFlail.gameObject.SetActive(false);
 			melonFlail.gameObject.SetActive(true);
+		}
+	}
+
+	public void _HIDE_ROPE()
+	{
+		if (melonFlail != null)
+		{
+			melonFlail.gameObject.SetActive(false);
 		}
 	}
 
