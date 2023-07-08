@@ -170,6 +170,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5163e104b5b7b4ed0b346a88798720ed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  wielder: {fileID: 0}
+  ropeSegments: []
   segmentLength: 15
   nConstraint: 10
   lineWidth: 0.1
@@ -186,7 +188,8 @@ MonoBehaviour:
   doneThreshold: 0.5
   endVisualObj: {fileID: 4711826222651773629}
   hitbox: {fileID: 8207068494121817073}
-  hitBoxRb: {fileID: 4244484953883253552}
+  hitboxRb: {fileID: 4244484953883253552}
+  hitboxSpeed: 15
   isFunny: 0
   counterLimit: 0.1
   bottomLeftBound: {x: -8.16, y: -3.18}
@@ -203,6 +206,7 @@ GameObject:
   - component: {fileID: 3573446164191207606}
   - component: {fileID: 8207068494121817073}
   - component: {fileID: 4244484953883253552}
+  - component: {fileID: 1045358840067322223}
   m_Layer: 0
   m_Name: melon and vine (ball)
   m_TagString: EnemyAttack
@@ -308,7 +312,21 @@ Rigidbody2D:
   m_AngularDrag: 0.05
   m_GravityScale: 0
   m_Material: {fileID: 0}
-  m_Interpolate: 1
+  m_Interpolate: 2
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
+--- !u!114 &1045358840067322223
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5505984351860148113}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 098466d4142d1450d95c8b2e9e9c8d64, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rope: {fileID: 527753925201563011}
+  reachDuration: 0.25

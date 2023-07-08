@@ -16,6 +16,7 @@ public class MelonEdulitoh : Enemy
 	[SerializeField] bool lockDirectionAnim;
 	private Vector2 destPos;
 	[SerializeField] bool stillPreping;
+	private bool thrown;
 
 	protected override void CallChildOnStart()
 	{
@@ -84,7 +85,6 @@ public class MelonEdulitoh : Enemy
 			{
 				rb.velocity = Vector2.zero;
 			}
-
 		}
 	}
 	
@@ -110,30 +110,39 @@ public class MelonEdulitoh : Enemy
 		}
 	}
 
+	public void BallRetract()
+	{
+		anim.SetTrigger("retract");
+		thrown = false;
+	}
+
+
 	public void _THROW_MELON_FLAIL()
 	{
-		if (melonFlail != null)
+		if (!thrown && melonFlail != null)
 		{
+			thrown = true;
 			Vector2 dir = (target.self.position - gripPos.position).normalized;
-			RaycastHit2D targetInfo = Physics2D.Raycast(
-				gripPos.position, 
-				dir,  
-				flailReach,
-				whatIsGround
-			);
+			// RaycastHit2D targetInfo = Physics2D.Raycast(
+			// 	gripPos.position, 
+			// 	dir,  
+			// 	flailReach,
+			// 	whatIsGround
+			// );
 			
-			// missed
-			if (targetInfo.collider == null)
-			{
-				melonFlail.skipStuckState = true;
-				anim.Play("melon_edulitoh_attack_anim", -1, 0.75f);
-				melonFlail.endPos = gripPos.position + (Vector3) (dir * flailReach);
-			}
-			// ht something
-			else
-			{
-				melonFlail.endPos = targetInfo.point;
-			}
+			// // missed
+			// if (targetInfo.collider == null)
+			// {
+			// 	melonFlail.skipStuckState = true;
+			// 	anim.Play("melon_edulitoh_attack_anim", -1, 0.75f);
+			// 	melonFlail.endPos = gripPos.position + (Vector3) (dir * flailReach);
+			// }
+			// // ht something
+			// else
+			// {
+			// 	melonFlail.endPos = targetInfo.point;
+			// }
+			melonFlail.endPos = target.self.position;
 			melonFlail.dir = model.transform.localScale.x > 0 ? 1 : -1;
 			melonFlail.gameObject.SetActive(false);
 			melonFlail.gameObject.SetActive(true);

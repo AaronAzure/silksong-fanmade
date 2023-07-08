@@ -49,7 +49,7 @@ public class MusicManager : MonoBehaviour
     public void PlayMusic(AudioSource a, float vol=0.5f, bool remember=false)
 	{
 		string musicName = a != null ? a.name : "None";
-		Debug.Log($"<color=yellow>{musicName}</color>");
+		// Debug.Log($"<color=yellow>{musicName}</color>");
 
 		this.enabled = true;
 		if (a != null)

@@ -20,6 +20,7 @@ public class SawBlade : Tool
 	[Space] [SerializeField] Transform wallDetect;
 	[SerializeField] Vector2 wallRect;
 	[SerializeField] LayerMask whatIsGround;
+	[SerializeField] LayerMask whatIsPlatform;
 
 	protected override void CallChildOnStart()
 	{
@@ -59,7 +60,8 @@ public class SawBlade : Tool
 
 	private void OnCollisionEnter2D(Collision2D other)
 	{
-		if (!isMoving && !isOpening && other.gameObject.CompareTag("Ground") && rb.velocity.y <= 0)
+		if (!isMoving && !isOpening && rb.velocity.y <= 0 &&
+			other.gameObject.CompareTag("Ground"))
 		{
 			isOpening = true;
 			if (anim != null)
@@ -78,13 +80,12 @@ public class SawBlade : Tool
 
 			if (!isStuck)
 			{
-				if (Physics2D.OverlapBox(wallDetect.position, wallRect, 0, whatIsGround))
+				if (Physics2D.OverlapBox(wallDetect.position, wallRect, 0, whatIsGround | whatIsPlatform))
 				{
 					isStuck = true;
 					if (destroyAfterCo != null) StopCoroutine(destroyAfterCo);
 					destroyAfter = 0.2f;
 					destroyAfterCo = StartCoroutine( DestroyAfterCo() );
-					// Debug.Log("<color=magenta>stuck!!</color>");
 				}
 			}
 		}

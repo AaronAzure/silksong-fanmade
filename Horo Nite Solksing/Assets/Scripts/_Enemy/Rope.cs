@@ -5,13 +5,23 @@ using System.Linq;
 
 public class Rope : MonoBehaviour
 {
-	private LineRenderer lineRenderer;
-	// [SerializeField] MeshCollider meshCol;
-	// [SerializeField] bool generateMeshOnce=true;
-	// [SerializeField] EdgeCollider2D col;
+	[System.Serializable] public struct RopeSegment
+	{
+		public Vector2 posNow;
+		public Vector2 posOld;
 
+		public RopeSegment(Vector2 pos)
+		{
+			this.posNow = pos;
+			this.posOld = pos;
+		}
+	}
+
+
+	private LineRenderer lineRenderer;
+	[SerializeField] MelonEdulitoh wielder;
 	
-	private List<RopeSegment> ropeSegments = new List<RopeSegment>();
+	[SerializeField] List<RopeSegment> ropeSegments = new List<RopeSegment>();
 	private float ropeSegLen = 0.25f;
 	private int origSegmentLength;
 	[SerializeField] [Range(0,100)] int segmentLength = 35;
@@ -24,6 +34,7 @@ public class Rope : MonoBehaviour
 	public Vector2 endPos;
 	public float dir;
 	private Vector2 launchDir;
+	[SerializeField] bool isLaunched=true;
 	[SerializeField] bool isSimulating=true;
 	public bool isRetracting;
 	private float retractTimer;
@@ -33,6 +44,10 @@ public class Rope : MonoBehaviour
 	private float doneTimer;
 	[SerializeField] float doneThreshold=0.5f;
 	[SerializeField] Transform endVisualObj;
+	private bool hitboxActive;
+	[SerializeField] Collider2D hitbox;
+	[SerializeField] Rigidbody2D hitboxRb;
+	[SerializeField] float hitboxSpeed=40;
 
 	
 	[Space] [Header("Funny")] 
@@ -50,36 +65,17 @@ public class Rope : MonoBehaviour
 	void OnEnable()
 	{
 		origSegmentLength = segmentLength;
-		// Vector2 ropeStartPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+		this.segmentLength = 2;
 		Vector2 ropeStartPoint = Vector2.zero;
-		float xDif = ((endPos.x - (transform.position.x)) / (segmentLength)) * dir;
-		float yDif = ((endPos.y - (transform.position.y)) / (segmentLength));
 		transform.position = tailPos.position;
-
-		ropeSegLen = (Vector2.Distance(endPos, transform.position) / segmentLength);
 		launchDir = (endPos - (Vector2) transform.position).normalized;
 
-		retractSpeed = retractDuration / segmentLength;
-		doneTimer = 0;
-
-		for (int i = 0; i < segmentLength; i++)
-		{
-			this.ropeSegments.Add(new RopeSegment(ropeStartPoint));
-			if (isFunny)
-			{
-				ropeStartPoint.x = Random.Range(bottomLeftBound.x, topRightBound.x);
-				ropeStartPoint.y = Random.Range(bottomLeftBound.y, topRightBound.y);
-			}
-			else
-			{
-				ropeStartPoint.x += xDif;
-				ropeStartPoint.y += yDif;
-			}
-		}
-
-		// endVisualObj.localPosition = lineRenderer.GetPosition(lineRenderer.positionCount - 1);
 		endVisualObj.localPosition = Vector3.zero;
 		endVisualObj.gameObject.SetActive(true);
+		this.ropeSegments.Add(new RopeSegment(ropeStartPoint));
+		this.ropeSegments.Add(new RopeSegment(ropeStartPoint));
+		if (hitbox != null)
+			hitbox.enabled = true;
 	}
 
 	private void OnDisable() 
@@ -89,6 +85,9 @@ public class Rope : MonoBehaviour
 		isRetracting = false;
 		endVisualObj.gameObject.SetActive(false);
 		skipStuckState = false;
+		isLaunched = hitboxActive = true;
+		if (hitbox != null)
+			hitbox.enabled = true;
 	}
 
 	// Update is called once per frame
@@ -111,29 +110,71 @@ public class Rope : MonoBehaviour
 	{
 		transform.position = tailPos.position;
 
-		if (endVisualObj != null && lineRenderer.positionCount > 0)
-			endVisualObj.localPosition = lineRenderer.GetPosition(lineRenderer.positionCount - 1);
-
-		if (!skipStuckState && doneTimer < doneThreshold)
+		if (isLaunched)
 		{
-			doneTimer += Time.fixedDeltaTime;
+			LaunchMechanic();
 		}
-		else if (isSimulating)
+		else
 		{
-			this.Simulate();
-		}
+			if (endVisualObj != null && lineRenderer.positionCount > 0)
+				endVisualObj.localPosition = lineRenderer.GetPosition(lineRenderer.positionCount - 1);
 
-		if (skipStuckState || isRetracting)
-		{
-
-			retractTimer += Time.fixedDeltaTime;
-			if (retractTimer > retractSpeed)
+			if (!skipStuckState && doneTimer < doneThreshold)
 			{
-				retractTimer = 0;
-				if (segmentLength > 0)
-					segmentLength--;
-				else
-					gameObject.SetActive(false);
+				doneTimer += Time.fixedDeltaTime;
+			}
+
+			if (isRetracting)
+			{
+				this.Simulate();
+				retractTimer += Time.fixedDeltaTime;
+				if (retractTimer > retractSpeed)
+				{
+					retractTimer = 0;
+					if (segmentLength > 0)
+						segmentLength--;
+					else
+						gameObject.SetActive(false);
+				}
+			}
+		}
+	}
+
+	private void LaunchMechanic()
+	{
+		hitboxRb.velocity = launchDir * hitboxSpeed;
+		
+		this.ropeSegments[0] = new RopeSegment(Vector2.zero);
+		this.ropeSegments[1] = new RopeSegment(endVisualObj.localPosition);
+		// Debug.Log($" - {tailPos.position} - {endVisualObj.position} -");
+	}
+
+	private void CreateSegments()
+	{
+		segmentLength = origSegmentLength;
+		this.ropeSegments.Clear();
+		Vector2 ropeStartPoint = Vector2.zero;
+		float xDif = ((endVisualObj.position.x - (transform.position.x)) / (segmentLength)) * dir;
+		float yDif = ((endVisualObj.position.y - (transform.position.y)) / (segmentLength));
+		transform.position = tailPos.position;
+
+		ropeSegLen = (Vector2.Distance(endVisualObj.position, transform.position) / segmentLength);
+
+		retractSpeed = retractDuration / segmentLength;
+		doneTimer = 0;
+
+		for (int i = 0; i < segmentLength; i++)
+		{
+			this.ropeSegments.Add(new RopeSegment(ropeStartPoint));
+			if (isFunny)
+			{
+				ropeStartPoint.x = Random.Range(bottomLeftBound.x, topRightBound.x);
+				ropeStartPoint.y = Random.Range(bottomLeftBound.y, topRightBound.y);
+			}
+			else
+			{
+				ropeStartPoint.x += xDif;
+				ropeStartPoint.y += yDif;
 			}
 		}
 	}
@@ -252,6 +293,35 @@ public class Rope : MonoBehaviour
 	// 	meshCol.sharedMesh = newMesh;
 	// }
 
+	public void CollidedWithGround(bool missed=false)
+	{
+		isLaunched = false;
+		CreateSegments();
+		hitboxRb.velocity = Vector2.zero;
+
+		if (!missed)
+			StartCoroutine( BallRestractCo() );
+		else
+		{
+			skipStuckState = true;
+			wielder.BallRetract();
+		}
+		StartCoroutine( DeactivateHitboxCo() );
+	}
+
+	IEnumerator DeactivateHitboxCo()
+	{
+		yield return new WaitForSeconds(0.05f);
+		if (hitbox != null)
+			hitbox.enabled = hitboxActive = false;
+	}
+
+	IEnumerator BallRestractCo()
+	{
+		yield return new WaitForSeconds(0.75f);
+		wielder.BallRetract();
+	}
+
 	private Vector2[] ConvertArray(Vector3[] v3)
 	{
 		Vector2[] v2 = new Vector2[v3.Length];
@@ -261,17 +331,5 @@ public class Rope : MonoBehaviour
 			v2[i] = (Vector2) v3[i];
 		}
 		return v2;
-	}
-
-	public struct RopeSegment
-	{
-		public Vector2 posNow;
-		public Vector2 posOld;
-
-		public RopeSegment(Vector2 pos)
-		{
-			this.posNow = pos;
-			this.posOld = pos;
-		}
 	}
 }

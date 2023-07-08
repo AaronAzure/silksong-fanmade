@@ -6035,6 +6035,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   totaluses: 6
   icon: {fileID: 21300000, guid: b49b5f612fbe0452ba4132a8f1e9204d, type: 3}
+  <quickCooldown>k__BackingField: 0
   dmg: 0
   toRight: 1
   dir: {x: 2, y: 8}
@@ -6062,6 +6063,9 @@ MonoBehaviour:
   whatIsGround:
     serializedVersion: 2
     m_Bits: 8
+  whatIsPlatform:
+    serializedVersion: 2
+    m_Bits: 16384
 --- !u!50 &4224987290238405798
 Rigidbody2D:
   serializedVersion: 4

@@ -806,7 +806,7 @@ public class PlayerControls : MonoBehaviour
 		if (!isJumping && jumpBufferTimer < jumpBufferThreshold && coyoteTimer < coyoteThreshold)
 		{
 			jumpRegistered = false;
-			jumpBufferTimer = 0;
+			jumpBufferTimer = jumpBufferThreshold;
 			Jump();
 		}
 		// Released jump button
@@ -825,6 +825,7 @@ public class PlayerControls : MonoBehaviour
 				rb.velocity = new Vector2(rb.velocity.x, jumpForce);
 				jumpTimer += Time.deltaTime;
 			}
+			// jump over
 			else
 			{
 				isJumping = false;
