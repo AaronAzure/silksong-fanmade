@@ -14,10 +14,12 @@ public class MelonWinged : Enemy
 	[SerializeField] float throwForce=8;
 	[SerializeField] float horzForce=5;
 	[SerializeField] EnemyProjectile melonObj;
+	[SerializeField] float distToPlayer=2.5f;
+	private Vector2 destPos;
 
 	protected override void CallChildOnStart()
 	{
-		targetDest = target.aboveTarget;
+		// targetDest = target.aboveTarget;
 	}
 
 	protected override void IdleAction()
@@ -36,7 +38,17 @@ public class MelonWinged : Enemy
 		{
 			if (!attackingAnim && !alertAnim)
 			{
-				Vector2 dir = (targetDest.position - transform.position).normalized;
+				RaycastHit2D targetInfo = Physics2D.Raycast(
+					target.self.position, 
+					Vector2.up,  
+					distToPlayer,
+					whatIsGround
+				);
+				destPos = (targetInfo.collider != null) ? 
+					targetInfo.point + new Vector2(0, -0.5f) : 
+					Vector2.up * distToPlayer + (Vector2) target.self.position;
+
+				Vector2 dir = (destPos - (Vector2) transform.position).normalized;
 				rb.AddForce(dir * chaseSpeed * 5, ForceMode2D.Force);
 				rb.velocity = new Vector2(
 					Mathf.Clamp(rb.velocity.x, -chaseSpeed, chaseSpeed),

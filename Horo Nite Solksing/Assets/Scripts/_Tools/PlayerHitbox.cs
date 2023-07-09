@@ -5,7 +5,7 @@ using UnityEngine;
 public class PlayerHitbox : MonoBehaviour
 {
 
-	[SerializeField] int dmg;
+	public int dmg;
 	[SerializeField] float kbForce; 
 	[SerializeField] Vector2 kbDir; 
 	[SerializeField] bool overrideShake;

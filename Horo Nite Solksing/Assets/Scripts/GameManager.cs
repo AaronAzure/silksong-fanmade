@@ -287,11 +287,6 @@ public class GameManager : MonoBehaviour
 		// m.PlayMusic(m.bgMusic, m.bgMusicVol);
 	}
 
-	// public void ResumeTime()
-	// {
-	// 	if (!isPaused)
-	// 		Time.timeScale = 1;
-	// }
 	public void Vignette()
 	{
 		StartCoroutine( VignetteCo() );

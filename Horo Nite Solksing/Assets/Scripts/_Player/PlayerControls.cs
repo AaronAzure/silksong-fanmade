@@ -129,11 +129,6 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] Vector2 wallCheckSize;
 	[SerializeField] float wallSlideSpeed=2;
 
-	
-	[field: SerializeField] public Transform aboveTarget {get; private set;}
-	[field: SerializeField] public Transform leftTarget {get; private set;}
-	[field: SerializeField] public Transform rightTarget {get; private set;}
-
 
 	[Space] [SerializeField] Transform ceilingCheck;
 	[SerializeField] Vector2 ceilingCheckSize;
@@ -1327,11 +1322,13 @@ public class PlayerControls : MonoBehaviour
 			Quaternion.identity
 		);
 		tool.toRight = IsFacingRight();
+		tool.inAir = !isGrounded;
+		tool.isMaster = true;
 
-		// caltrops
+		// caltrops only
 		if (tool.isMultiple)
 		{
-			for (int i=1; i<tool.nCopies ; i++)
+			for (int i=1; i<tool.nCopies+tool.level ; i++)
 			{
 				var toolCopy = Instantiate( 
 					isTool1 || tool2 == null ? tool1 : tool2, 

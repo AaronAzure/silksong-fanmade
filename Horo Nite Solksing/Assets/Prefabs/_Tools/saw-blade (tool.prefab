@@ -6033,6 +6033,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b75c0059d548945dd85f0da66ff79b38, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  level: 0
+  isMaster: 0
+  inAir: 0
   totaluses: 6
   icon: {fileID: 21300000, guid: b49b5f612fbe0452ba4132a8f1e9204d, type: 3}
   <quickCooldown>k__BackingField: 0
@@ -6055,6 +6058,7 @@ MonoBehaviour:
   destroyAfter: 5
   anim: {fileID: 6269174450476574025}
   isCollidingAnim: 0
+  hitbox: {fileID: 2792216252244518913}
   speed: 6
   hitSpeed: 1.5
   drawbackSpeed: 1.5

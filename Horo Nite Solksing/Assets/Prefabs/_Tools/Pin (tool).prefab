@@ -110,7 +110,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8438758837603142360}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -7.58, y: -0.65, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.3, y: 0.2, z: 1}
   m_Children:
   - {fileID: 4636154882496376972}
@@ -180,10 +180,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f3deeb46fd704f1d936be3a03308eca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  level: 0
   totaluses: 12
   icon: {fileID: 21300000, guid: 1f01837e54231473b881dca598076882, type: 3}
   <quickCooldown>k__BackingField: 1
   dmg: 12
+  isMaster: 0
   toRight: 1
   dir: {x: 20, y: 0}
   velocityMultiplier: 1
@@ -200,6 +202,8 @@ MonoBehaviour:
   justThrown: 0
   noStart: 0
   destroyAfter: 0
+  pin: {fileID: 8818872947580564614}
+  angle: 0
 --- !u!50 &-723624383632158439
 Rigidbody2D:
   serializedVersion: 4

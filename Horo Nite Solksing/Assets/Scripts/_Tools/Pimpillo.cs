@@ -6,9 +6,27 @@ public class Pimpillo : Tool
 {
 	[Space] [Header("Pimpillo")]
 	[SerializeField] ParticleSystem trailPs;
-	[SerializeField] GameObject explosion;
+	[SerializeField] GameObject explosionObj;
+	[SerializeField] Tool explosion;
 	private bool createdExplosion;
 
+	protected override void CallChildOnStart()
+	{
+		switch (level)
+		{
+			case 1 :
+				explosion.dmg = 40;
+				break;
+			case 2 :
+				explosion.dmg = 50;
+				break;
+			case 3 :
+				explosion.dmg = 60;
+				break;
+			default :
+				break;
+		}
+	}
 
 	protected override void CallChildOnEnemyHit(Collider2D other)
 	{
@@ -25,9 +43,9 @@ public class Pimpillo : Tool
 			trailPs.transform.parent = null;
 			trailPs.Stop(true, ParticleSystemStopBehavior.StopEmitting);
 		}
-		if (explosion != null)
+		if (explosionObj != null)
 		{
-			Instantiate(explosion, transform.position, Quaternion.identity);
+			Instantiate(explosionObj, transform.position, Quaternion.identity);
 		}
 		Destroy(gameObject);
 	}
@@ -42,9 +60,9 @@ public class Pimpillo : Tool
 			trailPs.transform.parent = null;
 			trailPs.Stop(true, ParticleSystemStopBehavior.StopEmitting);
 		}
-		if (explosion != null)
+		if (explosionObj != null)
 		{
-			Instantiate(explosion, transform.position, Quaternion.identity);
+			Instantiate(explosionObj, transform.position, Quaternion.identity);
 		}
 		Destroy(gameObject);
 	}

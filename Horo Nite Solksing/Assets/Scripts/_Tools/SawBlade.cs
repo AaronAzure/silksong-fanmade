@@ -7,6 +7,7 @@ public class SawBlade : Tool
 	[Space] [Header("Saw Blade")] 
 	[SerializeField] Animator anim;
 	[SerializeField] bool isCollidingAnim;
+	[SerializeField] PlayerHitbox hitbox;
 
 	
 	[Space] [SerializeField] float speed=8;
@@ -27,6 +28,20 @@ public class SawBlade : Tool
 		if (transform.localScale.x < 0)
 		{
 			moveDir = -1;
+		}
+		switch (level)
+		{
+			case 1 :
+				hitbox.dmg = 7;
+				break;
+			case 2 :
+				hitbox.dmg = 9;
+				break;
+			case 3 :
+				hitbox.dmg = 11;
+				break;
+			default :
+				break;
 		}
 	}
 	protected override void CallChildOnEnemyHit(Collider2D other) {}

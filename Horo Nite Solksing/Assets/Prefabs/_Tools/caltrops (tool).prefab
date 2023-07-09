@@ -356,8 +356,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9451f649ebd4e4154b2f37d16f590811, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  level: 0
+  isMaster: 0
+  inAir: 0
   totaluses: 4
   icon: {fileID: 0}
+  <quickCooldown>k__BackingField: 0
   dmg: 5
   toRight: 1
   dir: {x: 0, y: 0}
@@ -534,8 +538,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c57282d8fcddb439c9eb49eee0b43f08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  level: 0
+  isMaster: 0
+  inAir: 0
   totaluses: 8
   icon: {fileID: 21300000, guid: 8e4b2a491f05d4f2a806dbfbffbe0565, type: 3}
+  <quickCooldown>k__BackingField: 0
   dmg: 0
   toRight: 1
   dir: {x: 3, y: 7}
@@ -544,7 +552,7 @@ MonoBehaviour:
   kbDir: {x: 0, y: 0}
   rb: {fileID: -723624383632158439}
   isMultiple: 1
-  nCopies: 4
+  nCopies: 3
   strikePs: {fileID: 8239582908247128724, guid: c20a70a8004b444e29f7efb9291192dd, type: 3}
   offset: 15
   destroyOnWallHit: 0
@@ -714,8 +722,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c57282d8fcddb439c9eb49eee0b43f08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  level: 0
+  isMaster: 0
+  inAir: 0
   totaluses: 4
   icon: {fileID: 0}
+  <quickCooldown>k__BackingField: 0
   dmg: 5
   toRight: 1
   dir: {x: 0, y: 0}
