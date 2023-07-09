@@ -20,12 +20,17 @@ public class PlayerControls : MonoBehaviour
 	private GameManager gm;
 
 
-	[Space] [Header("Status")]
-	[SerializeField] int maxHp=6;
+	[Space] [Header("STATUS")]
+	private int maxHp=6;
 	[SerializeField] int hp;
-	[SerializeField] GameObject[] extraHp;
-	[SerializeField] GameObject[] extraHpMasks;
-	[SerializeField] int nRosaries;
+	[SerializeField] int nBonusHp;
+
+	private int maxSilk=9;
+	[SerializeField] int nSilk;
+	[SerializeField] int nBonusSilk;
+	
+	
+	[Space] [SerializeField] int nRosaries;
 	[SerializeField] ParticleSystem rosaryCollectPs;
 	private int oldRosaries;
 	[SerializeField] TextMeshProUGUI rosariesTxt;
@@ -33,7 +38,6 @@ public class PlayerControls : MonoBehaviour
 	public int gossamerDmg=5;
 	public int stabDmg=30;
 	public int rushDmg=20;
-	[SerializeField] int silkMeter;
 	[SerializeField] Animator[] silks;
 	[SerializeField] GameObject[] hpMasks;
 	[SerializeField] GameObject silkGlowNorm;
@@ -44,7 +48,7 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] Material flashMat;
 
 
-	[Space] [Header("Platformer")]
+	[Space] [Header("PLATFORMER")]
 	[SerializeField] Rigidbody2D rb;
 	public Transform model;
 	public Transform camTarget;
@@ -174,14 +178,14 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] GameObject areaCanvas;
 
 
-	[Space] [Header("Sound effects")]
+	[Space] [Header("SOUND EFFECTS")]
 	[SerializeField] AudioSource shawSound;
 	[SerializeField] AudioSource agaleSound;
 	[SerializeField] AudioSource adimaSound;
 	[SerializeField] AudioSource gitGudSound;
 
 
-	[Space] [Header("Particle effects")]
+	[Space] [Header("PARTICLE EFFECTS")]
 	[SerializeField] GameObject dashEffectL;
 	[SerializeField] GameObject dashEffectR;
 	[SerializeField] GameObject healingPs;
@@ -194,7 +198,7 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] Animator flashAnim;
 
 
-	[Space] [Header("Animator Controlled")]
+	[Space] [Header("ANIMATOR CONTROLLED")]
 	[SerializeField] bool isLedgeGrabbing; // controlled by animator
 	[SerializeField] bool inAnimation;
 	[SerializeField] bool inRushSkill;
@@ -217,12 +221,12 @@ public class PlayerControls : MonoBehaviour
 	private bool beaten;
 
 
-	[Space] [Header("In-Game Related")]
+	[Space] [Header("IN-GAME RELATED")]
 	[SerializeField] Bench bench;
 	[SerializeField] bool startWalkingIn;
 
 
-	[Space] [Header("Tools")]
+	[Space] [Header("TOOLS")]
 	[SerializeField] Tool equippedTool;
 	[Space] [SerializeField] StraightPin straightPin;
 	[SerializeField] Pimpillo pimpillo;
@@ -249,13 +253,23 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] Sprite[] shieldSprs;
 	private int shieldHp;
 	[SerializeField] bool hasExtraSpool;
-	[SerializeField] GameObject normSpoolObj;
-	[SerializeField] GameObject extraSpoolObj;
-	[SerializeField] GameObject normHarpistSpoolObj;
-	[SerializeField] GameObject extraHarpistSpoolObj;
+	[SerializeField] GameObject[] spoolObj;
+	[SerializeField] GameObject[] extraSpoolObj;
+	[SerializeField] Image spoolBindMarkerImg6;
+	[SerializeField] Image spoolBindMarkerImg9;
+	[SerializeField] Image extraMidMarkerImg;
+	[SerializeField] Sprite spoolNormSpr;
+	[SerializeField] Sprite spoolBindMarkerSpr;
+	[SerializeField] Sprite extraMidMarkerSpr;
+	[SerializeField] Sprite extraBindMarkerSpr;
+	[SerializeField] GameObject spoolEndObj;
+	// [SerializeField] GameObject normSpoolObj;
+	// [SerializeField] GameObject extraSpoolObj;
+	// [SerializeField] GameObject normHarpistSpoolObj;
+	// [SerializeField] GameObject extraHarpistSpoolObj;
 
 
-	[Space] [Header("Ui")]
+	[Space] [Header("UI")]
 	[SerializeField] Animator transitionAnim;
 
 	[Space] [SerializeField] GameObject pauseMenu;
@@ -287,7 +301,7 @@ public class PlayerControls : MonoBehaviour
 		}
 	}
 
-	[Space] [Header("Crests")]
+	[Space] [Header("CRESTS")]
 	[SerializeField] Crest[] crests;
 	[SerializeField] Image[] crestIcons;
 	public int crestNum;
@@ -308,7 +322,7 @@ public class PlayerControls : MonoBehaviour
 	private bool movingRight;
 
 
-	[Space] [Header("Debug")]
+	[Space] [Header("DEBUG")]
 	[SerializeField] [Range(1,10)] int silkMultiplier=1;
 	[SerializeField] bool invincible;
 	[SerializeField] bool infiniteHp;
@@ -413,20 +427,8 @@ public class PlayerControls : MonoBehaviour
 		{
 			if (difficultyObj != null)
 				difficultyObj.SetActive(true);
-			if (extraHp != null && extraHp.Length > 0)
-			{
-				maxHp = 8;
-				List<GameObject> temp = new List<GameObject>(hpMasks);
-				foreach (GameObject obj in extraHp)
-				{
-					obj.SetActive(true);
-				}
-				foreach (GameObject obj in extraHpMasks)
-				{
-					temp.Add(obj);
-				}
-				hpMasks = temp.ToArray();
-			}
+			maxHp = 8;
+			SetUiHp();
 		}
 
 		if (startWalkingIn)
@@ -556,7 +558,7 @@ public class PlayerControls : MonoBehaviour
 					SkillAttack();
 
 				// bind (heal)
-				else if (player.GetButtonDown("Bind") && (infiniteSilk || silkMeter >= GetBindCost()) && bindCo == null)
+				else if (player.GetButtonDown("Bind") && (infiniteSilk || nSilk >= GetBindCost()) && bindCo == null)
 					bindCo = StartCoroutine( BindCo() );
 
 				// tools
@@ -1202,7 +1204,7 @@ public class PlayerControls : MonoBehaviour
 	void SkillAttack()
 	{
 		// Stabby stabby strike
-		if ((infiniteSilk || silkMeter >= skillStabCost))
+		if ((infiniteSilk || nSilk >= skillStabCost))
 			atkCo = StartCoroutine( SkillAttackCo() );
 	}
 
@@ -1278,7 +1280,7 @@ public class PlayerControls : MonoBehaviour
 	public void CancelGossamerStorm()
 	{
 		// done
-		if (!player.GetButton("Skill") || (!infiniteSilk && silkMeter <= 0))
+		if (!player.GetButton("Skill") || (!infiniteSilk && nSilk <= 0))
 		{
 			anim.SetBool("isGossamerStorm", false);
 			rb.gravityScale = 1;
@@ -1439,6 +1441,7 @@ public class PlayerControls : MonoBehaviour
 				hasShield = false;
 				shieldImg.gameObject.SetActive(false);
 				ChangeSpoolNotch();
+				SetUiSilk();
 				return hasExtraSpool;
 			default:
 				return false;
@@ -1446,43 +1449,23 @@ public class PlayerControls : MonoBehaviour
 	}
 	void ChangeSpoolNotch()
 	{
-		extraHarpistSpoolObj.SetActive(false);
-		extraSpoolObj.SetActive(false);
-		normHarpistSpoolObj.SetActive(false);
-		normSpoolObj.SetActive(false);
-
+		// other crests
 		if (crestNum != 1 && silkGlowNorm != null)
 		{
 			silkGlowHarp.SetActive(false);
-			silkGlowNorm.SetActive(silkMeter >= 9);
+			silkGlowNorm.SetActive(nSilk >= 9);
 		}
+		// harpist crest
 		else if (crestNum == 1 && silkGlowHarp != null)
 		{
 			silkGlowNorm.SetActive(false);
-			silkGlowHarp.SetActive(silkMeter >= 6);
+			silkGlowHarp.SetActive(nSilk >= 6);
 		}
 
-		spoolImg.sprite = (silkMeter >= GetBindCost()) ? 
+		spoolImg.sprite = (nSilk >= GetBindCost()) ? 
 			fullSpoolSpr : emptySpoolSpr;
 
-		if (hasExtraSpool)
-		{
-			// harpist
-			if (crestNum == 1)
-				extraHarpistSpoolObj.SetActive(true);
-			// else
-			else
-				extraSpoolObj.SetActive(true);
-		}
-		else
-		{
-			// harpist
-			if (crestNum == 1)
-				normHarpistSpoolObj.SetActive(true);
-			// else
-			else
-				normSpoolObj.SetActive(true);
-		}
+		SetUiSilk();
 	}
 
 	void Jump()
@@ -1568,8 +1551,13 @@ public class PlayerControls : MonoBehaviour
 		anim.SetBool("isLedgeGrabbing", false);
 		if (player.GetButton("Dash"))
 		{
-			DashMechanic(true);
+			Invoke("LedgeGrabDash", 0.01f);
 		}
+	}
+
+	void LedgeGrabDash()
+	{
+		DashMechanic(true);
 	}
 
 
@@ -1584,7 +1572,7 @@ public class PlayerControls : MonoBehaviour
 
 	void FullRestore(bool clearShadowRealmList=false)
 	{
-		hp = maxHp;
+		hp = maxHp + nBonusHp;
 		SetHp(true);
 
 		if (clearShadowRealmList)
@@ -1608,6 +1596,8 @@ public class PlayerControls : MonoBehaviour
 		{
 			nToolUses2 = tool2.totaluses;
 		}
+
+
 	}
 
 	public void ShawRetreat(bool dashStrike=false, float multiplier=1)
@@ -2111,7 +2101,7 @@ public class PlayerControls : MonoBehaviour
 		if (soulLeakPs != null) soulLeakPs.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
 		PlayBackgroundMusic();
 		FullRestore();	// respawn
-		SetSilk(-silkMeter);
+		SetSilk(-nSilk);
 		hurtCo = null;
 	}
 
@@ -2232,7 +2222,7 @@ public class PlayerControls : MonoBehaviour
 
 	IEnumerator BindCo()
 	{
-		if (silkMeter < GetBindCost())
+		if (nSilk < GetBindCost())
 		{
 			bindCo = null;
 			yield break;
@@ -2269,6 +2259,8 @@ public class PlayerControls : MonoBehaviour
 		{
 			FullRestore(true); // rest
 			canUnrest = true;
+			SetUiHp();
+			SetUiSilk();
 		}
 
 		// Instantiate(bindPs, transform.position, Quaternion.identity);
@@ -2276,6 +2268,48 @@ public class PlayerControls : MonoBehaviour
 		foreach (SpriteRenderer sprite in sprites)
 			sprite.material = defaultMat;
 		anim.SetBool("isBinding", false);
+	}
+
+	void SetUiHp()
+	{
+		for (int i=0 ; i<maxHp+nBonusHp ; i++)
+			if (hpMasks.Length > i)
+				hpMasks[i].transform.parent.gameObject.SetActive(true);
+	}
+
+	void SetUiSilk()
+	{
+		// Extra Spool
+		foreach (GameObject o in extraSpoolObj)
+			o.SetActive(hasExtraSpool);
+		spoolEndObj.SetActive(!hasExtraSpool);
+		
+		// harpist
+		if (crestNum == 1)
+		{
+			spoolBindMarkerImg9.sprite = spoolNormSpr;
+			spoolBindMarkerImg6.sprite = spoolBindMarkerSpr;
+			extraMidMarkerImg.sprite = extraMidMarkerSpr;
+		}
+		// everything other crests
+		else
+		{
+			spoolBindMarkerImg6.sprite = spoolNormSpr;
+			if (maxSilk+nBonusSilk > 9)
+			{
+				spoolBindMarkerImg9.sprite = spoolBindMarkerSpr;
+				extraMidMarkerImg.sprite = extraMidMarkerSpr;
+			}
+			else
+			{
+				spoolBindMarkerImg9.sprite = spoolNormSpr;
+				extraMidMarkerImg.sprite = extraBindMarkerSpr;
+			}
+		}
+
+		for (int i=0 ; i<maxSilk+nBonusSilk-2 ; i++)
+			if (spoolObj.Length > i)
+				spoolObj[i].SetActive(true);
 	}
 
 	void SetHp(bool healed=false)
@@ -2309,38 +2343,39 @@ public class PlayerControls : MonoBehaviour
 	
 	public void SetSilk(int addToSilk=0)
 	{
-		int prevSilk = silkMeter;
-		silkMeter = Mathf.Clamp(
-			silkMeter + addToSilk * (addToSilk > 0 ? silkMultiplier : 1), 
+		int prevSilk = nSilk;
+		int totalSilk = (hasExtraSpool ? maxSilk + nBonusSilk + 3 : maxSilk + nBonusSilk);
+		nSilk = Mathf.Clamp(
+			nSilk + addToSilk * (addToSilk > 0 ? silkMultiplier : 1), 
 			0,
-			(hasExtraSpool ? silks.Length : silks.Length - 3)
+			totalSilk
 		);
 
 		// cancel if no changes
-		if (prevSilk == silkMeter) return;
+		if (prevSilk == nSilk) return;
 
 		if (spoolImg != null)
 		{
-			spoolImg.sprite = (silkMeter >= GetBindCost()) ? 
+			spoolImg.sprite = (nSilk >= GetBindCost()) ? 
 				fullSpoolSpr : emptySpoolSpr;
 		}
 
-		for (int i=0 ; i<silks.Length ; i++)
+		for (int i=0 ; (i<silks.Length && i<totalSilk) ; i++)
 		{
 			// visible
-			if (i < silkMeter && i >= prevSilk)
+			if (i < nSilk && i >= prevSilk)
 				silks[i].SetTrigger("latch");
 			// invisble
-			else if (i >= silkMeter && i < prevSilk)
+			else if (i >= nSilk && i < prevSilk)
 				silks[i].SetTrigger("unlatch");
 		}
 
-		if (silkMeter != prevSilk)
+		if (nSilk != prevSilk)
 		{
 			if (crestNum == 1 && silkGlowHarp != null)
-				silkGlowHarp.SetActive(silkMeter >= 6);
+				silkGlowHarp.SetActive(nSilk >= 6);
 			else if (crestNum != 1 && silkGlowNorm != null)
-				silkGlowNorm.SetActive(silkMeter >= 9);
+				silkGlowNorm.SetActive(nSilk >= 9);
 		}
 	}
 
@@ -2428,7 +2463,7 @@ public class PlayerControls : MonoBehaviour
 		beenHurt = false;
 		if (soulLeakPs != null) soulLeakPs.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
 		FullRestore();
-		SetSilk(-silkMeter);
+		SetSilk(-nSilk);
 		hurtCo = null;
 		cacoonObj.SetActive(false);
 	}
