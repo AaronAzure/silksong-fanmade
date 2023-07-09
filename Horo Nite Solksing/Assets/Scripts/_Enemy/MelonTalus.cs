@@ -9,19 +9,27 @@ public class MelonTalus : Enemy
 	[SerializeField] EnemyShockWave shockWaveMini;
 	[SerializeField] Transform shockWavePos;
 	[SerializeField] Transform shockWaveBackPos;
-	[SerializeField] float horzFactor=1.5f;
-	[SerializeField] int horzOffset;
-	[SerializeField] float upOffset=5f;
-	[SerializeField] float capHorzForce=10;
-	[SerializeField] float capVertForce=10;
 	[SerializeField] float fallForce=5;
+	[SerializeField] bool isJumpingAnim;
 	[SerializeField] bool isFallingAnim;
+	[SerializeField] float atkMomentum=10f;
+	[SerializeField] bool lungeAnim;
 	private GameManager gm;
 
 	// [Space] [SerializeField] bool keepFacingPlayer;
 	protected override void CallChildOnStart()
 	{
 		gm = GameManager.Instance;
+	}
+
+	protected bool CheckForGround()
+	{
+		RaycastHit2D groundInfo = Physics2D.Linecast(
+			groundDetect.position, 
+			groundDetect.position + new Vector3(0, -groundDistDetect), 
+			whatIsGround
+		);
+		return (groundInfo.collider != null);
 	}
 
 
@@ -36,6 +44,13 @@ public class MelonTalus : Enemy
 		if (isFallingAnim && isGrounded)
 		{
 			anim.SetTrigger("slam");
+		}
+		else if (!isJumpingAnim && !receivingKb)
+		{
+			if (lungeAnim && CheckForGround())
+				rb.velocity = new Vector2(atkMomentum * model.localScale.x, rb.velocity.y);
+			else
+				rb.velocity = new Vector2(0, rb.velocity.y);
 		}
 	}
 
@@ -73,7 +88,24 @@ public class MelonTalus : Enemy
 			FacePlayer();
 			if (isClose)
 			{
-				anim.SetBool("nextAttackIsJump", Random.Range(0,3) != 0);
+				switch (Random.Range(0,5))
+				{
+					// shockwave
+					case 0: 
+						anim.SetBool("nextAttackIsJump", false);
+						break;
+					// jump attack
+					case 1: 
+						anim.SetBool("nextAttackIsJump", true);
+						break;
+					// jump attack
+					case 2: 
+						anim.SetBool("nextAttackIsJump", true);
+						break;
+					default: 
+						anim.SetTrigger("closeCombat");
+						break;
+				}
 			}
 			else
 			{
@@ -91,7 +123,7 @@ public class MelonTalus : Enemy
 
 	public void SHOCKWAVE()
 	{
-		CinemachineShake.Instance.ShakeCam(10f, 0.5f, 2);
+		CinemachineShake.Instance.ShakeCam(10f, 0.5f, 1.5f);
 		if (gm != null && gm.easyMode)
 		{
 			if (shockWaveMini != null)
@@ -110,6 +142,11 @@ public class MelonTalus : Enemy
 					obj.Flip();
 			}
 		}
+	}
+
+	public void _SHAKECAM()
+	{
+		CinemachineShake.Instance.ShakeCam(7.5f, 0.5f, 0.75f);
 	}
 
 	public void _JUMP()
@@ -133,7 +170,7 @@ public class MelonTalus : Enemy
 	public void SLAM()
 	{
 		rb.velocity = Vector2.zero;
-		CinemachineShake.Instance.ShakeCam(15f, 0.5f, 2);
+		CinemachineShake.Instance.ShakeCam(15f, 0.5f, 1.5f);
 		if (gm != null && gm.easyMode)
 		{
 			if (shockWaveMini != null)
