@@ -181,11 +181,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   level: 0
+  isMaster: 0
+  inAir: 0
+  isVarTotaluses: 1
+  totalusesDiff: 2
   totaluses: 12
   icon: {fileID: 21300000, guid: 1f01837e54231473b881dca598076882, type: 3}
   <quickCooldown>k__BackingField: 1
   dmg: 12
-  isMaster: 0
   toRight: 1
   dir: {x: 20, y: 0}
   velocityMultiplier: 1
@@ -204,6 +207,7 @@ MonoBehaviour:
   destroyAfter: 0
   pin: {fileID: 8818872947580564614}
   angle: 0
+  heightOffset: 1.5
 --- !u!50 &-723624383632158439
 Rigidbody2D:
   serializedVersion: 4

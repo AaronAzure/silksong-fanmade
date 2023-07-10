@@ -48,6 +48,7 @@ public class MelonKnight : Enemy
 		{
 			UseShield(true);
 		}
+
 		if (!inAtkAnim)
 		{
 			if (isShielding)
@@ -74,7 +75,7 @@ public class MelonKnight : Enemy
 			// chasing and not shield
 			if (!isSuperClose)
 			{
-				if (chasingAnim && isGrounded && !receivingKb)
+				if (!isShielding && chasingAnim && isGrounded && !receivingKb)
 					ChasePlayer();
 				if (usedShield)
 				{

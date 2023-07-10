@@ -5,22 +5,44 @@ using UnityEngine;
 public class EnemySuperCloseRange : MonoBehaviour
 {
     [SerializeField] Enemy enemy;
+	[SerializeField] bool reactToTools;
+	private bool playerIsSuperClose;
+	private bool toolIsSuperClose;
 
 
     private void OnTriggerEnter2D(Collider2D other) 
 	{
-		if (other.CompareTag("Player") && enemy != null)
+		if (enemy != null)
 		{
-			enemy.isSuperClose = true;	
-			enemy.CallChildOnSuperClose();
+			if (other.CompareTag("Player"))
+			{
+				playerIsSuperClose = enemy.isSuperClose = true;	
+				enemy.CallChildOnSuperClose();
+			}
+			if (reactToTools && other.CompareTag("Respawn"))
+			{
+				toolIsSuperClose = enemy.isSuperClose = true;	
+				enemy.CallChildOnSuperClose();
+			}
 		}
 	}
 
     private void OnTriggerExit2D(Collider2D other) 
 	{
-		if (other.CompareTag("Player") && enemy != null)
+		if (enemy != null)
 		{
-			enemy.isSuperClose = false;	
+			if (other.CompareTag("Player"))
+			{
+				playerIsSuperClose = false;
+				if (!playerIsSuperClose && !toolIsSuperClose)
+					enemy.isSuperClose = false;	
+			}
+			if (reactToTools && other.CompareTag("Respawn"))
+			{
+				toolIsSuperClose = false;
+				if (!playerIsSuperClose && !toolIsSuperClose)
+					enemy.ToggleSuperClose(false);
+			}
 		}
 	}
 }

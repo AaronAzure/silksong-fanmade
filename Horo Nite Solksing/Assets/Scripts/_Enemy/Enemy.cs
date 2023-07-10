@@ -742,6 +742,17 @@ public abstract class Enemy : MonoBehaviour
 		}
 	}
 
+	public void ToggleSuperClose(bool active)
+	{
+		StartCoroutine( ToggleSuperCloseCo(active) );
+	}
+
+	IEnumerator ToggleSuperCloseCo(bool active)
+	{
+		yield return new WaitForSeconds(0.25f);
+		isSuperClose = active;
+	}
+
 	protected IEnumerator JumpCo(float delay=0.2f)
 	{
 		rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);

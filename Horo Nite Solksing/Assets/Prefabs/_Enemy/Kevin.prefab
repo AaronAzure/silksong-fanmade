@@ -499,6 +499,7 @@ MonoBehaviour:
   recoverTimer: 0
   self: {fileID: 1376537067151301452}
   model: {fileID: 1376537066910156643}
+  eyes: {fileID: 0}
   sprites:
   - {fileID: 7772490679270145349}
   - {fileID: 6418198224867518671}
@@ -511,21 +512,33 @@ MonoBehaviour:
   - {fileID: 178337671938686486}
   - {fileID: 5232524521168854629}
   anim: {fileID: 7314768531214044379}
+  hasJumpVelocityAnim: 1
+  hasIsGroundedAnim: 1
+  hasIsMovingAnim: 1
+  hasIsDeadAnim: 1
+  hasSpawnAnim: 1
+  hasSpawningInAnim: 1
+  hasMoveSpeedAnim: 1
   rb: {fileID: 1376537067151301455}
   col: {fileID: 1376537066910156642}
+  col2: {fileID: 0}
   closeRangeFinder: {fileID: 8713374008261122446}
   distRangeFinder: {fileID: 6415627392250083116}
-  defaultMat: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  superCloseRangeFinder: {fileID: 0}
   dmgMat: {fileID: 2100000, guid: 432135ab22bc84106b4fe0a466cbb4d4, type: 2}
+  defaultMat: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
   sortGroup: {fileID: 1156060217075352508}
+  loot: {fileID: 0}
+  nLoot: 1
   isSmart: 1
+  isStupid: 0
   controlledByAnim: 0
   cannotTakeKb: 0
   cannotTakeDmg: 0
   moveSpeed: 2.5
   chaseSpeed: 7.5
   jumpForce: 10
-  runSpeed: 5
+  maxSpeed: 5
   groundDetect: {fileID: 9114477566536772447}
   wallDetect: {fileID: 1351233206461515513}
   groundDistDetect: 0.5
@@ -545,23 +558,29 @@ MonoBehaviour:
   idleActionOnly: 0
   groundCheck: {fileID: 7452915362852078129}
   groundCheckSize: {x: 0.5, y: 0.05}
+  currentAction: 0
   idleTotalCounter: 3.5
+  immediateFlip: 0
   initDir: -1
+  stillAttacking: 0
   target: {fileID: 0}
   alwaysInRange: 0
   inRange: 0
   inSight: 0
   isClose: 0
+  isSuperClose: 0
+  maxSearchTime: 2
   spawningIn: 0
   cannotAtk: 0
   activated: 0
   inParryState: 0
-  silkEffectObj: {fileID: 7056141771011346426, guid: fb1f8aab62db342b48719794d38c90d1, type: 3}
+  isShielding: 0
   bloodEffectObj: {fileID: 7056141771011346426, guid: 80b9547a3f3f744689ac71dfe20b6e50, type: 3}
+  silkEffectObj: {fileID: 7056141771011346426, guid: fb1f8aab62db342b48719794d38c90d1, type: 3}
   stringEffectObj: {fileID: 4911711394541689474}
-  alert: {fileID: 4215765334170310324}
   room: {fileID: 0}
   isWaiting: 0
+  alert: {fileID: 4215765334170310324}
   offset: 30
   lungeForce: 7.5
   inAttackAnim: 0

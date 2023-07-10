@@ -243,11 +243,14 @@ public class PlayerControls : MonoBehaviour
 	
 
 	[Space] [SerializeField] bool hasShield;
+	public int nShieldBonus;
 	[SerializeField] GameObject shieldObj;
 	[SerializeField] Image shieldImg;
+	[SerializeField] Sprite shieldUndmgSpr;
 	[SerializeField] Sprite[] shieldSprs;
 	private int shieldHp;
 	[SerializeField] bool hasExtraSpool;
+	public int nExtraSpoolBonus;
 	[SerializeField] GameObject[] spoolObj;
 	[SerializeField] GameObject[] extraSpoolObj;
 	[SerializeField] Image spoolBindMarkerImg6;
@@ -445,6 +448,8 @@ public class PlayerControls : MonoBehaviour
 		if (pauseCo != null)
 			StopCoroutine(pauseCo);
 		pauseCo = StartCoroutine( UnpauseCo() );
+		pauseMenu.SetActive(false);
+		pause2Menu.SetActive(false);
 	}
 
 	IEnumerator UnpauseCo()
@@ -681,7 +686,7 @@ public class PlayerControls : MonoBehaviour
 			{
 				nToolSlowUses1 = Mathf.Lerp(nToolSlowUses1, nToolUses1, t1);
 				t1 += 0.5f * Time.fixedDeltaTime * (refillUses ? 5 : 1);
-				toolUses1.fillAmount = nToolSlowUses1/tool1.totaluses;
+				toolUses1.fillAmount = nToolSlowUses1/tool1.GetTotalUses();
 			}
 			else
 			{
@@ -695,7 +700,7 @@ public class PlayerControls : MonoBehaviour
 			{
 				nToolSlowUses2 = Mathf.Lerp(nToolSlowUses2, nToolUses2, t2);
 				t2 += 0.5f * Time.fixedDeltaTime;
-				toolUses2.fillAmount = nToolSlowUses2/tool2.totaluses;
+				toolUses2.fillAmount = nToolSlowUses2/tool2.GetTotalUses();
 			}
 			else
 			{
@@ -1420,14 +1425,15 @@ public class PlayerControls : MonoBehaviour
 				hasExtraSpool = false;
 				if (hasShield)
 				{
-					shieldHp = 3;
+					shieldHp = 2 + nShieldBonus;
+					// shieldImg.sprite = shieldUndmgSpr;
 					shieldImg.gameObject.SetActive(true);
 					if (shieldImg != null && shieldHp < shieldSprs.Length) 
-						shieldImg.sprite = shieldSprs[shieldHp];
+						shieldImg.sprite = shieldSprs[(shieldHp == 2 + nShieldBonus) ? (shieldSprs.Length - 1) : shieldHp];
 				}
 				else
 				{
-					shieldHp = 3;
+					shieldHp = 2 + nShieldBonus;
 					shieldImg.gameObject.SetActive(false);
 				}
 				ChangeSpoolNotch();
@@ -1580,18 +1586,18 @@ public class PlayerControls : MonoBehaviour
 		}
 
 		if (hasShield)
-			shieldHp = 3;
-		if (shieldImg != null && shieldHp < shieldSprs.Length) 
-			shieldImg.sprite = shieldSprs[shieldHp];
+			shieldHp = 2 + nShieldBonus;
+		if (shieldImg != null && (shieldHp) < shieldSprs.Length) 
+			shieldImg.sprite = shieldSprs[(shieldHp == 2 + nShieldBonus) ? (shieldSprs.Length - 1) : shieldHp];
 
 		if (tool1 != null && toolUses1 != null)
 		{
-			nToolUses1 = tool1.totaluses;
+			nToolUses1 = tool1.GetTotalUses();
 			refillUses = true;
 		}
 		if (tool2 != null && toolUses2 != null)
 		{
-			nToolUses2 = tool2.totaluses;
+			nToolUses2 = tool2.GetTotalUses();
 		}
 
 
@@ -1796,8 +1802,8 @@ public class PlayerControls : MonoBehaviour
 				if (hasShield && hp == 1 && shieldHp > 0)
 				{
 					shieldHp = Mathf.Max(0, shieldHp - 1);
-					if (shieldImg != null && shieldHp < shieldSprs.Length) 
-						shieldImg.sprite = shieldSprs[shieldHp];
+					if (shieldImg != null && (shieldHp) < shieldSprs.Length) 
+						shieldImg.sprite = shieldSprs[(shieldHp == 2 + nShieldBonus) ? (shieldSprs.Length - 1) : shieldHp];
 				}
 				// Take damage
 				else
@@ -2277,8 +2283,11 @@ public class PlayerControls : MonoBehaviour
 	void SetUiSilk()
 	{
 		// Extra Spool
-		foreach (GameObject o in extraSpoolObj)
-			o.SetActive(hasExtraSpool);
+		for (int i=0 ; i<4+nExtraSpoolBonus ; i++)
+			if (extraSpoolObj.Length > i)
+				extraSpoolObj[i].SetActive(hasExtraSpool);
+		// foreach (GameObject o in extraSpoolObj)
+		// 	o.SetActive(hasExtraSpool);
 		spoolEndObj.SetActive(!hasExtraSpool);
 		
 		// harpist
@@ -2341,7 +2350,7 @@ public class PlayerControls : MonoBehaviour
 	public void SetSilk(int addToSilk=0)
 	{
 		int prevSilk = nSilk;
-		int totalSilk = (hasExtraSpool ? maxSilk + nBonusSilk + 3 : maxSilk + nBonusSilk);
+		int totalSilk = (hasExtraSpool ? maxSilk + nBonusSilk + 3 + nExtraSpoolBonus : maxSilk + nBonusSilk);
 		nSilk = Mathf.Clamp(
 			nSilk + addToSilk * (addToSilk > 0 ? silkMultiplier : 1), 
 			0,

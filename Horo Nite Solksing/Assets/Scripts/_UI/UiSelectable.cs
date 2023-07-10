@@ -25,16 +25,62 @@ public class UiSelectable : MonoBehaviour, ISelectHandler
 	[SerializeField] Sprite emptySpr;
 
 
-	[Space] [Header("Description")]
+	[Space] [Header("DESCRIPTION")]
 	[SerializeField] string title;
+	[SerializeField] bool GetTotalUses;
 	[SerializeField] string extraDesc;
+	[SerializeField] bool hasDifferentDesc;
 	[SerializeField] [TextArea(3,5)] string desc;
+	[SerializeField] [TextArea(3,5)] string desc1;
+	[SerializeField] [TextArea(3,5)] string desc2;
+	[SerializeField] [TextArea(3,5)] string desc3;
 
 	
 	[Space] [SerializeField] TextMeshProUGUI titleTxt;
+	[Space] [SerializeField] TextMeshProUGUI verTxt;
 	[Space] [SerializeField] TextMeshProUGUI extraTxt;
 	[Space] [SerializeField] TextMeshProUGUI descTxt;
 
+	[SerializeField] bool isShield;
+	[SerializeField] bool isExtraSpool;
+
+
+	public void OnEnable() 
+	{
+		if (verTxt != null)
+		{
+			if (isShield)
+			{
+				switch (PlayerControls.Instance.nShieldBonus)
+				{
+					case 0: verTxt.text = "I"; break;
+					case 1: verTxt.text = "II"; break;
+					case 2: verTxt.text = "III"; break;
+					case 3: verTxt.text = "IV"; break;
+				}
+			}
+			else if (isExtraSpool)
+			{
+				switch (PlayerControls.Instance.nExtraSpoolBonus)
+				{
+					case 0: verTxt.text = "I"; break;
+					case 1: verTxt.text = "II"; break;
+					case 2: verTxt.text = "III"; break;
+					case 3: verTxt.text = "IV"; break;
+				}
+			}
+			else if (tool != null)
+			{
+				switch (tool.level)
+				{
+					case 0: verTxt.text = "I"; break;
+					case 1: verTxt.text = "II"; break;
+					case 2: verTxt.text = "III"; break;
+					case 3: verTxt.text = "IV"; break;
+				}
+			}
+		}	
+	}
 
 	public void SET_TOOL()
 	{
@@ -66,7 +112,7 @@ public class UiSelectable : MonoBehaviour, ISelectHandler
 	{
 		Assert.IsNotNull(PlayerControls.Instance, "PlayerControls.Instance == null");
 
-		if (tool != null && PlayerControls.Instance != null && PlayerControls.Instance.isResting)
+		if (PlayerControls.Instance != null && PlayerControls.Instance.isResting)
 		{
 			if (PlayerControls.Instance.EquipPassive(n))
 			{
@@ -112,11 +158,27 @@ public class UiSelectable : MonoBehaviour, ISelectHandler
 		}
 		if (extraTxt != null)
 		{
-			extraTxt.text = extraDesc;
+			extraTxt.text = GetTotalUses ? $"{tool.GetTotalUses()} uses" : extraDesc;
 		}
 		if (descTxt != null)
 		{
-			descTxt.text = desc;
+			// doesn't change with tool level
+			if (!hasDifferentDesc)
+			{
+				descTxt.text = desc;
+			}
+			// has different for each tool level
+			else
+			{
+				PlayerControls p = PlayerControls.Instance;
+				switch (isShield ? p.nShieldBonus : (isExtraSpool ? p.nExtraSpoolBonus : tool.level))
+				{
+					case 1: 	descTxt.text = desc1;	break;
+					case 2: 	descTxt.text = desc2;	break;
+					case 3: 	descTxt.text = desc3;	break;
+					default: 	descTxt.text = desc;	break;
+				}
+			}
 		}
 		if (eventSystem != null)
 		{
