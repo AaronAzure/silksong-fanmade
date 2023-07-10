@@ -5,11 +5,16 @@ using UnityEngine;
 public abstract class Tool : MonoBehaviour
 {
 	// [SerializeField] protected int uses=4;
-	[SerializeField] public int totaluses=4;
-	[SerializeField] public Sprite icon;
+	public int level;
+	[HideInInspector] public bool isMaster;
+	[HideInInspector] public bool inAir;
+	[Space] [SerializeField] bool isVarTotaluses;
+	[SerializeField] int totalusesDiff;
+	public int totaluses=4;
+	public Sprite icon;
 	[field: SerializeField] public bool quickCooldown {get; private set;}
 
-	[Space] [SerializeField] protected int dmg;
+	[Space] public int dmg;
 	public bool toRight=true;
 	[SerializeField] protected Vector2 dir;
 	[HideInInspector] public float velocityMultiplier=1;
@@ -35,25 +40,28 @@ public abstract class Tool : MonoBehaviour
 		{
 			if (dir != Vector2.zero)
 			{
-				if (!toRight)
-				{
-					rb.velocity = new Vector2(-dir.x * velocityMultiplier, dir.y);
-					kbDir = new Vector2(-kbDir.x, kbDir.y);
-					gameObject.transform.localScale = new Vector3(
-						-transform.localScale.x,
-						transform.localScale.y
-					);
-				}
-				else
-				{
-					rb.velocity = dir * velocityMultiplier;
-				}
+				LaunchDir();
 			}
 			CallChildOnStart();
 		}
 		CallChildOnStartAlways();
 		if (destroyAfter > 0)
 			destroyAfterCo = StartCoroutine( DestroyAfterCo() );
+	}
+
+	public int GetTotalUses()
+	{
+		return isVarTotaluses ? totaluses - (totalusesDiff * level) : totaluses;
+	}
+
+	protected virtual void LaunchDir()
+	{
+		rb.velocity = new Vector2((toRight ? dir.x : -dir.x) * velocityMultiplier, dir.y);
+		kbDir = new Vector2((toRight ? kbDir.x : -kbDir.x), kbDir.y);
+		gameObject.transform.localScale = new Vector3(
+			(toRight ? transform.localScale.x : -transform.localScale.x),
+			transform.localScale.y
+		);
 	}
 
 	private void OnTriggerEnter2D(Collider2D other) 
