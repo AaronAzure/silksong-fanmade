@@ -29,6 +29,10 @@ public class MelonKnight : Enemy
 	private void UseShield(bool equip)
 	{
 		usedShield = equip;
+		anim.SetFloat(
+			"shieldDir", 
+			((target.transform.position.y - self.transform.position.y) > playerAboveVal) ? 1 : 0
+		);
 		anim.SetBool("usingShield", equip);
 	}
 
