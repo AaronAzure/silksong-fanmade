@@ -13,6 +13,7 @@ public abstract class Tool : MonoBehaviour
 	public int totaluses=4;
 	public Sprite icon;
 	[field: SerializeField] public bool quickCooldown {get; private set;}
+	private int upgradeCost=50;
 
 	[Space] public int dmg;
 	public bool toRight=true;

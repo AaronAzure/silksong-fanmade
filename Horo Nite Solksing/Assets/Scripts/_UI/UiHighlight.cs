@@ -1,9 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine.EventSystems;
-using UnityEngine.Events;
-using UnityEngine.UI;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UiHighlight : MonoBehaviour
 {
@@ -16,7 +14,6 @@ public class UiHighlight : MonoBehaviour
 	private bool isMoving;
 	private Vector3 startPos;
 	private float timeElapsed;
-
 
 	public void Select()
 	{

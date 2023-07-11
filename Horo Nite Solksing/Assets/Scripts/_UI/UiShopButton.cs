@@ -2,15 +2,47 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.Events;
+using TMPro;
 using UnityEngine.EventSystems;
-using Rewired.Integration.UnityUI;
 
 public class UiShopButton : MonoBehaviour, ISelectHandler, IPointerEnterHandler
 {
+	[HideInInspector] public Button self;
 	[SerializeField] UiShopHighlight master;
-	[SerializeField] float offset;
-	[SerializeField] RewiredEventSystem res;
+	public float offset;
+	[SerializeField] TextMeshProUGUI costTxt;
+	private int nPurchased;
+
+
+	public enum Upgrade {
+		pin,
+		pimpillo,
+		caltrop,
+		sawblade,
+		shield,
+		extraSpool,
+		health,
+		spool
+	}
+	[SerializeField] protected Upgrade upgrade=0;
+
+	private void Awake() 
+	{
+		self = GetComponent<Button>();	
+	}
+
+	private void OnEnable() 
+	{
+		SetCostText();
+	}
+
+	private void SetCostText() 
+	{
+		if (costTxt != null)
+		{
+			costTxt.text = $"{PlayerControls.Instance.GetCost(upgrade)}";
+		}	
+	}
 
 	public void OnPointerEnter(PointerEventData eventData)
 	{
@@ -26,11 +58,23 @@ public class UiShopButton : MonoBehaviour, ISelectHandler, IPointerEnterHandler
 		if (master != null)
 		{
 			master.offset = this.offset;
-			master.MoveToButton();
+			master.MoveToButton(this);
 		}
-		if (res != null)
+	}
+
+	public void _PURCHASE()
+	{
+		// Is able to purchase
+		if (nPurchased < 3 && PlayerControls.Instance.CanAffordPurchase(upgrade))
 		{
-			res.firstSelectedGameObject = this.gameObject;
+			PlayerControls.Instance.MakePurchase(upgrade);
+			nPurchased++;
+			SetCostText();
+		}
+		if (nPurchased >= 3)
+		{
+			gameObject.SetActive(false);
+			master.SelectNewButton();
 		}
 	}
 }

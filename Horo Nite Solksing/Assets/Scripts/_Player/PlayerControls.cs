@@ -23,11 +23,11 @@ public class PlayerControls : MonoBehaviour
 	[Space] [Header("STATUS")]
 	private int maxHp=6;
 	[SerializeField] int hp;
-	[SerializeField] int nBonusHp;
+	public int nBonusHp;
 
 	private int maxSilk=9;
 	[SerializeField] int nSilk;
-	[SerializeField] int nBonusSilk;
+	public int nBonusSilk;
 	
 	
 	[Space] [SerializeField] int nRosaries;
@@ -222,8 +222,8 @@ public class PlayerControls : MonoBehaviour
 
 
 	[Space] [Header("TOOLS")]
-	[SerializeField] Tool equippedTool;
-	[Space] [SerializeField] StraightPin straightPin;
+	// [SerializeField] Tool equippedTool;
+	[SerializeField] StraightPin straightPin;
 	[SerializeField] Pimpillo pimpillo;
 	[SerializeField] Caltrops caltrops;
 	[SerializeField] SawBlade sawBlade;
@@ -594,7 +594,6 @@ public class PlayerControls : MonoBehaviour
 					rb.velocity = Vector2.zero;
 					anim.SetBool("isResting", true);
 					startPosition = transform.position;
-					// FullRestore(true); // rest
 				}
 
 				// Open Shop
@@ -2303,7 +2302,7 @@ public class PlayerControls : MonoBehaviour
 			yield break;
 		rb.gravityScale = 1;
 		// anim.SetBool("isBinding", false);
-		hp = Mathf.Min(hp+(crestNum == 1 ? 2 : 3), hpMasks.Length);
+		hp = Mathf.Min(hp+(crestNum == 1 ? 2 : 3), maxHp+nBonusHp);
 		SetHp(true);
 		bindCo = null;
 	}
@@ -2582,5 +2581,78 @@ public class PlayerControls : MonoBehaviour
 	{
 		pause2Menu.SetActive(false);
 		gm.ExitGame();
+	}
+
+
+	public int GetCost(UiShopButton.Upgrade u)
+	{
+		switch (u)
+		{
+			case UiShopButton.Upgrade.pin:
+				return (50 * (int) Mathf.Pow(3, straightPin.level));
+			case UiShopButton.Upgrade.pimpillo:
+				return (50 * (int) Mathf.Pow(3, pimpillo.level));
+			case UiShopButton.Upgrade.caltrop:
+				return (50 * (int) Mathf.Pow(3, caltrops.level));
+			case UiShopButton.Upgrade.sawblade:
+				return (50 * (int) Mathf.Pow(3, sawBlade.level));
+			case UiShopButton.Upgrade.shield:
+				return (50 * (int) Mathf.Pow(3, nShieldBonus));
+			case UiShopButton.Upgrade.extraSpool:
+				return (50 * (int) Mathf.Pow(3, nExtraSpoolBonus));
+			case UiShopButton.Upgrade.health:
+				return (50 * (int) Mathf.Pow(3, nBonusHp));
+			case UiShopButton.Upgrade.spool:
+				return (50 * (int) Mathf.Pow(3, nBonusSilk));
+		}
+		return -1;
+	}
+	public bool CanAffordPurchase(UiShopButton.Upgrade u)
+	{
+		return nRosaries >= GetCost(u);
+	}
+
+	public void MakePurchase(UiShopButton.Upgrade u)
+	{
+		nRosaries -= GetCost(u);
+		switch (u)
+		{
+			case UiShopButton.Upgrade.pin:
+				straightPin.level++;
+				break;
+			case UiShopButton.Upgrade.pimpillo:
+				pimpillo.level++;
+				break;
+			case UiShopButton.Upgrade.caltrop:
+				caltrops.level++;
+				break;
+			case UiShopButton.Upgrade.sawblade:
+				sawBlade.level++;
+				break;
+			case UiShopButton.Upgrade.shield:
+				nShieldBonus++;
+				if (hasShield)
+				{
+					shieldHp = 2 + nShieldBonus;
+					// shieldImg.sprite = shieldUndmgSpr;
+					shieldImg.gameObject.SetActive(true);
+					if (shieldImg != null && shieldHp < shieldSprs.Length) 
+						shieldImg.sprite = shieldSprs[(shieldHp == 2 + nShieldBonus) ? (shieldSprs.Length - 1) : shieldHp];
+				}
+				break;
+			case UiShopButton.Upgrade.extraSpool:
+				nExtraSpoolBonus++;
+				SetUiSilk();
+				break;
+			case UiShopButton.Upgrade.health:
+				nBonusHp++;
+				SetUiHp();
+				FullRestore();
+				break;
+			case UiShopButton.Upgrade.spool:
+				nBonusSilk++;
+				SetUiSilk();
+				break;
+		}
 	}
 }
