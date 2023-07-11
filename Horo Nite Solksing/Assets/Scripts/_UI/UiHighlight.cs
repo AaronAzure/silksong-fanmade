@@ -8,14 +8,14 @@ using UnityEngine;
 public class UiHighlight : MonoBehaviour
 {
 	[SerializeField] RectTransform rect;
-	[SerializeField] float speed;
 	public RectTransform selected; // target
-	[Space] 
-	[SerializeField] Animator anim;
+	
+	
+	[Space] [SerializeField] Animator anim;
 	[SerializeField] float lerpDuration=0.5f;
-	bool isMoving;
-	Vector3 startPos;
-	float timeElapsed;
+	private bool isMoving;
+	private Vector3 startPos;
+	private float timeElapsed;
 
 
 	public void Select()

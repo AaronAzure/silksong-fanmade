@@ -12,4 +12,12 @@ public class PauseMenu : MonoBehaviour
 			PlayerControls.Instance.Unpause();
 		}
 	}
+
+	public void _CLOSE_SHOP()
+	{
+		if (PlayerControls.Instance != null)
+		{
+			PlayerControls.Instance.Unpause();
+		}
+	}
 }

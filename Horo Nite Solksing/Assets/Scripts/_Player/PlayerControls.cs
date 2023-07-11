@@ -320,6 +320,15 @@ public class PlayerControls : MonoBehaviour
 	private bool movingRight;
 
 
+	[Space] [Header("SHOP")]
+	[SerializeField] bool isNearShop;
+	[SerializeField] bool isAtShop;
+	private NPC npc; // current npc nearby
+	[SerializeField] GameObject shopCanvas;
+	[SerializeField] GameObject shopCam;
+	[SerializeField] Animator shopAnim;
+
+
 	[Space] [Header("DEBUG")]
 	[SerializeField] [Range(1,10)] int silkMultiplier=1;
 	[SerializeField] bool invincible;
@@ -440,7 +449,9 @@ public class PlayerControls : MonoBehaviour
 	bool CanControl()
 	{
 		return (!isLedgeGrabbing && !ledgeGrab && !beenHurt && !noControl && !isBinding &&
-			!inAnimation && !isDead && !inStunLock && !isResting && !isPaused && !inRushSkill && !isFinished);
+			!inAnimation && !isDead && !inStunLock && !isResting && !isPaused && !inRushSkill 
+			&& !isFinished && !isAtShop
+		);
 	}
 
 	public void Unpause()
@@ -450,14 +461,18 @@ public class PlayerControls : MonoBehaviour
 		pauseCo = StartCoroutine( UnpauseCo() );
 		pauseMenu.SetActive(false);
 		pause2Menu.SetActive(false);
+		shopCanvas.SetActive(false);
+		shopCam.SetActive(false);
 	}
 
 	IEnumerator UnpauseCo()
 	{
 		yield return null;
 		yield return null;
-		isPaused = false;
+		isAtShop = isPaused = false;
 		pauseCo = null;
+		if (npc != null)
+			npc.ToggleTextbox(true);
 	}
 
 	private string ConvertToTime(TimeSpan time)
@@ -581,6 +596,18 @@ public class PlayerControls : MonoBehaviour
 					startPosition = transform.position;
 					// FullRestore(true); // rest
 				}
+
+				// Open Shop
+				else if (isNearShop && isGrounded && player.GetAxis("Move Vertical") > 0.85f)
+				{
+					if (npc != null)
+						npc.ToggleTextbox(false);
+					isAtShop = true;
+					shopCanvas.SetActive(true);
+					shopCam.SetActive(true);
+					rb.velocity = new Vector2(0, rb.velocity.y);
+					anim.SetBool("isWalking", false);
+				}
 			}
 
 			// jump
@@ -596,6 +623,7 @@ public class PlayerControls : MonoBehaviour
 			if (canLedgeGrab && !isWallJumping && !isLedgeGrabbing && !ledgeGrab)
 				LedgeGrab();
 		}
+		// Leave Bench
 		else if (isResting && canUnrest &&
 			(player.GetButtonDown("No") || player.GetAxis("Move Vertical") < -0.85f
 			|| player.GetAxis("Move Horizontal") < -0.7f || player.GetAxis("Move Horizontal") > 0.85f)
@@ -608,6 +636,18 @@ public class PlayerControls : MonoBehaviour
 			rb.gravityScale = 1;
 			rb.velocity = Vector2.zero;
 			anim.SetBool("isResting", false);
+		}
+		// leave shop
+		else if (isAtShop && player.GetButtonDown("No"))
+		{
+			if (shopAnim != null)
+				shopAnim.SetTrigger("close");
+			else
+			{
+				shopCanvas.SetActive(false);
+				shopCam.SetActive(false);
+				isAtShop = false;
+			}
 		}
 	}
 
@@ -843,6 +883,10 @@ public class PlayerControls : MonoBehaviour
 
 	void ResetAllBools()
 	{
+		isAtShop = false;
+		shopCanvas.SetActive(false);
+		shopCam.SetActive(false);
+		isAtShop = false;
 		stuckToNewScene = false;
 		isJumping = jumpDashed = jumped = false;
 		airDashed = isDashing = false;
@@ -1599,8 +1643,6 @@ public class PlayerControls : MonoBehaviour
 		{
 			nToolUses2 = tool2.GetTotalUses();
 		}
-
-
 	}
 
 	public void ShawRetreat(bool dashStrike=false, float multiplier=1)
@@ -1740,6 +1782,13 @@ public class PlayerControls : MonoBehaviour
 				StopCoroutine( stunLockCo );
 			stunLockCo = StartCoroutine( StunLockCo(other.transform) );
 		}	
+		if (!isDead && other.CompareTag("NPC") && hurtCo == null)
+		{
+			isNearShop = true;
+			npc = other.GetComponent<NPC>();
+			if (npc != null)
+				npc.ToggleTextbox(true);
+		}
 		if (!isDead && other.CompareTag("Death") && hurtCo == null)
 		{
 			hurtCo = StartCoroutine( InstantDeathCo() );
@@ -1789,6 +1838,13 @@ public class PlayerControls : MonoBehaviour
 		if (other.CompareTag("Bench"))
 		{
 			bench = null;
+		}
+		if (other.CompareTag("NPC"))
+		{
+			isNearShop = false;
+			if (npc != null)
+				npc.ToggleTextbox(false);
+			npc = null;
 		}
 	}
 
