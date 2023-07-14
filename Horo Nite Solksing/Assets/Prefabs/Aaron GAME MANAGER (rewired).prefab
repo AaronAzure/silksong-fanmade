@@ -5735,6 +5735,15 @@ MonoBehaviour:
       _behaviorId: 0
       _userAssignable: 1
       _categoryId: 0
+    - _id: 23
+      _name: Map
+      _type: 1
+      _descriptiveName: Map
+      _positiveDescriptiveName: Move Up
+      _negativeDescriptiveName: Move Down
+      _behaviorId: 0
+      _userAssignable: 1
+      _categoryId: 0
     - _id: 12
       _name: Minus
       _type: 1
@@ -5776,7 +5785,7 @@ MonoBehaviour:
     actionCategoryMap:
       list:
       - categoryId: 0
-        actionIds: 00000000010000000600000004000000050000000200000007000000090000000a0000000c000000
+        actionIds: 00000000010000000600000004000000050000000200000007000000090000000a000000170000000c000000
       - categoryId: 1
         actionIds: 1500000016000000
     inputBehaviors:
@@ -5946,7 +5955,7 @@ MonoBehaviour:
         _modifierKey2: 0
         _modifierKey3: 0
       - _actionCategoryId: 0
-        _actionId: 3
+        _actionId: 23
         _elementType: 1
         _elementIdentifierId: 8
         _axisRange: 0
@@ -5968,7 +5977,7 @@ MonoBehaviour:
         _modifierKey2: 0
         _modifierKey3: 0
       - _actionCategoryId: 0
-        _actionId: 8
+        _actionId: -1
         _elementType: 1
         _elementIdentifierId: 10
         _axisRange: 0
@@ -6239,7 +6248,7 @@ MonoBehaviour:
         _modifierKey2: 0
         _modifierKey3: 0
       - _actionCategoryId: 0
-        _actionId: 3
+        _actionId: 23
         _elementType: 1
         _elementIdentifierId: 10
         _axisRange: 0
@@ -6543,7 +6552,7 @@ MonoBehaviour:
         _modifierKey2: 0
         _modifierKey3: 0
       - _actionCategoryId: 0
-        _actionId: -1
+        _actionId: 23
         _elementType: 1
         _elementIdentifierId: 10
         _axisRange: 0
@@ -6554,7 +6563,7 @@ MonoBehaviour:
         _modifierKey2: 0
         _modifierKey3: 0
       - _actionCategoryId: 0
-        _actionId: -1
+        _actionId: 23
         _elementType: 0
         _elementIdentifierId: 11
         _axisRange: 0
@@ -6825,7 +6834,7 @@ MonoBehaviour:
         _modifierKey2: 0
         _modifierKey3: 0
       - _actionCategoryId: 0
-        _actionId: -1
+        _actionId: 23
         _elementType: 1
         _elementIdentifierId: 10
         _axisRange: 0
@@ -7118,13 +7127,24 @@ MonoBehaviour:
         _modifierKey1: 0
         _modifierKey2: 0
         _modifierKey3: 0
+      - _actionCategoryId: 0
+        _actionId: 23
+        _elementType: 1
+        _elementIdentifierId: -1
+        _axisRange: 0
+        _invert: 0
+        _axisContribution: 0
+        _keyboardKeyCode: 9
+        _modifierKey1: 0
+        _modifierKey2: 0
+        _modifierKey3: 0
     mouseMaps: []
     customControllerMaps: []
     customControllers: []
     controllerMapLayoutManagerRuleSets: []
     controllerMapEnablerRuleSets: []
     playerIdCounter: 10
-    actionIdCounter: 23
+    actionIdCounter: 24
     actionCategoryIdCounter: 2
     inputBehaviorIdCounter: 2
     mapCategoryIdCounter: 2

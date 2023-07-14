@@ -489,7 +489,7 @@ public abstract class Enemy : MonoBehaviour
 		StopAllCoroutines();
 		if (loot != null)
 		{
-			loot.SpawnLoot(nLoot);
+			loot.SpawnLoot( Mathf.RoundToInt(nLoot * target.lootMultiplier) );
 		}
 		if (closeRangeFinder != null) Destroy(closeRangeFinder);
 		if (distRangeFinder != null) Destroy(distRangeFinder);

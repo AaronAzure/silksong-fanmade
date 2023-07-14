@@ -61,6 +61,7 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] float moveSpeed=5;
 	[SerializeField] float jumpDashForce=10;
 	[SerializeField] float jumpForce=10;
+	[SerializeField] [Range(0f,1f)] float jumpCutoffForce=0.75f;
 	[SerializeField] float fallSpeed=3;
 	[SerializeField] float fallClampSpeed=-10f;
 	[SerializeField] float fallGrav=1.2f;
@@ -79,6 +80,7 @@ public class PlayerControls : MonoBehaviour
 	private bool jumpDashed;
 	private bool isDashing;
 	private bool isJumping;
+	private bool isUsingMap;
 	private bool isWallJumping;
 
 	private bool isGrounded;
@@ -329,8 +331,14 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] Animator shopAnim;
 
 
+	[Space] [Header("MAP")]
+	[SerializeField] GameObject mapCanvas;
+	[SerializeField] Animator mapAnim;
+
+
 	[Space] [Header("DEBUG")]
 	[SerializeField] [Range(1,10)] int silkMultiplier=1;
+	[Range(1,10)] public float lootMultiplier=1;
 	[SerializeField] bool invincible;
 	[SerializeField] bool infiniteHp;
 	[SerializeField] bool infiniteSilk;
@@ -563,6 +571,16 @@ public class PlayerControls : MonoBehaviour
 				pause2Anim.SetTrigger("close");
 		}
 		// basic movement
+		else if (isUsingMap)
+		{
+			if (player.GetButtonUp("Map") || !isGrounded)
+			{
+				isUsingMap = false;
+				anim.SetBool("isUsingMap", false);
+			}
+			CalcMove();
+		}
+		// basic movement
 		else if (CanControl() && !inShawAtk)
 		{
 			if (!inAirDash)
@@ -607,6 +625,12 @@ public class PlayerControls : MonoBehaviour
 					rb.velocity = new Vector2(0, rb.velocity.y);
 					anim.SetBool("isWalking", false);
 				}
+			}
+
+			if (player.GetButtonDown("Map") && isGrounded)
+			{
+				isUsingMap = true;
+				anim.SetBool("isUsingMap", true);
 			}
 
 			// jump
@@ -854,7 +878,7 @@ public class PlayerControls : MonoBehaviour
 		else if (player.GetButtonUp("Jump") || CheckIsCeiling())
 		{
 			if (isJumping)
-				rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.75f);
+				rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * jumpCutoffForce);
 			jumpRegistered = isJumping = false;
 			coyoteTimer = coyoteThreshold;
 		}
@@ -869,6 +893,8 @@ public class PlayerControls : MonoBehaviour
 			// jump over
 			else
 			{
+				// if (isJumping)
+				// 	rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * jumpCutoffForce);
 				isJumping = false;
 				jumpTimer = 0;
 			}
@@ -883,6 +909,8 @@ public class PlayerControls : MonoBehaviour
 	void ResetAllBools()
 	{
 		isAtShop = false;
+		isUsingMap = false;
+		anim.SetBool("isUsingMap", false);
 		shopCanvas.SetActive(false);
 		shopCam.SetActive(false);
 		isAtShop = false;
@@ -1004,7 +1032,7 @@ public class PlayerControls : MonoBehaviour
 				rb.gravityScale = fallGrav;
 			else
 				rb.gravityScale = origGrav;
-			rb.velocity = new Vector2(x * activeMoveSpeed, rb.velocity.y);
+			rb.velocity = new Vector2(x * activeMoveSpeed * (isUsingMap ? 0.25f : 1), rb.velocity.y);
 		}
 		// dashing
 		else
@@ -1808,6 +1836,8 @@ public class PlayerControls : MonoBehaviour
 				movingVerticallyJumping = n.transform.position.y - self.position.y > 0;
 			}
 			exitPointInd = n.exitIndex;
+			isUsingMap = false;
+			anim.SetBool("isUsingMap", false);
 			StartCoroutine( MoveToNextSceneCo(n.newSceneName) );
 		}
 		if (!isFinished && other.CompareTag("Goal"))
@@ -1819,6 +1849,8 @@ public class PlayerControls : MonoBehaviour
 
 			// gm.transitionAnim.SetTrigger("toBlack");
 			isCountingTime = false;
+			isUsingMap = false;
+			anim.SetBool("isUsingMap", false);
 			TimeSpan time = TimeSpan.FromSeconds(timePlayed);
 			Debug.Log($"<color=green>Thanks for Playing: {ConvertToTime(time)}</color>");
 			if (gm.invincibilityDuration > 0.5f)
@@ -2654,5 +2686,10 @@ public class PlayerControls : MonoBehaviour
 				SetUiSilk();
 				break;
 		}
+	}
+
+	public void _CHEAT_MONEY()
+	{
+		nRosaries = 100000;
 	}
 }

@@ -70,7 +70,6 @@ public class UiShopHighlight : MonoBehaviour
 
 	public void SelectNewButton()
 	{
-		Debug.Log($"- {prevButton} | {currButton}");
 		// no previous button registered
 		if (prevButton == null)
 		{
@@ -83,19 +82,17 @@ public class UiShopHighlight : MonoBehaviour
 					prevButton = shopButtons[ind-1];
 				else
 					prevButton = shopButtons[ind];
-				Debug.Log($"-- {prevButton} | {currButton}");
 			}
 		}
 		else
 			shopButtons.Remove(currButton);
-		if (shopButtons.Count == 0)
-			return;
-		Debug.Log($"--- {prevButton} | {currButton}");
-		currButton = prevButton;
-		SetButtonOffset();
-		prevButton.self.Select();
-		prevButton = null;
-		Debug.Log($"---- {prevButton} | {currButton}");
+		if (shopButtons.Count > 0)
+		{
+			currButton = prevButton;
+			SetButtonOffset();
+			prevButton.self.Select();
+			prevButton = null;
+		}
 	}
 
     void Update()
