@@ -19,7 +19,7 @@ public abstract class Breakable : MonoBehaviour
 	[SerializeField] protected Breakable[] breakables;
 	[SerializeField] protected GameObject[] extraTiles;
 	[SerializeField] protected Collider2D col;
-	protected GameManager gm;
+	[SerializeField] protected GameManager gm;
 
 
     // Start is called before the first frame update
@@ -28,10 +28,7 @@ public abstract class Breakable : MonoBehaviour
         CallChildOnStart();
     }
 
-    protected virtual void CallChildOnStart()
-	{
-
-	}
+    protected virtual void CallChildOnStart() { }
 
 	public void Damage(int dmg)
 	{

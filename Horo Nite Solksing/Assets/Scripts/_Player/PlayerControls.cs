@@ -326,12 +326,14 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] bool isNearShop;
 	[SerializeField] bool isAtShop;
 	private NPC npc; // current npc nearby
+	private Interactable interactable;
 	[SerializeField] GameObject shopCanvas;
 	[SerializeField] GameObject shopCam;
 	[SerializeField] Animator shopAnim;
 
 
 	[Space] [Header("MAP")]
+	[SerializeField] bool isUsingMapAnim;
 	[SerializeField] GameObject mapCanvas;
 	[SerializeField] Animator mapAnim;
 
@@ -477,10 +479,10 @@ public class PlayerControls : MonoBehaviour
 	{
 		yield return null;
 		yield return null;
+		if (isAtShop && npc != null)
+			npc.ToggleTextbox(true);
 		isAtShop = isPaused = false;
 		pauseCo = null;
-		if (npc != null)
-			npc.ToggleTextbox(true);
 	}
 
 	private string ConvertToTime(TimeSpan time)
@@ -542,7 +544,7 @@ public class PlayerControls : MonoBehaviour
 		}
 
 		// inventory open
-		if (!isPaused && pauseAnim != null && player.GetButtonDown("Minus"))
+		if (!isPaused && !isAtShop && pauseAnim != null && player.GetButtonDown("Minus"))
 		{
 			isPaused = true;
 			isPauseMenu1 = true;
@@ -550,7 +552,7 @@ public class PlayerControls : MonoBehaviour
 			pauseAnim.SetTrigger("open");
 		}
 		// pause open
-		else if (!isPaused && pause2Anim != null && player.GetButtonDown("Start"))
+		else if (!isPaused && !isAtShop && pause2Anim != null && player.GetButtonDown("Start"))
 		{
 			isPaused = true;
 			isPauseMenu1 = false;
@@ -571,7 +573,7 @@ public class PlayerControls : MonoBehaviour
 				pause2Anim.SetTrigger("close");
 		}
 		// basic movement
-		else if (isUsingMap)
+		else if (isUsingMapAnim && isUsingMap)
 		{
 			if (player.GetButtonUp("Map") || !isGrounded)
 			{
@@ -585,7 +587,7 @@ public class PlayerControls : MonoBehaviour
 		{
 			if (!inAirDash)
 			{
-				if (player.GetButtonDown("Attack") && atkCo == null)
+				if (player.GetButtonDown("Attack") && atkCo == null && !anim.GetBool("isAttacking"))
 					Attack();
 				else if (player.GetButtonDown("Skill"))
 					SkillAttack();
@@ -595,11 +597,11 @@ public class PlayerControls : MonoBehaviour
 					bindCo = StartCoroutine( BindCo() );
 
 				// tools
-				else if (player.GetButtonDown("Tool") && toolCo == null)
+				else if (player.GetButtonDown("Tool") && toolCo == null && !anim.GetBool("isAttacking"))
 				{
 					int tool = 0;
 					if (tool == 0 && nToolUses1 > 0)
-						toolCo = StartCoroutine( UseTool(0) );
+						toolCo = StartCoroutine( UseToolCo(0) );
 				}
 
 				// rest on bench
@@ -611,6 +613,7 @@ public class PlayerControls : MonoBehaviour
 					rb.gravityScale = 0;
 					rb.velocity = Vector2.zero;
 					anim.SetBool("isResting", true);
+					if (bench != null) bench.ToggleTextbox(false);
 					startPosition = transform.position;
 				}
 
@@ -659,6 +662,8 @@ public class PlayerControls : MonoBehaviour
 			rb.gravityScale = 1;
 			rb.velocity = Vector2.zero;
 			anim.SetBool("isResting", false);
+			if (bench != null)
+				bench.ToggleTextbox(true);
 		}
 		// leave shop
 		else if (isAtShop && player.GetButtonDown("No"))
@@ -782,6 +787,7 @@ public class PlayerControls : MonoBehaviour
 			isJumping = jumpDashed = jumped = false;
 			jumpTimer = jumpMaxTimer;
 			jumpTimer = 0;
+			rb.gravityScale = origGrav;
 
 			// air dash
 			if (!isGrounded)
@@ -812,7 +818,7 @@ public class PlayerControls : MonoBehaviour
 				Instantiate(dashEffectR, dashSpawnPos.position, dashEffectR.transform.rotation, null);
 		}
 		// First frame of finishing dash
-		if (isDashing && player.GetButtonUp("Dash") && dashCounter <= 0)
+		if (isDashing && !player.GetButton("Dash") && dashCounter <= 0)
 		{
 			CancelDash();
 		}
@@ -1021,6 +1027,12 @@ public class PlayerControls : MonoBehaviour
 			moveDir = model.localScale.x;
 		}
 			
+		// quicker fall speed
+		if (!isGrounded && !inShawAtk && !isJumping && !isWallJumping && rb.velocity.y < fallSpeed)
+			rb.gravityScale = fallGrav;
+		else
+			rb.gravityScale = origGrav;
+
 		// Controlled movement
 		if (!isDashing)
 		{
@@ -1028,10 +1040,6 @@ public class PlayerControls : MonoBehaviour
 			{
 				anim.SetFloat("moveSpeed", x != 0 ? Mathf.Abs(x * activeMoveSpeed) : 1);
 			}
-			if (!isGrounded && !inShawAtk && !isJumping && !isWallJumping && rb.velocity.y < fallSpeed)
-				rb.gravityScale = fallGrav;
-			else
-				rb.gravityScale = origGrav;
 			rb.velocity = new Vector2(x * activeMoveSpeed * (isUsingMap ? 0.25f : 1), rb.velocity.y);
 		}
 		// dashing
@@ -1365,12 +1373,15 @@ public class PlayerControls : MonoBehaviour
 		}
 	}
 
-	IEnumerator UseTool(int tool=0)
+	IEnumerator UseToolCo(int tool=0)
 	{
 		if (toolCo != null) yield break;
 		isTool1 = (tool == 0);
-		if (isTool1) nToolUses1--;
-		else nToolUses2--;
+		// if (isTool1) nToolUses1--;
+		// else nToolUses2--;
+
+		if (isWallSliding)
+			Flip();
 
 		CancelDash();
 		atkDir = 4;
@@ -1400,6 +1411,8 @@ public class PlayerControls : MonoBehaviour
 		tool.toRight = IsFacingRight();
 		tool.inAir = !isGrounded;
 		tool.isMaster = true;
+		if (isTool1) nToolUses1--;
+		else nToolUses2--;
 
 		// caltrops only
 		if (tool.isMultiple)
@@ -1734,7 +1747,6 @@ public class PlayerControls : MonoBehaviour
 	}
 	public void RisingAtkRetreat(float multiplier=1)
 	{
-		// anim.SetBool("isAttacking", false);
 		rb.velocity = new Vector2(0, rb.velocity.y);
 
 		rb.AddForce( new Vector2(-moveDir * risingRecoilForce * multiplier, 0), ForceMode2D.Impulse);

@@ -7,8 +7,13 @@ public class BreakableWall : Breakable
 	protected override void CallChildOnStart() 
 	{
 		gm = GameManager.Instance;
-		if (gm != null && gm.CheckDestroyedList(gameObject.name))
+		if (gm != null && gm.CheckDestroyedList(name))
+		{
+			foreach (Breakable breakable in breakables)
+				if (breakable != null)
+					breakable.EnableCanBeHit();
 			Destroy(gameObject);
+		}
 		if (dmgFx != null)
 			dmgFx.transform.parent = null;
 		if (destroyedObj != null)

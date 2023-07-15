@@ -9,12 +9,14 @@ public class UiShopHighlight : MonoBehaviour
 	[SerializeField] RectTransform rect;
 	[SerializeField] Canvas canvas;
 	[HideInInspector] public float offset;
-	[SerializeField] List<UiShopButton> shopButtons;
 	[SerializeField] float yOffset=0.25f;
 	private Vector2 prevAnchor=new Vector2(0.5f,0.1f);
-	[SerializeField] UiShopButton prevButton;
+	[SerializeField] List<UiShopButton> shopButtons;
 	[SerializeField] UiShopButton currButton;
-	[SerializeField] RewiredEventSystem res;
+	[SerializeField] UiShopButton prevButton;
+	
+	
+	[Space] [SerializeField] RewiredEventSystem res;
 	
 	
 	// [Space] [SerializeField] Animator anim;
@@ -55,6 +57,8 @@ public class UiShopHighlight : MonoBehaviour
 			prevButton = currButton;
 			currButton = o;
 			res.firstSelectedGameObject = o.gameObject;
+			if (prevButton == currButton)
+				prevButton = null;
 		}
 	}
 
@@ -86,11 +90,14 @@ public class UiShopHighlight : MonoBehaviour
 		}
 		else
 			shopButtons.Remove(currButton);
+
+		// has button to select from
 		if (shopButtons.Count > 0)
 		{
 			currButton = prevButton;
 			SetButtonOffset();
-			prevButton.self.Select();
+			if (prevButton != null)
+				prevButton.self.Select();
 			prevButton = null;
 		}
 	}

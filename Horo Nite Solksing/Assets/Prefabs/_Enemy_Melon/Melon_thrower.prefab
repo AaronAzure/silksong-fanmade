@@ -337,10 +337,13 @@ MonoBehaviour:
   inSight: 0
   isClose: 0
   isSuperClose: 0
+  maxSearchTime: 2
   spawningIn: 0
   cannotAtk: 0
   activated: 0
   inParryState: 0
+  isShielding: 0
+  mainPos: {fileID: 0}
   bloodEffectObj: {fileID: 7056141771011346426, guid: 80b9547a3f3f744689ac71dfe20b6e50, type: 3}
   silkEffectObj: {fileID: 7056141771011346426, guid: fb1f8aab62db342b48719794d38c90d1, type: 3}
   stringEffectObj: {fileID: 1629200900604851618}
@@ -354,7 +357,7 @@ MonoBehaviour:
   horzFactor: 1.5
   horzOffset: 0
   upOffset: 7
-  capHorzForce: 7
+  capHorzForce: 9
   capVertForce: 10
   isScouting: 0
   isBackDashing: 0

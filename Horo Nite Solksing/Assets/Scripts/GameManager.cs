@@ -19,10 +19,11 @@ public class GameManager : MonoBehaviour
 	[field: SerializeField] public bool easyMode {get; private set;}
 	[field: SerializeField] public bool hardMode {get; private set;}
 	[field: SerializeField] public float invincibilityDuration {get; private set;}=0.75f;
-	[field: SerializeField] public HashSet<string> roomCleared;
-	[field: SerializeField] public HashSet<string> enemiesDefeated;
-	[field: SerializeField] public HashSet<string> bossCleared;
-	[field: SerializeField] public HashSet<string> destroyedStuff;
+	public HashSet<string> roomCleared;
+	public HashSet<string> enemiesDefeated;
+	public HashSet<string> bossCleared;
+	public HashSet<string> destroyedStuff;
+	[SerializeField] private List<string> destroyedStuffList;
 	[field: SerializeField] public string firstScene="Scene1";
 
 
@@ -38,6 +39,7 @@ public class GameManager : MonoBehaviour
 
 	private void Start() 
 	{
+		destroyedStuffList = new List<string>();
 		enemiesDefeated = new HashSet<string>();
 		bossCleared = new HashSet<string>();
 		roomCleared = new HashSet<string>();
@@ -102,11 +104,16 @@ public class GameManager : MonoBehaviour
 	// todo ------------------------ Destroyed ---------------------------------
 	public void RegisterDestroyedList(string name)
 	{
+		Debug.Log("registered " + SceneManager.GetActiveScene().name + " " + name);
+
 		if (destroyedStuff == null)
 			destroyedStuff = new HashSet<string>();
 
 		if (!destroyedStuff.Contains(SceneManager.GetActiveScene().name + " " + name))
 			destroyedStuff.Add(SceneManager.GetActiveScene().name + " " + name);
+
+		if (!destroyedStuffList.Contains(SceneManager.GetActiveScene().name + " " + name))
+			destroyedStuffList.Add(SceneManager.GetActiveScene().name + " " + name);
 	}
 	public bool CheckDestroyedList(string name)
 	{

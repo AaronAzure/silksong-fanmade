@@ -121,6 +121,7 @@ public abstract class Enemy : MonoBehaviour
 	[SerializeField] GameObject bloodEffectObj;
 	[SerializeField] GameObject silkEffectObj;
 	[SerializeField] GameObject stringEffectObj;
+	[field: SerializeField] public Transform mainPos {get; private set;}
 
 
 	[Space] [Header("Room Related")]
@@ -425,9 +426,9 @@ public abstract class Enemy : MonoBehaviour
 		float angleZ = 
 			Mathf.Atan2(forceY, forceDir.x) * Mathf.Rad2Deg;
 		if (silkEffectObj != null)
-			Instantiate(silkEffectObj, transform.position, Quaternion.Euler(0,0,angleZ+offset*forceDir.x));
+			Instantiate(silkEffectObj, mainPos != null ? mainPos.position : transform.position, Quaternion.Euler(0,0,angleZ+offset*forceDir.x));
 		if (!cannotTakeDmg && bloodEffectObj != null)
-			Instantiate(bloodEffectObj, transform.position, Quaternion.Euler(0,0,angleZ+offset*forceDir.x));
+			Instantiate(bloodEffectObj, mainPos != null ? mainPos.position : transform.position, Quaternion.Euler(0,0,angleZ+offset*forceDir.x));
 		if (!cannotTakeKb && force != 0)
 		{
 			receivingKb = true;

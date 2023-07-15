@@ -73,12 +73,14 @@ public class PlayerAttack : MonoBehaviour
 				// receive normal attack
 				if (!target.inParryState && !target.isShielding)
 				{
-					Vector2 temp = (other.transform.position - transform.position).normalized;
+					Vector2 temp = (
+						(target.mainPos != null ? target.mainPos.position : other.transform.position)
+						 - transform.position).normalized;
 					float angleZ = 
 						Mathf.Atan2(Mathf.Abs(temp.y), temp.x) * Mathf.Rad2Deg;
 					Instantiate(
 						strikePs, 
-						other.transform.position, 
+						(target.mainPos != null ? target.mainPos.position : other.transform.position), 
 						Quaternion.Euler(0,0,angleZ + offset * temp.x)
 					);
 				}
@@ -160,12 +162,14 @@ public class PlayerAttack : MonoBehaviour
 				hitSomething = true;
 				if (!target.inParryState)
 				{
-					Vector2 temp = (other.transform.position - transform.position).normalized;
+					Vector2 temp = (
+						(target.mainPos != null ? target.mainPos.position : other.transform.position)
+						 - transform.position).normalized;
 					float angleZ = 
 						Mathf.Atan2(Mathf.Abs(temp.y), temp.x) * Mathf.Rad2Deg;
 					Instantiate(
 						strikePs, 
-						other.transform.position, 
+						(target.mainPos != null ? target.mainPos.position : other.transform.position), 
 						Quaternion.Euler(0,0,angleZ + offset * temp.x)
 					);
 				}

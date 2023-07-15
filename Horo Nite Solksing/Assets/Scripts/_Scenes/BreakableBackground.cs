@@ -10,7 +10,17 @@ public class BreakableBackground : Breakable
 	[SerializeField] GameObject dmgVfxObj;
 	[SerializeField] bool destoryAfter;
 
-	protected override void CallChildOnStart() { }
+	
+	[Space] [Header("TRAP")] 
+	[SerializeField] bool isTrap;
+	[SerializeField] float despawnTime=10f;
+
+
+	protected override void CallChildOnStart() 
+	{ 
+		if (isTrap)
+			StartCoroutine( DespawnCo() );
+	}
 
 	protected override void CallChildOnDamage(int dmg)
 	{
@@ -38,5 +48,11 @@ public class BreakableBackground : Breakable
 	{
 		yield return new WaitForSeconds(3);
 		Destroy(gameObject);
+	}
+
+	IEnumerator DespawnCo()
+	{
+		yield return new WaitForSeconds(despawnTime);
+		CallChildOnDamage(10000);
 	}
 }

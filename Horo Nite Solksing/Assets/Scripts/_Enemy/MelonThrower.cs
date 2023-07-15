@@ -67,7 +67,7 @@ public class MelonThrower : Enemy
 			else
 				rb.velocity = new Vector2(0, rb.velocity.y);
 		}
-		else if (justBackDashed)
+		else if (justBackDashed && !isBackDashing)
 		{
 			justBackDashed = false;
 			rb.velocity = new Vector2(0, rb.velocity.y);

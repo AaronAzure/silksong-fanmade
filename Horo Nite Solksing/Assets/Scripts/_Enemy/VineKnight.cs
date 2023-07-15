@@ -123,7 +123,7 @@ public class VineKnight : Enemy
 			else
 				rb.velocity = new Vector2(0, rb.velocity.y);
 		}
-		else if (justBackDashed && !receivingKb)
+		else if (justBackDashed && !isBackDashing && !receivingKb)
 		{
 			justBackDashed = false;
 			rb.velocity = new Vector2(0, rb.velocity.y);

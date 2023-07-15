@@ -5321,6 +5321,7 @@ MonoBehaviour:
   - {fileID: 3389105281220845880}
   - {fileID: 561157008712377857}
   - {fileID: 5159551384677958654}
+  - {fileID: 6847586209620203803}
   anim: {fileID: 8759415686820625224}
   hasJumpVelocityAnim: 1
   hasIsGroundedAnim: 0
@@ -5379,10 +5380,13 @@ MonoBehaviour:
   inSight: 0
   isClose: 0
   isSuperClose: 0
+  maxSearchTime: 2
   spawningIn: 0
   cannotAtk: 0
   activated: 0
   inParryState: 0
+  isShielding: 0
+  mainPos: {fileID: 0}
   bloodEffectObj: {fileID: 7056141771011346426, guid: 80b9547a3f3f744689ac71dfe20b6e50, type: 3}
   silkEffectObj: {fileID: 7056141771011346426, guid: fb1f8aab62db342b48719794d38c90d1, type: 3}
   stringEffectObj: {fileID: 6207117319868030888}
@@ -6416,9 +6420,9 @@ SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 4982269046417293223, guid: cf08518ce21db420c8a42646d6199dc6, type: 3}
   m_PrefabInstance: {fileID: 7027270056749726577}
   m_PrefabAsset: {fileID: 0}
---- !u!212 &9116687969077152127 stripped
+--- !u!212 &8291757451312705362 stripped
 SpriteRenderer:
-  m_CorrespondingSourceObject: {fileID: -6989274885878599154, guid: cf08518ce21db420c8a42646d6199dc6, type: 3}
+  m_CorrespondingSourceObject: {fileID: -7883588968783064029, guid: cf08518ce21db420c8a42646d6199dc6, type: 3}
   m_PrefabInstance: {fileID: 7027270056749726577}
   m_PrefabAsset: {fileID: 0}
 --- !u!212 &1928703043988936938 stripped
@@ -6426,9 +6430,9 @@ SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 8881593045009736603, guid: cf08518ce21db420c8a42646d6199dc6, type: 3}
   m_PrefabInstance: {fileID: 7027270056749726577}
   m_PrefabAsset: {fileID: 0}
---- !u!212 &8291757451312705362 stripped
+--- !u!212 &6847586209620203803 stripped
 SpriteRenderer:
-  m_CorrespondingSourceObject: {fileID: -7883588968783064029, guid: cf08518ce21db420c8a42646d6199dc6, type: 3}
+  m_CorrespondingSourceObject: {fileID: 4504271990945276522, guid: cf08518ce21db420c8a42646d6199dc6, type: 3}
   m_PrefabInstance: {fileID: 7027270056749726577}
   m_PrefabAsset: {fileID: 0}
 --- !u!212 &5159551384677958654 stripped
@@ -6449,6 +6453,11 @@ SpriteRenderer:
 --- !u!212 &3890312351978122245 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 6086837661810956148, guid: cf08518ce21db420c8a42646d6199dc6, type: 3}
+  m_PrefabInstance: {fileID: 7027270056749726577}
+  m_PrefabAsset: {fileID: 0}
+--- !u!212 &9116687969077152127 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: -6989274885878599154, guid: cf08518ce21db420c8a42646d6199dc6, type: 3}
   m_PrefabInstance: {fileID: 7027270056749726577}
   m_PrefabAsset: {fileID: 0}
 --- !u!95 &1307366715844961093
