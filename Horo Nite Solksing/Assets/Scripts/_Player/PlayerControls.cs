@@ -334,7 +334,7 @@ public class PlayerControls : MonoBehaviour
 
 	[Space] [Header("MAP")]
 	[SerializeField] bool isUsingMapAnim;
-	[SerializeField] GameObject mapCanvas;
+	[SerializeField] PlayerMap playerMap;
 	[SerializeField] Animator mapAnim;
 
 
@@ -454,6 +454,11 @@ public class PlayerControls : MonoBehaviour
 			StartCoroutine( StartCo() );
 
 		PlayBackgroundMusic();
+		if (playerMap != null) 
+		{
+			playerMap.CheckForSceneInMap(SceneManager.GetActiveScene().name);
+			playerMap.PlaceMarker(SceneManager.GetActiveScene().name);
+		}
 	}
 
 	bool CanControl()
@@ -575,12 +580,14 @@ public class PlayerControls : MonoBehaviour
 		// basic movement
 		else if (isUsingMapAnim && isUsingMap)
 		{
-			if (player.GetButtonUp("Map") || !isGrounded)
+			if (!player.GetButton("Map") || !isGrounded)
 			{
 				isUsingMap = false;
 				anim.SetBool("isUsingMap", false);
+				mapAnim.SetFloat("speed", -2);
 			}
-			CalcMove();
+			if (CanControl() && !inShawAtk)
+				CalcMove();
 		}
 		// basic movement
 		else if (CanControl() && !inShawAtk)
@@ -634,6 +641,7 @@ public class PlayerControls : MonoBehaviour
 			{
 				isUsingMap = true;
 				anim.SetBool("isUsingMap", true);
+				mapAnim.SetFloat("speed", 1);
 			}
 
 			// jump
@@ -917,6 +925,7 @@ public class PlayerControls : MonoBehaviour
 		isAtShop = false;
 		isUsingMap = false;
 		anim.SetBool("isUsingMap", false);
+		mapAnim.SetFloat("speed", -2);
 		shopCanvas.SetActive(false);
 		shopCam.SetActive(false);
 		isAtShop = false;
@@ -1848,6 +1857,7 @@ public class PlayerControls : MonoBehaviour
 			exitPointInd = n.exitIndex;
 			isUsingMap = false;
 			anim.SetBool("isUsingMap", false);
+			mapAnim.SetFloat("speed", -2);
 			StartCoroutine( MoveToNextSceneCo(n.newSceneName) );
 		}
 		if (!isFinished && other.CompareTag("Goal"))
@@ -1861,6 +1871,7 @@ public class PlayerControls : MonoBehaviour
 			isCountingTime = false;
 			isUsingMap = false;
 			anim.SetBool("isUsingMap", false);
+			mapAnim.SetFloat("speed", -2);
 			TimeSpan time = TimeSpan.FromSeconds(timePlayed);
 			Debug.Log($"<color=green>Thanks for Playing: {ConvertToTime(time)}</color>");
 			if (gm.invincibilityDuration > 0.5f)
@@ -2182,6 +2193,11 @@ public class PlayerControls : MonoBehaviour
 			deathAnimObj.SetActive(false);
 		gm.transitionAnim.SetFloat("speed", 1);
 		loadExitPoint = true;
+		if (playerMap != null) 
+		{
+			playerMap.CheckForSceneInMap(savedScene);
+			playerMap.PlaceMarker(savedScene);
+		}
 
 		if (!saveDeath)
 		{
@@ -2237,6 +2253,11 @@ public class PlayerControls : MonoBehaviour
 		AsyncOperation loadingOperation = SceneManager.LoadSceneAsync(newSceneName);
 		// float loadTime = 0;
 		rb.velocity = Vector2.zero;
+		if (playerMap != null) 
+		{
+			playerMap.CheckForSceneInMap(newSceneName);
+			playerMap.PlaceMarker(newSceneName);
+		}
 
 		// wait for scene to load
 		// while (!loadingOperation.isDone && loadTime < 5)
@@ -2560,6 +2581,11 @@ public class PlayerControls : MonoBehaviour
 	{
 		transform.position = savedPos;
 		SceneManager.LoadScene(savedScene);
+		if (playerMap != null) 
+		{
+			playerMap.CheckForSceneInMap(savedScene);
+			playerMap.PlaceMarker(savedScene);
+		}
 		gm.transitionAnim.SetTrigger("reset");
 		cacoonObj.SetActive(false);
 		isFinished = inStunLock = isDead = false;
