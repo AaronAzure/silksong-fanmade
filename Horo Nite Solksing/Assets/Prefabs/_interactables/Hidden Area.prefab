@@ -4890,6 +4890,7 @@ MonoBehaviour:
   anim: {fileID: 2098915075004556621}
   <hasRecoil>k__BackingField: 1
   <hasShawRecoil>k__BackingField: 1
+  <hasDashRecoil>k__BackingField: 1
   <canBeHit>k__BackingField: 1
   hp: 25
   dmgFx: {fileID: 2098915073443343279}
@@ -4902,6 +4903,8 @@ MonoBehaviour:
   breakables: []
   extraTiles: []
   col: {fileID: 2098915073685714977}
+  gm: {fileID: 0}
+  isSecret: 1
 --- !u!61 &2098915073685714977
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -14311,7 +14314,7 @@ ParticleSystem:
     m_Bounce:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 0.2
+      scalar: 0.05
       minScalar: 1
       maxCurve:
         serializedVersion: 2

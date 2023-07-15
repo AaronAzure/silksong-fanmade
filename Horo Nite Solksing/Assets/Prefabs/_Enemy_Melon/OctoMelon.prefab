@@ -241,19 +241,23 @@ MonoBehaviour:
   idleTotalCounter: 5
   immediateFlip: 0
   initDir: -1
+  stillAttacking: 0
   target: {fileID: 0}
   alwaysInRange: 0
   inRange: 0
   inSight: 0
   isClose: 0
   isSuperClose: 0
+  maxSearchTime: 2
   spawningIn: 0
   cannotAtk: 0
   activated: 0
   inParryState: 0
+  isShielding: 0
   bloodEffectObj: {fileID: 7056141771011346426, guid: 80b9547a3f3f744689ac71dfe20b6e50, type: 3}
   silkEffectObj: {fileID: 7056141771011346426, guid: fb1f8aab62db342b48719794d38c90d1, type: 3}
   stringEffectObj: {fileID: 1629200900604851618}
+  <mainPos>k__BackingField: {fileID: 0}
   room: {fileID: 0}
   isWaiting: 0
   alert: {fileID: 0}
@@ -262,8 +266,8 @@ MonoBehaviour:
   facingPlayerAnim: 0
   inAttackAnim: 0
   shotPos: {fileID: 7802825006348072538}
-  shotForce: 12
-  projectile: {fileID: 7378519789265086881}
+  shotForce: 10
+  projectile: {fileID: 7824197715926672409}
 --- !u!61 &1376537067151301442
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -356,8 +360,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1326576834178883752}
-  - component: {fileID: 335455147605879455}
-  - component: {fileID: 4230614823480632794}
   - component: {fileID: 4820894555111982655}
   m_Layer: 0
   m_Name: HITBOX
@@ -380,43 +382,6 @@ Transform:
   m_Father: {fileID: 6959111382631180815}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!58 &335455147605879455
-CircleCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2828672455616083929}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  serializedVersion: 2
-  m_Radius: 0.21333334
---- !u!50 &4230614823480632794
-Rigidbody2D:
-  serializedVersion: 4
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2828672455616083929}
-  m_BodyType: 1
-  m_Simulated: 1
-  m_UseFullKinematicContacts: 0
-  m_UseAutoMass: 0
-  m_Mass: 1
-  m_LinearDrag: 0
-  m_AngularDrag: 0.05
-  m_GravityScale: 1
-  m_Material: {fileID: 0}
-  m_Interpolate: 1
-  m_SleepingMode: 1
-  m_CollisionDetection: 1
-  m_Constraints: 4
 --- !u!212 &4820894555111982655
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -589,10 +554,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6959111382631180815}
-  - component: {fileID: 7378519789265086881}
+  - component: {fileID: 7824197715926672409}
   - component: {fileID: 5439780388197245301}
   - component: {fileID: 5346370032825681200}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: _melon_projectile
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -614,7 +579,7 @@ Transform:
   m_Father: {fileID: 221890542235075941}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7378519789265086881
+--- !u!114 &7824197715926672409
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -623,18 +588,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 6107849482837432711}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d536ecaaad374483baa70315ef24e034, type: 3}
+  m_Script: {fileID: 11500000, guid: bfd07ef792af84993928128c87eef70e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hurtBox: {fileID: 335455147605879455}
-  rb: {fileID: 5439780388197245301}
-  sr: {fileID: 0}
-  canHitback: 0
-  hitBackForce: 5
-  canBreak: 1
-  breakOnPlayerHit: 1
-  breakVfx: {fileID: 0}
   rotateInDir: 1
+  rb: {fileID: 5439780388197245301}
+  breakVfx: {fileID: 0}
+  dontDestroyOnHit: 0
 --- !u!50 &5439780388197245301
 Rigidbody2D:
   serializedVersion: 4
@@ -666,12 +626,12 @@ CircleCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
-  m_Radius: 0.64
+  m_Radius: 0.5
 --- !u!1 &6502570826747816531
 GameObject:
   m_ObjectHideFlags: 0
@@ -957,14 +917,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 60f67e43ae43e4889a09f8d5902a4f72, type: 3}
---- !u!1 &8280079970757899613 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6377824577211555839, guid: 60f67e43ae43e4889a09f8d5902a4f72, type: 3}
-  m_PrefabInstance: {fileID: 3056349255786212002}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &4855209162869804064 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7569282644059956866, guid: 60f67e43ae43e4889a09f8d5902a4f72, type: 3}
+  m_PrefabInstance: {fileID: 3056349255786212002}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &8280079970757899613 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6377824577211555839, guid: 60f67e43ae43e4889a09f8d5902a4f72, type: 3}
   m_PrefabInstance: {fileID: 3056349255786212002}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &6464209924370171487

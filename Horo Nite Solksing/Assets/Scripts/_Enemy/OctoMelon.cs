@@ -11,7 +11,7 @@ public class OctoMelon : Enemy
 	[SerializeField] bool inAttackAnim;
 	[SerializeField] Transform shotPos;
 	[SerializeField] float shotForce=5;
-	[SerializeField] EnemyProjectile projectile;
+	[SerializeField] EnemyProjectile2 projectile;
 
 
 	protected override void IdleAction()
@@ -57,7 +57,6 @@ public class OctoMelon : Enemy
 			inSightAnim = false;
 			anim.SetBool("inSight", false);
 		}
-		// atk.transform.rotation = Quaternion.LookRotation(dir);
 	}
 
 	public void ENABLE_HITBOX()

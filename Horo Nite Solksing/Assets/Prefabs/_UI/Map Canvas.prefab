@@ -373,7 +373,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &5226969854497337817
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1466,6 +1466,7 @@ MonoBehaviour:
   rect: {fileID: 3849124402766842261}
   canvas: {fileID: 2453071306530124337}
   offset: 0
+  yOffset: 0.25
   shopButtons:
   - {fileID: 3611625146280370857}
   - {fileID: 4980267017356583706}
@@ -1475,9 +1476,8 @@ MonoBehaviour:
   - {fileID: 3703690360578276850}
   - {fileID: 8073399345795160753}
   - {fileID: 459784919567554310}
-  yOffset: 0.25
-  prevButton: {fileID: 0}
   currButton: {fileID: 0}
+  prevButton: {fileID: 0}
   res: {fileID: 1257477463021126418}
   lerpDuration: 0.25
   inverse: 0

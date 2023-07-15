@@ -1377,9 +1377,7 @@ public class PlayerControls : MonoBehaviour
 	{
 		if (toolCo != null) yield break;
 		isTool1 = (tool == 0);
-		// if (isTool1) nToolUses1--;
-		// else nToolUses2--;
-
+		
 		if (isWallSliding)
 			Flip();
 
@@ -1921,7 +1919,10 @@ public class PlayerControls : MonoBehaviour
 			hurtCo = null;
 			yield break;
 		}
-		MusicManager.Instance.PlayHurtSFX();
+		if (dmg == 1)
+			MusicManager.Instance.PlayHurtSFX();
+		else
+			MusicManager.Instance.PlayHurt2SFX();
 		MusicManager.Instance.SoftenBgMusic();
 		gm.Vignette();
 		if (hunterSpinObj != null) hunterSpinObj.SetActive(false);

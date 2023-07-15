@@ -20,6 +20,7 @@ public abstract class Breakable : MonoBehaviour
 	[SerializeField] protected GameObject[] extraTiles;
 	[SerializeField] protected Collider2D col;
 	[SerializeField] protected GameManager gm;
+	[SerializeField] protected bool isSecret;
 
 
     // Start is called before the first frame update
@@ -59,7 +60,7 @@ public abstract class Breakable : MonoBehaviour
 				// Don't respawn
 				if (gm != null)
 				{
-					gm.RegisterDestroyedList(name);
+					gm.RegisterDestroyedList(name, isSecret);
 				}
 				// Reveal any secrets
 				if (revealAnims != null)

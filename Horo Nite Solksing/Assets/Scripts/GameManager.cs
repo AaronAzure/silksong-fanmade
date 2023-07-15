@@ -102,9 +102,15 @@ public class GameManager : MonoBehaviour
 
 	// todo --------------------------------------------------------------------
 	// todo ------------------------ Destroyed ---------------------------------
-	public void RegisterDestroyedList(string name)
+	public void RegisterDestroyedList(string name, bool isSecret=false)
 	{
 		Debug.Log("registered " + SceneManager.GetActiveScene().name + " " + name);
+
+		if (isSecret)
+		{
+			MusicManager.Instance.SoftenBgMusic(3);
+			MusicManager.Instance.PlaySecretAreaSFX();
+		}
 
 		if (destroyedStuff == null)
 			destroyedStuff = new HashSet<string>();
@@ -112,8 +118,8 @@ public class GameManager : MonoBehaviour
 		if (!destroyedStuff.Contains(SceneManager.GetActiveScene().name + " " + name))
 			destroyedStuff.Add(SceneManager.GetActiveScene().name + " " + name);
 
-		if (!destroyedStuffList.Contains(SceneManager.GetActiveScene().name + " " + name))
-			destroyedStuffList.Add(SceneManager.GetActiveScene().name + " " + name);
+		// if (!destroyedStuffList.Contains(SceneManager.GetActiveScene().name + " " + name))
+		// 	destroyedStuffList.Add(SceneManager.GetActiveScene().name + " " + name);
 	}
 	public bool CheckDestroyedList(string name)
 	{

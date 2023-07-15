@@ -24,6 +24,8 @@ public class MusicManager : MonoBehaviour
 	[Space] [SerializeField] AudioSource parrySfx;
 	[SerializeField] AudioSource parry2Sfx;
 	[SerializeField] AudioSource hurtSfx;
+	[SerializeField] AudioSource hurt2Sfx;
+	[SerializeField] AudioSource secretAreaSfx;
 	[SerializeField] AudioSource hornetAtkSfx;
 	[SerializeField] AudioSource hornetAtk2Sfx;
 
@@ -83,7 +85,17 @@ public class MusicManager : MonoBehaviour
 		if (hurtSfx != null)
 			hurtSfx.Play();
 	}
-    public void SoftenBgMusic()
+    public void PlayHurt2SFX()
+	{
+		if (hurt2Sfx != null)
+			hurt2Sfx.Play();
+	}
+    public void PlaySecretAreaSFX()
+	{
+		if (secretAreaSfx != null)
+			secretAreaSfx.Play();
+	}
+    public void SoftenBgMusic(float duration=1)
 	{
 		if (softenCo != null)
 		{
@@ -91,7 +103,7 @@ public class MusicManager : MonoBehaviour
 			if (currentMusic != null)
 				currentMusic.volume = origVolume;
 		}
-		softenCo = StartCoroutine(SoftenMusicCo());
+		softenCo = StartCoroutine(SoftenMusicCo(duration));
 	}
     public void PlayHornetAtkSfx(bool atk1)
 	{
@@ -123,14 +135,14 @@ public class MusicManager : MonoBehaviour
 		currentMusic = a;
 	}
 
-	IEnumerator SoftenMusicCo()
+	IEnumerator SoftenMusicCo(float duration)
 	{
 		if (currentMusic == null) yield break;
 
 		origVolume = currentMusic.volume;
 		currentMusic.volume = origVolume / 2f;
 
-		yield return new WaitForSecondsRealtime(1);
+		yield return new WaitForSecondsRealtime(duration);
 		while (currentMusic != null && currentMusic.volume < origVolume)
 		{
 			currentMusic.volume += 0.05f;
