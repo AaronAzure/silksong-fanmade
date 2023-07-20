@@ -269,6 +269,7 @@ public class PlayerControls : MonoBehaviour
 
 
 	[Space] [Header("UI")]
+	[SerializeField] Animator mainUI;
 	[SerializeField] Animator transitionAnim;
 
 	[Space] [SerializeField] GameObject pauseMenu;
@@ -645,6 +646,7 @@ public class PlayerControls : MonoBehaviour
 						if (!uiDialogue.IsDefaultText())
 							nAaronTalked++;
 						uiDialogue.gameObject.SetActive(true);
+						SetMainUI(false);
 						npc.ToggleTextbox(false);
 					}
 					isAtShop = true;
@@ -2238,6 +2240,7 @@ public class PlayerControls : MonoBehaviour
 		rb.gravityScale = 0;
 		anim.SetBool("isDead", true);
 		rb.gravityScale = origGrav;
+		SetMainUI(false);
 
 		if (saveDeath)
 		{
@@ -2261,7 +2264,10 @@ public class PlayerControls : MonoBehaviour
 		isCountingTime = true;
 		gm.transitionAnim.SetFloat("speed", 0);
 		gm.transitionAnim.SetTrigger("reset");
+		
+		// from black
 		yield return new WaitForSeconds(0.05f);
+		SetMainUI(true);
 		if (deathAnimObj != null)
 			deathAnimObj.SetActive(false);
 		gm.transitionAnim.SetFloat("speed", 1);
@@ -2461,6 +2467,12 @@ public class PlayerControls : MonoBehaviour
 		anim.SetBool("isBinding", false);
 	}
 
+	void SetMainUI(bool active)
+	{
+		if (mainUI != null)
+			mainUI.SetTrigger(active ? "open" : "close");
+	}
+
 	void SetUiHp()
 	{
 		for (int i=0 ; i<maxHp+nBonusHp ; i++)
@@ -2577,6 +2589,8 @@ public class PlayerControls : MonoBehaviour
 	{
 		shopCanvas.SetActive(active);
 		shopCam.SetActive(active);
+		if (active)
+			SetMainUI(true);
 	}
 
 	public void CollectCacoon()
