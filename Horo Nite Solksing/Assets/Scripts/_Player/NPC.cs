@@ -4,7 +4,15 @@ using UnityEngine;
 
 public class NPC : MonoBehaviour
 {
+	[System.Serializable] public class Dialogue
+	{
+		[TextArea(1,3)] public string[] lines;
+	}
+
+	
 	[SerializeField] Animator textboxAnim;
+	public Dialogue[] dialogue;
+	
 
 	public void ToggleTextbox(bool active)
 	{
@@ -14,3 +22,4 @@ public class NPC : MonoBehaviour
 		}
 	}
 }
+

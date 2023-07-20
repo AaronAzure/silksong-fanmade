@@ -322,10 +322,12 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] bool isNearShop;
 	[SerializeField] bool isAtShop;
 	private NPC npc; // current npc nearby
+	private int nAaronTalked;
 	private Interactable interactable;
 	[SerializeField] GameObject shopCanvas;
 	[SerializeField] GameObject shopCam;
 	[SerializeField] Animator shopAnim;
+	[SerializeField] UiDialogue uiDialogue;
 
 
 	[Space] [Header("MAP")]
@@ -552,8 +554,13 @@ public class PlayerControls : MonoBehaviour
 			timePlayedTxt.text = ConvertToTime(time);
 		}
 
+		// dialogue
+		if (uiDialogue.gameObject.activeSelf && player.GetButtonDown("Yes"))
+		{
+			uiDialogue.NextLine();
+		}
 		// inventory open
-		if (!isPaused && !isAtShop && pauseAnim != null && player.GetButtonDown("Minus"))
+		else if (!isPaused && !isAtShop && pauseAnim != null && player.GetButtonDown("Minus"))
 		{
 			isPaused = true;
 			isPauseMenu1 = true;
@@ -632,10 +639,17 @@ public class PlayerControls : MonoBehaviour
 				else if (isNearShop && isGrounded && player.GetAxis("Move Vertical") > 0.85f)
 				{
 					if (npc != null)
+					{
+						if (nAaronTalked == 0)
+							uiDialogue.SetLines(npc.dialogue[nAaronTalked].lines);
+						if (!uiDialogue.IsDefaultText())
+							nAaronTalked++;
+						uiDialogue.gameObject.SetActive(true);
 						npc.ToggleTextbox(false);
+					}
 					isAtShop = true;
-					shopCanvas.SetActive(true);
-					shopCam.SetActive(true);
+					// shopCanvas.SetActive(true);
+					// shopCam.SetActive(true);
 					rb.velocity = new Vector2(0, rb.velocity.y);
 					anim.SetBool("isWalking", false);
 				}
@@ -678,7 +692,7 @@ public class PlayerControls : MonoBehaviour
 				bench.ToggleTextbox(true);
 		}
 		// leave shop
-		else if (isAtShop && player.GetButtonDown("No"))
+		else if (isAtShop && shopCanvas.activeSelf && player.GetButtonDown("No"))
 		{
 			if (shopAnim != null)
 				shopAnim.SetTrigger("close");
@@ -2557,6 +2571,12 @@ public class PlayerControls : MonoBehaviour
 			else if (crestNum != 1 && silkGlowNorm != null)
 				silkGlowNorm.SetActive(nSilk >= 9);
 		}
+	}
+
+	public void ToggleShop(bool active)
+	{
+		shopCanvas.SetActive(active);
+		shopCam.SetActive(active);
 	}
 
 	public void CollectCacoon()

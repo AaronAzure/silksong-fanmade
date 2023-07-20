@@ -509,11 +509,11 @@ AnimatorStateMachine:
   - {fileID: -5633941182767252250}
   - {fileID: 4608303204932490840}
   - {fileID: -7103306973005777400}
+  - {fileID: 6767831276965970669}
+  - {fileID: 913947130076478662}
   - {fileID: 5442936471706874659}
   - {fileID: -2589901660875246950}
   - {fileID: -5921293850999439354}
-  - {fileID: 913947130076478662}
-  - {fileID: 6767831276965970669}
   m_EntryTransitions: []
   m_StateMachineTransitions: {}
   m_StateMachineBehaviours: []
@@ -615,6 +615,9 @@ AnimatorStateTransition:
     m_EventTreshold: 0
   - m_ConditionMode: 4
     m_ConditionEvent: jumpVelocity
+    m_EventTreshold: 0
+  - m_ConditionMode: 2
+    m_ConditionEvent: isRespawning
     m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 6646969817187793168}
@@ -1245,6 +1248,9 @@ AnimatorStateTransition:
   - m_ConditionMode: 3
     m_ConditionEvent: jumpVelocity
     m_EventTreshold: 0
+  - m_ConditionMode: 2
+    m_ConditionEvent: isRespawning
+    m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 3549160863734485430}
   m_Solo: 0
@@ -1343,7 +1349,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: hornet_hurt_anim
-  m_Speed: 1
+  m_Speed: 0
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: 2155188401235801343}
