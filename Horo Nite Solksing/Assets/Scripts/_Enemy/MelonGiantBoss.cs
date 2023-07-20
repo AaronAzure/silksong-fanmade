@@ -9,6 +9,7 @@ public class MelonGiantBoss : Enemy
 
 	[Space] [SerializeField] bool downstrikeChaseL;
 	[SerializeField] bool downstrikeChaseR;
+	[SerializeField] bool sweepChase;
 	[SerializeField] EnemyShockWave shockWave;
 	[SerializeField] EnemyShockWave shockWaveMini;
 	[SerializeField] Transform shockWaveRightPos;
@@ -18,15 +19,41 @@ public class MelonGiantBoss : Enemy
 	private GameManager gm;
 	private bool chased;
 
+	
+	[Space] [SerializeField] Transform rubbleMasterT;
+	[SerializeField] Transform[] rubblePos;
+	[SerializeField] EnemyProjectile rubbleObj;
+	[SerializeField] float rubbleFallVel=2;
+
+	[Space] [SerializeField] int setAtk=-1;
+
 
 	protected override void CallChildOnStart()
 	{
 		gm = GameManager.Instance;
+		if (rubbleMasterT != null)
+			rubbleMasterT.parent = null;
 	}
 
 	protected override void CallChildOnEarlyUpdate()
 	{
-		if (downstrikeChaseL || downstrikeChaseR)
+		if (sweepChase)
+		{
+			chased = true;
+			int playerDir = (target.self.position.x - 
+				(mainPos != null ? mainPos.position.x : self.position.x) 
+				> 0) ? 1 : -1;
+			Debug.Log("chasing");
+			if (!receivingKb)
+			{
+				rb.AddForce(new Vector2(chaseSpeed * playerDir * 5, 0), ForceMode2D.Force);
+				rb.velocity = new Vector2(
+					Mathf.Clamp(rb.velocity.x, -maxSpeed, maxSpeed), 
+					rb.velocity.y 
+				);
+			}
+		}
+		else if (downstrikeChaseL || downstrikeChaseR)
 		{
 			chased = true;
 			int playerDir = (target.self.position.x - 
@@ -51,6 +78,43 @@ public class MelonGiantBoss : Enemy
 
 	public void _CHOOSE_ATTACK()
 	{
+		switch (setAtk)
+		{
+			case 0: 
+				anim.SetTrigger("downstrike L");
+				return;
+			case 1: 
+				anim.SetTrigger("downstrike R");
+				return;
+			case 2: 
+				anim.SetTrigger("rubble");
+				return;
+			case 3: 
+				anim.SetTrigger("sweep R");
+				return;
+			case 4: 
+				anim.SetTrigger("sweep L");
+				return;
+			default: 
+				
+				break;
+		}
+
+		if (Random.Range(0,3) == 0)
+		{
+			anim.SetTrigger("rubble");
+			return;
+		}
+		else if (Random.Range(0,2) == 0)
+		{
+			int rng = Random.Range(0,2);
+			anim.SetTrigger(rng == 0 ? "sweep L" : "sweep R");
+			if (atPhase2)
+				anim.SetTrigger(rng != 0 ? "sweep L" : "sweep R");
+			if (atPhase3)
+				anim.SetTrigger(rng == 0 ? "sweep L" : "sweep R");
+			return;
+		}
 		float distFromLeftHand = Vector2.Distance(target.self.position, leftArmPos.position);
 		float distFromRightHand = Vector2.Distance(target.self.position, rightArmPos.position);
 		if (distFromLeftHand < distFromRightHand)
@@ -116,6 +180,23 @@ public class MelonGiantBoss : Enemy
 				var obj = Instantiate(shockWave, shockWaveLeftPos1.position, Quaternion.identity);
 				obj.Flip();
 			}
+		}
+	}
+
+	IEnumerator _RUBBLE_CO()
+	{
+		CinemachineShake.Instance.ShakeCam(10f, 2.5f, 1.5f);
+		List<int> temp = new List<int>();
+		for (int i=0 ; i<rubblePos.Length ; i++)
+			temp.Add(i);
+		
+		for (int i=0 ; i<rubblePos.Length ; i++)
+		{
+			yield return new WaitForSeconds( Random.Range(0.1f, 0.25f) );
+			int rng = temp[ Random.Range(0, temp.Count) ];
+			var obj = Instantiate(rubbleObj, rubblePos[rng].position, Quaternion.identity);
+			obj.rb.velocity = Vector2.down * rubbleFallVel;
+			temp.Remove(rng);
 		}
 	}
 }

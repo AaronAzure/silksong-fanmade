@@ -390,7 +390,7 @@ public abstract class Enemy : MonoBehaviour
 		}
 		else if (isShielding && canBlock && FacingPlayer())
 		{
-			CallChildOnParry();
+			CallChildOnShielded();
 		}
 		else if (!isWaiting && !died)
 		{

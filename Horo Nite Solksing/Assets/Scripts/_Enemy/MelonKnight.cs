@@ -108,6 +108,15 @@ public class MelonKnight : Enemy
 		}
 	}
 
+	protected override void CallChildOnShielded()
+	{
+		if (isSuperClose)
+		{
+			closeCounter = 0;
+			anim.SetTrigger("attack");
+		}
+	}
+
 	private bool sighted;
 	
 	protected override void CallChildOnInSight()

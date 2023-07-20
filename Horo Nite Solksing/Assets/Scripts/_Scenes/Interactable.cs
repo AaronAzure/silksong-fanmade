@@ -6,6 +6,8 @@ public abstract class Interactable : MonoBehaviour
 {
     [SerializeField] protected Animator textboxAnim;
 
+	public virtual void Interact() { }
+	
 	private void OnTriggerEnter2D(Collider2D other) 
 	{
 		if (other.CompareTag("Player"))	
@@ -29,4 +31,5 @@ public abstract class Interactable : MonoBehaviour
 			textboxAnim.SetTrigger(active ? "open" : "close");
 		}
 	}
+
 }

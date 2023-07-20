@@ -10,6 +10,7 @@ public abstract class Tool : MonoBehaviour
 	[HideInInspector] public bool inAir;
 	[Space] [SerializeField] bool isVarTotaluses;
 	[SerializeField] int totalusesDiff;
+	[SerializeField] int capTotalDiff=4;
 	public int totaluses=4;
 	public Sprite icon;
 	[field: SerializeField] public bool quickCooldown {get; private set;}
@@ -52,7 +53,7 @@ public abstract class Tool : MonoBehaviour
 
 	public int GetTotalUses()
 	{
-		return isVarTotaluses ? totaluses - (totalusesDiff * level) : totaluses;
+		return isVarTotaluses ? totaluses - Mathf.Min(totalusesDiff * level, capTotalDiff) : totaluses;
 	}
 
 	protected virtual void LaunchDir()
@@ -73,7 +74,7 @@ public abstract class Tool : MonoBehaviour
 		}
 		else 
 		{
-			if (destroyOnWallHit && other.CompareTag("Ground"))
+			if (destroyOnWallHit && (other.CompareTag("Ground") || other.CompareTag("Breakable")))
 				CallChildOnHit();
 			if (other.CompareTag("Enemy"))
 			{

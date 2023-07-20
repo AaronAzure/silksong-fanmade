@@ -68,6 +68,7 @@ public class UiShopButton : MonoBehaviour, ISelectHandler, IPointerEnterHandler
 		if (nPurchased < 3 && PlayerControls.Instance.CanAffordPurchase(upgrade))
 		{
 			PlayerControls.Instance.MakePurchase(upgrade);
+			PlayerControls.Instance.FullRestore();
 			nPurchased++;
 			SetCostText();
 		}

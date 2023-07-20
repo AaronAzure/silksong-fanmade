@@ -23,7 +23,7 @@ public class GameManager : MonoBehaviour
 	public HashSet<string> enemiesDefeated;
 	public HashSet<string> bossCleared;
 	public HashSet<string> destroyedStuff;
-	[SerializeField] private List<string> destroyedStuffList;
+	[SerializeField] private List<string> destroyedStuffList; // debug
 	[field: SerializeField] public string firstScene="Scene1";
 
 

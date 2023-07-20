@@ -59,14 +59,24 @@ public class PlayerControls : MonoBehaviour
 	private bool isDustTrailPlaying=true;
 	private bool isWallSlideTrailPlaying=true;
 	[SerializeField] float moveSpeed=5;
+
+
+	[Space] [Header("JUMP RELATED")]
 	[SerializeField] float jumpDashForce=10;
 	[SerializeField] float jumpForce=10;
+	[SerializeField] float jumpingOutOfSceneForce=10;
 	[SerializeField] [Range(0f,1f)] float jumpCutoffForce=0.75f;
 	[SerializeField] float fallSpeed=3;
 	[SerializeField] float fallClampSpeed=-10f;
 	[SerializeField] float fallGrav=1.2f;
+	[SerializeField] float jumpMaxTimer=0.5f;
+	private float coyoteTimer;
+	[SerializeField] float coyoteThreshold=0.1f;
+	private float jumpBufferTimer;
+	[SerializeField] float jumpBufferThreshold=0.2f;
+
 	// private bool isFalling;
-	[SerializeField] float risingForce=10;
+	[Space] [SerializeField] float risingForce=10;
 	[SerializeField] Vector2 wallJumpForce;
 	private float origGrav;
 	private float moveX;
@@ -111,12 +121,7 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] Transform wallCheckPos;
 	[SerializeField] float ledgeGrabDist=0.3f;
 
-	[Space] [SerializeField] float jumpMaxTimer=0.5f;
-	private float coyoteTimer;
-	[SerializeField] float coyoteThreshold=0.1f;
-	private float jumpBufferTimer;
-	[SerializeField] float jumpBufferThreshold=0.2f;
-	[SerializeField] Transform groundCheck;
+	[Space] [SerializeField] Transform groundCheck;
 	// [SerializeField] Transform closeToGroundCheck;
 	[SerializeField] Vector2 groundCheckSize;
 	// [SerializeField] Vector2 closeToGroundCheckSize;
@@ -469,6 +474,10 @@ public class PlayerControls : MonoBehaviour
 		);
 	}
 
+	public void HideShopCam()
+	{
+		shopCam.SetActive(false);
+	}
 	public void Unpause()
 	{
 		if (pauseCo != null)
@@ -584,7 +593,7 @@ public class PlayerControls : MonoBehaviour
 			{
 				isUsingMap = false;
 				anim.SetBool("isUsingMap", false);
-				mapAnim.SetFloat("speed", -2);
+				if (mapAnim != null) mapAnim.SetFloat("speed", -2);
 			}
 			if (CanControl() && !inShawAtk)
 				CalcMove();
@@ -641,7 +650,7 @@ public class PlayerControls : MonoBehaviour
 			{
 				isUsingMap = true;
 				anim.SetBool("isUsingMap", true);
-				mapAnim.SetFloat("speed", 1);
+				if (mapAnim != null) mapAnim.SetFloat("speed", 1);
 			}
 
 			// jump
@@ -907,8 +916,8 @@ public class PlayerControls : MonoBehaviour
 			// jump over
 			else
 			{
-				// if (isJumping)
-				// 	rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * jumpCutoffForce);
+				if (isJumping)
+					rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * jumpCutoffForce);
 				isJumping = false;
 				jumpTimer = 0;
 			}
@@ -925,7 +934,7 @@ public class PlayerControls : MonoBehaviour
 		isAtShop = false;
 		isUsingMap = false;
 		anim.SetBool("isUsingMap", false);
-		mapAnim.SetFloat("speed", -2);
+		if (mapAnim != null) mapAnim.SetFloat("speed", -2);
 		shopCanvas.SetActive(false);
 		shopCam.SetActive(false);
 		isAtShop = false;
@@ -987,7 +996,7 @@ public class PlayerControls : MonoBehaviour
 				{
 					rb.velocity = new Vector2(
 						NewSceneJumpMovement(), 
-						movingVerticallyJumping ? jumpForce : rb.velocity.y
+						movingVerticallyJumping ? jumpingOutOfSceneForce : rb.velocity.y
 					);
 				}
 				else
@@ -1243,10 +1252,12 @@ public class PlayerControls : MonoBehaviour
 			anim.SetTrigger("attack");
 			anim.SetBool("isAttacking", true);
 
+			// reaper and beast crest
 			if (crestNum > 1 && atkDir == 1)
 			{
+				// jumpRegistered = isJumping = false;
+				coyoteTimer = coyoteThreshold;
 				yield return new WaitForSeconds(0.167f);
-				
 			}
 			// shaw attack
 			if (atkDir == 2)
@@ -1265,6 +1276,11 @@ public class PlayerControls : MonoBehaviour
 					rb.gravityScale = 0;
 					yield return new WaitForSeconds(0.1f);
 					rb.gravityScale = 1;
+				}
+				else
+				{
+					jumpRegistered = isJumping = false;
+					coyoteTimer = coyoteThreshold;
 				}
 			}
 			// normal slash
@@ -1664,7 +1680,7 @@ public class PlayerControls : MonoBehaviour
 		obj.transform.position = self.position;
 	}
 
-	void FullRestore(bool clearShadowRealmList=false)
+	public void FullRestore(bool clearShadowRealmList=false)
 	{
 		hp = maxHp + nBonusHp;
 		SetHp(true);
@@ -1857,7 +1873,7 @@ public class PlayerControls : MonoBehaviour
 			exitPointInd = n.exitIndex;
 			isUsingMap = false;
 			anim.SetBool("isUsingMap", false);
-			mapAnim.SetFloat("speed", -2);
+			if (mapAnim != null) mapAnim.SetFloat("speed", -2);
 			StartCoroutine( MoveToNextSceneCo(n.newSceneName) );
 		}
 		if (!isFinished && other.CompareTag("Goal"))
@@ -1871,7 +1887,7 @@ public class PlayerControls : MonoBehaviour
 			isCountingTime = false;
 			isUsingMap = false;
 			anim.SetBool("isUsingMap", false);
-			mapAnim.SetFloat("speed", -2);
+			if (mapAnim != null) mapAnim.SetFloat("speed", -2);
 			TimeSpan time = TimeSpan.FromSeconds(timePlayed);
 			Debug.Log($"<color=green>Thanks for Playing: {ConvertToTime(time)}</color>");
 			if (gm.invincibilityDuration > 0.5f)

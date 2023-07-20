@@ -20,4 +20,12 @@ public class PauseMenu : MonoBehaviour
 			PlayerControls.Instance.Unpause();
 		}
 	}
+
+	public void _DEACTIVATE_SHOP_CAM()
+	{
+		if (PlayerControls.Instance != null)
+		{
+			PlayerControls.Instance.HideShopCam();
+		}
+	}
 }
