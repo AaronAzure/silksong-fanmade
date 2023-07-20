@@ -17058,7 +17058,7 @@ Animator:
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: 9762e5d3b91ad41eaa05cf17ae48dd85, type: 2}
   m_CullingMode: 0
-  m_UpdateMode: 0
+  m_UpdateMode: 2
   m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
   m_WarningMessage: 
@@ -38708,7 +38708,7 @@ MonoBehaviour:
   isInvincible: 0
   hasLedge: 0
   hasWall: 0
-  receivingKb: 0
+  isRespawningA: 0
   ledgeCheckPos: {fileID: 5491880763718416450}
   wallCheckPos: {fileID: 5491880765103290502}
   ledgeGrabDist: 0.3
@@ -38925,6 +38925,7 @@ MonoBehaviour:
   isUsingMapAnim: 0
   playerMap: {fileID: 0}
   mapAnim: {fileID: 0}
+  safeZonePos: {fileID: 0}
   silkMultiplier: 1
   lootMultiplier: 1
   invincible: 0

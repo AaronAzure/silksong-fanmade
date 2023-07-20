@@ -75,7 +75,6 @@ public class PlayerControls : MonoBehaviour
 	private float jumpBufferTimer;
 	[SerializeField] float jumpBufferThreshold=0.2f;
 
-	// private bool isFalling;
 	[Space] [SerializeField] float risingForce=10;
 	[SerializeField] Vector2 wallJumpForce;
 	private float origGrav;
@@ -85,7 +84,6 @@ public class PlayerControls : MonoBehaviour
 	private float atkDir;
 	private float skillDir; // 0 = stab, 1 = rush, else = storm
 	private bool isTool1=true;
-	// private float moveY;
 	private bool jumped;
 	private bool jumpDashed;
 	private bool isDashing;
@@ -95,7 +93,6 @@ public class PlayerControls : MonoBehaviour
 
 	private bool isGrounded;
 	private bool isPlatformed;
-	// private bool isCloseToGround;
 	private bool jumpRegistered;
 	private bool inWater;
 	private bool isPogoing;
@@ -106,6 +103,7 @@ public class PlayerControls : MonoBehaviour
 	private bool canLedgeGrab;
 	private bool ledgeGrab;
 	private bool noControl;
+	private bool isRespawning;
 	public bool isResting {get; private set;}
 	public bool canUnrest {get; private set;}
 	[SerializeField] GameObject needToRestObj;
@@ -115,7 +113,7 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] bool isInvincible;
 	[SerializeField] bool hasLedge;
 	[SerializeField] bool hasWall;
-	[SerializeField] bool receivingKb;
+	[SerializeField] bool isRespawningA;
 
 	[SerializeField] Transform ledgeCheckPos;
 	[SerializeField] Transform wallCheckPos;
@@ -268,10 +266,6 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] Sprite extraMidMarkerSpr;
 	[SerializeField] Sprite extraBindMarkerSpr;
 	[SerializeField] GameObject spoolEndObj;
-	// [SerializeField] GameObject normSpoolObj;
-	// [SerializeField] GameObject extraSpoolObj;
-	// [SerializeField] GameObject normHarpistSpoolObj;
-	// [SerializeField] GameObject extraHarpistSpoolObj;
 
 
 	[Space] [Header("UI")]
@@ -279,13 +273,10 @@ public class PlayerControls : MonoBehaviour
 
 	[Space] [SerializeField] GameObject pauseMenu;
 	[SerializeField] Animator pauseAnim;
-	// [SerializeField] CanvasGroup pauseMenuUi;
 
 	[Space] [SerializeField] GameObject pause2Menu;
 	[SerializeField] bool canExitPause2Menu=true;
-	// [SerializeField] GameObject pause2Buttons;
 	[SerializeField] Animator pause2Anim;
-	// [SerializeField] CanvasGroup pause2MenuUi;
 
 	[Space] [SerializeField] Image[] toolIcons;
 	[SerializeField] Image[] toolsEquipped;
@@ -341,6 +332,10 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] bool isUsingMapAnim;
 	[SerializeField] PlayerMap playerMap;
 	[SerializeField] Animator mapAnim;
+
+	
+	[Space] [SerializeField] Transform safeZonePos;
+	private Vector2 roomStartPos;
 
 
 	[Space] [Header("DEBUG")]
@@ -470,7 +465,7 @@ public class PlayerControls : MonoBehaviour
 	{
 		return (!isLedgeGrabbing && !ledgeGrab && !beenHurt && !noControl && !isBinding &&
 			!inAnimation && !isDead && !inStunLock && !isResting && !isPaused && !inRushSkill 
-			&& !isFinished && !isAtShop
+			&& !isFinished && !isAtShop && !isRespawning
 		);
 	}
 
@@ -698,6 +693,8 @@ public class PlayerControls : MonoBehaviour
 
 	void FixedUpdate()
 	{
+		if (isDead)
+			rb.velocity = Vector2.zero;
 		if (stuckToNewScene)
 		{
 			transform.position = this.newScenePos;
@@ -727,7 +724,6 @@ public class PlayerControls : MonoBehaviour
 				if (!isGrounded)
 					anim.SetFloat("jumpVelocity", rb.velocity.y);
 
-				// CheckIsCloseToGround();
 				CheckIsGrounded();
 				CoyoteTimeMechanic();
 				CheckIsInWater();
@@ -757,7 +753,6 @@ public class PlayerControls : MonoBehaviour
 			Vector2 dir = (stunLockPos.position - transform.position);
 			rb.velocity = dir.normalized 
 				* stunLockSpeed * dir.magnitude;
-			// transform.position = Vector3.Lerp(startPosition, stunLockPos.position, t);
 		}
 		else if (!isDead && bench != null && isResting && t < 1)
 		{
@@ -1136,12 +1131,6 @@ public class PlayerControls : MonoBehaviour
 		if (isGrounded && anim.GetBool("isAirDash")) 
 			anim.SetBool("isAirDash", false);
 	}
-	// void CheckIsCloseToGround()
-	// {
-	// 	isCloseToGround = Physics2D.OverlapBox(
-	// 		closeToGroundCheck.position, closeToGroundCheckSize, 0, whatIsGround | whatIsPlatform
-	// 	);
-	// }
 	void CheckIsWalled()
 	{
 		isWallSliding = Physics2D.OverlapBox(wallCheck.position, wallCheckSize, 0, whatIsGround) && !isGrounded && moveX != 0;
@@ -1307,7 +1296,6 @@ public class PlayerControls : MonoBehaviour
 	
 	void SkillAttack()
 	{
-		// Stabby stabby strike
 		if ((infiniteSilk || nSilk >= skillStabCost))
 			atkCo = StartCoroutine( SkillAttackCo() );
 	}
@@ -1830,6 +1818,11 @@ public class PlayerControls : MonoBehaviour
 
 	private void OnTriggerStay2D(Collider2D other) 
 	{
+		if (CanBeHurt() && other.CompareTag("QuickDeath") && hurtCo == null)
+		{
+			isRespawning = true;
+			hurtCo = StartCoroutine( TakeDamageCo(other.transform) );
+		}
 		if (CanBeHurt() && (other.CompareTag("Enemy") || other.CompareTag("EnemyAttack")) && hurtCo == null)
 			hurtCo = StartCoroutine( TakeDamageCo(other.transform) );
 		if (CanBeHurt() && other.CompareTag("EnemyStrongAttack") && hurtCo == null)
@@ -1844,6 +1837,10 @@ public class PlayerControls : MonoBehaviour
 				StopCoroutine( stunLockCo );
 			stunLockCo = StartCoroutine( StunLockCo(other.transform) );
 		}	
+		if (!isDead && other.CompareTag("SafeZone"))
+		{
+			safeZonePos = other.transform;
+		}
 		if (!isDead && other.CompareTag("NPC") && hurtCo == null)
 		{
 			isNearShop = true;
@@ -1941,13 +1938,17 @@ public class PlayerControls : MonoBehaviour
 
 	IEnumerator TakeDamageCo(Transform opponent, int dmg=1)
 	{
+		// Cancel Coroutine if Invincible
 		if (isInvincible)
 		{
 			hurtCo = null;
 			yield break;
 		}
+
+		// Default damage sound effect
 		if (dmg == 1)
 			MusicManager.Instance.PlayHurtSFX();
+		// Double damage sound effect
 		else
 			MusicManager.Instance.PlayHurt2SFX();
 		MusicManager.Instance.SoftenBgMusic();
@@ -1964,14 +1965,11 @@ public class PlayerControls : MonoBehaviour
 		if (hp != 0)
 		{
 			CinemachineShake.Instance.ShakeCam(15, 0.25f);
-			// if (hp > 1 || (hasShield && hp == 1 && shieldHp > 0))
-			// 	animeLinesAnim.SetTrigger("dmg");
 		}
 		anim.SetBool("isSkillAttacking", false);
 		anim.SetBool("isGossamerStorm", false);
 		anim.SetBool("isBinding", false);
 		usingSkill = false;
-		// rb.gravityScale = 1;
 
 		// stop healing
 		if (bindCo != null) 
@@ -2030,23 +2028,68 @@ public class PlayerControls : MonoBehaviour
 			dirX = 1;
 		else if ((opponent.position.x - transform.position.x) < 0)
 			dirX = -1;
-        rb.velocity = new Vector2(-dirX * 8, 5);
-
+		rb.velocity = new Vector2(-dirX * 8, 5);
+			
 		// Freeze frame over
-		yield return new WaitForSecondsRealtime(0.25f);
-		anim.SetBool("isHurt", false);
-		if (!isPaused)
-			Time.timeScale = 1;
+		if (!isRespawning)
+		{
+			yield return new WaitForSecondsRealtime(0.25f);
+			anim.SetBool("isHurt", false);
+			if (!isPaused)
+				Time.timeScale = 1;
+		}
 
-		// Can control again
-		yield return new WaitForSeconds(0.25f);
-		beenHurt = false;
+		// respawning fade to black
+		if (isRespawning)
+		{
+			gm.transitionAnim.SetFloat("speed", 1);
+			gm.transitionAnim.SetTrigger("toBlack");
+			yield return new WaitForSecondsRealtime(0.125f);
+			if (!isPaused)
+				Time.timeScale = 1;
 
-		// invincibility over
-		yield return new WaitForSeconds(gm.invincibilityDuration);
-		foreach (SpriteRenderer sprite in sprites)
-			sprite.material = defaultMat;
-		hurtCo = null;
+			yield return new WaitForSeconds(0.251f);
+			anim.SetBool("isHurt", false);
+			anim.SetBool("isRespawning", true);
+			gm.transitionAnim.SetTrigger("reset");
+			if (safeZonePos != null)
+			{
+				RaycastHit2D hit = Physics2D.Raycast
+				(
+					safeZonePos.position, 
+					Vector2.down,
+					10,
+					whatIsGround
+				);
+				self.position = (hit.collider != null ? (Vector3) hit.point : safeZonePos.position);
+			}
+			else
+				self.position = roomStartPos;
+
+			// Can control again
+			yield return new WaitForSeconds(1f);
+			anim.SetBool("isRespawning", false);
+			isRespawning = beenHurt = false;
+
+			// invincibility over
+			yield return new WaitForSeconds(gm.invincibilityDuration);
+			foreach (SpriteRenderer sprite in sprites)
+				sprite.material = defaultMat;
+			hurtCo = null;
+		}
+		// resume 
+		else
+		{
+			// Can control again
+			yield return new WaitForSeconds(0.25f);
+			beenHurt = false;
+
+			// invincibility over
+			yield return new WaitForSeconds(gm.invincibilityDuration);
+			foreach (SpriteRenderer sprite in sprites)
+				sprite.material = defaultMat;
+			hurtCo = null;
+		}
 	}
 
 	IEnumerator StunLockCo(Transform stunLockPos)
@@ -2267,20 +2310,12 @@ public class PlayerControls : MonoBehaviour
 
 		yield return new WaitForSeconds(0.25f);
 		AsyncOperation loadingOperation = SceneManager.LoadSceneAsync(newSceneName);
-		// float loadTime = 0;
 		rb.velocity = Vector2.zero;
 		if (playerMap != null) 
 		{
 			playerMap.CheckForSceneInMap(newSceneName);
 			playerMap.PlaceMarker(newSceneName);
 		}
-
-		// wait for scene to load
-		// while (!loadingOperation.isDone && loadTime < 5)
-		// {
-		// 	loadTime += Time.deltaTime;
-		// 	yield return null;
-		// }
 	}
 
 	public void MoveOutOfNewScene(Vector2 newScenePos)
@@ -2328,6 +2363,7 @@ public class PlayerControls : MonoBehaviour
 		
 		yield return new WaitForSeconds(0.5f);
 		canMoveHorz = canMove = movingToNextScene = invulnerable = false;
+		roomStartPos = self.position;
 	}
 
 	IEnumerator MoveOutOfStartCo()
@@ -2344,6 +2380,7 @@ public class PlayerControls : MonoBehaviour
 
 		yield return new WaitForSeconds(0.75f);
 		started = canMove = movingToNextScene = invulnerable = false;
+		roomStartPos = self.position;
 		areaCanvas.SetActive(true);
 	}
 
@@ -2351,6 +2388,7 @@ public class PlayerControls : MonoBehaviour
 	{
 		yield return new WaitForSeconds(0.5f);
 		started = canMove = movingToNextScene = invulnerable = false;
+		roomStartPos = self.position;
 		areaCanvas.SetActive(true);
 	}
 
@@ -2403,7 +2441,6 @@ public class PlayerControls : MonoBehaviour
 			SetUiSilk();
 		}
 
-		// Instantiate(bindPs, transform.position, Quaternion.identity);
 		yield return new WaitForSeconds(0.1f);
 		foreach (SpriteRenderer sprite in sprites)
 			sprite.material = defaultMat;
