@@ -77,6 +77,7 @@ public class PlayerControls : MonoBehaviour
 
 	[Space] [SerializeField] float risingForce=10;
 	[SerializeField] Vector2 wallJumpForce;
+	[SerializeField] Vector2 wallJumpForceMultiplier=Vector2.one;
 	private float origGrav;
 	private float moveX;
 	private float dashDir;
@@ -271,13 +272,25 @@ public class PlayerControls : MonoBehaviour
 	[Space] [Header("UI")]
 	[SerializeField] Animator mainUI;
 	[SerializeField] Animator transitionAnim;
+	[SerializeField] CanvasGroup iconInteractable;
+	[SerializeField] GameObject icons;
+	[SerializeField] GameObject highlightObj;
 
 	[Space] [SerializeField] GameObject pauseMenu;
 	[SerializeField] Animator pauseAnim;
+	
 
 	[Space] [SerializeField] GameObject pause2Menu;
 	[SerializeField] bool canExitPause2Menu=true;
 	[SerializeField] Animator pause2Anim;
+
+	[Space] [SerializeField] Animator[] iconAnims;
+	[SerializeField] GameObject[] otherUis;
+	[SerializeField] RectTransform mapUi;
+	[SerializeField] Animator mapUiAnim;
+	[SerializeField] float mapScrollSpeed=5;
+	private bool inMap;
+	private int nIcon=1;
 
 	[Space] [SerializeField] Image[] toolIcons;
 	[SerializeField] Image[] toolsEquipped;
@@ -429,6 +442,8 @@ public class PlayerControls : MonoBehaviour
 
 		if (pauseMenu != null) pauseMenu.SetActive(false);
 		if (pause2Menu != null) pause2Menu.SetActive(false);
+		if (iconAnims != null && nIcon < iconAnims.Length && iconAnims[nIcon] != null)
+			iconAnims[nIcon].SetBool("isSelected", true);
 
 		gm = GameManager.Instance;
 		origGrav = rb.gravityScale;
@@ -566,6 +581,8 @@ public class PlayerControls : MonoBehaviour
 			isPaused = true;
 			isPauseMenu1 = true;
 			pauseMenu.SetActive(true);
+			if (iconAnims != null && nIcon < iconAnims.Length && iconAnims[nIcon] != null)
+				iconAnims[nIcon].SetBool("isSelected", true);
 			pauseAnim.SetTrigger("open");
 		}
 		// pause open
@@ -579,15 +596,42 @@ public class PlayerControls : MonoBehaviour
 		// inventory close
 		else if (isPaused)
 		{
-			// close inventory
-			if (isPauseMenu1 && (player.GetButtonDown("No") || player.GetButtonDown("Minus")))
+			if (inMap)
 			{
-				pauseAnim.SetTrigger("close");
-				toolGaugeUi.SetActive(tool1 != null);
+				float y = player.GetAxis("Move Vertical");
+				float x = player.GetAxis("Move Horizontal");
+				mapUi.localPosition -= (new Vector3(x, y) * mapScrollSpeed);
+				// exit zoom map
+				if (player.GetButtonDown("No"))
+				{
+					ZoomOutMap();
+				}
+				// exit everything
+				else if (player.GetButtonDown("Minus"))
+				{
+					ZoomOutMap();
+					if (isPauseMenu1)
+					{
+						pauseAnim.SetTrigger("close");
+						toolGaugeUi.SetActive(tool1 != null);
+					}
+					if (!isPauseMenu1 && canExitPause2Menu)
+						pause2Anim.SetTrigger("close");
+				}
 			}
-			// close Pause
-			if (!isPauseMenu1 && canExitPause2Menu && (player.GetButtonDown("No") || player.GetButtonDown("Start")))
-				pause2Anim.SetTrigger("close");
+			else
+			{
+				// close inventory
+				if (isPauseMenu1 && (player.GetButtonDown("No") || player.GetButtonDown("Minus")))
+				{
+					ZoomOutMap();
+					pauseAnim.SetTrigger("close");
+					toolGaugeUi.SetActive(tool1 != null);
+				}
+				// close Pause
+				if (!isPauseMenu1 && canExitPause2Menu && (player.GetButtonDown("No") || player.GetButtonDown("Start")))
+					pause2Anim.SetTrigger("close");
+			}
 		}
 		// basic movement
 		else if (isUsingMapAnim && isUsingMap)
@@ -1620,7 +1664,10 @@ public class PlayerControls : MonoBehaviour
 		{
 			isWallSliding = false;
 			isWallJumping = true;
-			rb.velocity = model.localScale.x > 0 ? new Vector2(-wallJumpForce.x, wallJumpForce.y) : wallJumpForce;
+			rb.velocity = new Vector2(
+				(model.localScale.x > 0 ? -1 : 1 )* wallJumpForce.x * wallJumpForceMultiplier.x, 
+				wallJumpForce.y * wallJumpForceMultiplier.y
+			);
 			model.localScale = rb.velocity.x > 0 ? new Vector3(1, 1, 1) : new Vector3(-1, 1, 1);
 			Invoke("ResetWallJump", 0.25f);
 		}
@@ -2471,6 +2518,46 @@ public class PlayerControls : MonoBehaviour
 	{
 		if (mainUI != null)
 			mainUI.SetTrigger(active ? "open" : "close");
+	}
+
+	public void _SET_UI(int n)
+	{
+		// already on Map
+		if (n == 2 && nIcon == 2)
+			ZoomInMap();
+
+		if (n != nIcon && otherUis != null && n < otherUis.Length && otherUis[n] != null)
+		{
+			// disable previous ui
+			if (iconAnims != null && nIcon < iconAnims.Length && iconAnims[nIcon] != null)
+				iconAnims[nIcon].SetBool("isSelected", false);
+			otherUis[nIcon].SetActive(false);
+
+			// register new 
+			nIcon = n;
+			
+			// enable new ui
+			if (iconAnims != null && nIcon < iconAnims.Length && iconAnims[nIcon] != null)
+				iconAnims[nIcon].SetBool("isSelected", true);
+			otherUis[nIcon].SetActive(true);
+		}
+	}
+	public void ZoomInMap()
+	{
+		mapUiAnim.SetBool("zoomIn", true);
+		iconInteractable.interactable = false;
+		icons.SetActive(false);
+		highlightObj.SetActive(false);
+		inMap = true;
+	}
+
+	void ZoomOutMap()
+	{
+		mapUiAnim.SetBool("zoomIn", false);
+		iconInteractable.interactable = true;
+		icons.SetActive(true);
+		highlightObj.SetActive(true);
+		inMap = false;
 	}
 
 	void SetUiHp()
