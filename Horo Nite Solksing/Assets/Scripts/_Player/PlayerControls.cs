@@ -31,9 +31,22 @@ public class PlayerControls : MonoBehaviour
 	
 	
 	[Space] [SerializeField] int nRosaries;
+	[SerializeField] int nRosaryStrings;
+	[SerializeField] int nShellShards;
 	[SerializeField] ParticleSystem rosaryCollectPs;
-	private int oldRosaries;
-	[SerializeField] TextMeshProUGUI rosariesTxt;
+	private int oldRosaries=-1;
+	private int oldShellShards=-1;
+
+	
+	[Space] [SerializeField] TextMeshProUGUI rosariesTxt;
+	[SerializeField] TextMeshProUGUI rosaryStringsTxt;
+
+
+	[Space] [SerializeField] int rosariesReqForConversion=60;
+	[SerializeField] int rosaryStringConverted=50;
+	
+	
+	[Space] [Header("ATTACK")]
 	public int[] atkDmg={10,8,15,10};
 	public int gossamerDmg=5;
 	public int stabDmg=30;
@@ -66,6 +79,7 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] float jumpForce=10;
 	[SerializeField] float jumpingOutOfSceneForce=10;
 	[SerializeField] [Range(0f,1f)] float jumpCutoffForce=0.75f;
+	[SerializeField] [Range(0f,1f)] float maxJumpCutoffForce=0.6f;
 	[SerializeField] float fallSpeed=3;
 	[SerializeField] float fallClampSpeed=-10f;
 	[SerializeField] float fallGrav=1.2f;
@@ -228,7 +242,6 @@ public class PlayerControls : MonoBehaviour
 
 
 	[Space] [Header("TOOLS")]
-	// [SerializeField] Tool equippedTool;
 	[SerializeField] StraightPin straightPin;
 	[SerializeField] Pimpillo pimpillo;
 	[SerializeField] Caltrops caltrops;
@@ -272,9 +285,16 @@ public class PlayerControls : MonoBehaviour
 	[Space] [Header("UI")]
 	[SerializeField] Animator mainUI;
 	[SerializeField] Animator transitionAnim;
-	[SerializeField] CanvasGroup iconInteractable;
+	[SerializeField] CanvasGroup iconI;
 	[SerializeField] GameObject icons;
 	[SerializeField] GameObject highlightObj;
+	[SerializeField] TextMeshProUGUI rosariesUiTxt;
+	[SerializeField] TextMeshProUGUI rosaryStringsUiTxt;
+	private bool inConversion;
+	[SerializeField] GameObject conversionUi;
+	[SerializeField] CanvasGroup inventoryI;
+	[SerializeField] Button conversionBtn;
+	[SerializeField] Button conversionConfirmBtn;
 
 	[Space] [SerializeField] GameObject pauseMenu;
 	[SerializeField] Animator pauseAnim;
@@ -528,6 +548,8 @@ public class PlayerControls : MonoBehaviour
 			{
 				oldRosaries = nRosaries;
 				rosariesTxt.text = nRosaries.ToString();
+				if (rosariesUiTxt != null)
+					rosariesUiTxt.text = nRosaries.ToString();
 			}
 		}
 
@@ -596,7 +618,28 @@ public class PlayerControls : MonoBehaviour
 		// inventory close
 		else if (isPaused)
 		{
-			if (inMap)
+			if (inConversion)
+			{
+				// exit zoom map
+				if (player.GetButtonDown("No"))
+				{
+					ToggleConversionUi(false);
+				}
+				// exit everything
+				else if (player.GetButtonDown("Minus"))
+				{
+					ToggleConversionUi(false);
+					if (isPauseMenu1)
+					{
+						pauseAnim.SetTrigger("close");
+						toolGaugeUi.SetActive(tool1 != null);
+					}
+					if (!isPauseMenu1 && canExitPause2Menu)
+						pause2Anim.SetTrigger("close");
+				}
+			}
+			// In Map UI
+			else if (inMap)
 			{
 				float y = player.GetAxis("Move Vertical");
 				float x = player.GetAxis("Move Horizontal");
@@ -972,7 +1015,7 @@ public class PlayerControls : MonoBehaviour
 			else
 			{
 				if (isJumping)
-					rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * jumpCutoffForce);
+					rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * maxJumpCutoffForce);
 				isJumping = false;
 				jumpTimer = 0;
 			}
@@ -1878,12 +1921,22 @@ public class PlayerControls : MonoBehaviour
 	{
 		return (!isDead && !invulnerable && !invincible && !justParried && !inInvincibleAnim && !movingToNextScene);
 	}
+	private bool CanBeHurtNotInvincible()
+	{
+		return (!isDead && !justParried && !inInvincibleAnim && !movingToNextScene && !isRespawning);
+	}
 
 	private void OnTriggerStay2D(Collider2D other) 
 	{
-		if (CanBeHurt() && other.CompareTag("QuickDeath") && hurtCo == null)
+		if (CanBeHurtNotInvincible() && other.CompareTag("QuickDeath"))
 		{
 			isRespawning = true;
+			if (hurtCo != null)
+			{
+				foreach (SpriteRenderer sprite in sprites)
+					sprite.material = defaultMat;
+				hurtCo = null;
+			}
 			hurtCo = StartCoroutine( TakeDamageCo(other.transform) );
 		}
 		if (CanBeHurt() && (other.CompareTag("Enemy") || other.CompareTag("EnemyAttack")) && hurtCo == null)
@@ -2085,33 +2138,39 @@ public class PlayerControls : MonoBehaviour
 			GRAB_LEDGE();
 		}
 
-		// Knockback
-		float dirX = model.localScale.x;
-		if ((opponent.position.x - transform.position.x) > 0)
-			dirX = 1;
-		else if ((opponent.position.x - transform.position.x) < 0)
-			dirX = -1;
-		rb.velocity = new Vector2(-dirX * 8, 5);
 			
-		// Freeze frame over
 		if (!isRespawning)
 		{
+			// Knockback
+			float dirX = model.localScale.x;
+			if ((opponent.position.x - transform.position.x) > 0)
+				dirX = 1;
+			else if ((opponent.position.x - transform.position.x) < 0)
+				dirX = -1;
+			rb.velocity = new Vector2(-dirX * 8, 5);
+
+			// Freeze frame over
 			yield return new WaitForSecondsRealtime(0.25f);
 			anim.SetBool("isHurt", false);
 			if (!isPaused)
 				Time.timeScale = 1;
 		}
+		else
+		{
+			rb.velocity = new Vector2(0, 5);
+		}
 
 		// respawning fade to black
 		if (isRespawning)
 		{
+			yield return new WaitForSecondsRealtime(0.125f);
 			gm.transitionAnim.SetFloat("speed", 1);
 			gm.transitionAnim.SetTrigger("toBlack");
 			yield return new WaitForSecondsRealtime(0.125f);
 			if (!isPaused)
 				Time.timeScale = 1;
 
-			yield return new WaitForSeconds(0.251f);
+			yield return new WaitForSecondsRealtime(0.251f);
 			anim.SetBool("isHurt", false);
 			anim.SetBool("isRespawning", true);
 			gm.transitionAnim.SetTrigger("reset");
@@ -2294,6 +2353,7 @@ public class PlayerControls : MonoBehaviour
 			collectedCacoon = false;
 			deathScene = SceneManager.GetActiveScene().name;
 			deathPos = transform.position;
+			nRosaries = 0;
 		}
 
 		yield return new WaitForSeconds(2);
@@ -2542,10 +2602,24 @@ public class PlayerControls : MonoBehaviour
 			otherUis[nIcon].SetActive(true);
 		}
 	}
+	public void _CONVERT_TO_STRING()
+	{
+		if (nRosaries >= rosariesReqForConversion)
+		{
+			nRosaries -= rosariesReqForConversion;
+			nRosaryStrings += rosaryStringConverted;
+			SetRosaryStringText();
+		}
+	}
+	public void _TOGGLE_CONVERSION_UI(int n=0)
+	{
+		if (isResting)
+			ToggleConversionUi(n == 0);
+	}
 	public void ZoomInMap()
 	{
 		mapUiAnim.SetBool("zoomIn", true);
-		iconInteractable.interactable = false;
+		iconI.interactable = false;
 		icons.SetActive(false);
 		highlightObj.SetActive(false);
 		inMap = true;
@@ -2554,10 +2628,41 @@ public class PlayerControls : MonoBehaviour
 	void ZoomOutMap()
 	{
 		mapUiAnim.SetBool("zoomIn", false);
-		iconInteractable.interactable = true;
+		iconI.interactable = true;
 		icons.SetActive(true);
 		highlightObj.SetActive(true);
 		inMap = false;
+		iconAnims[nIcon].SetBool("isSelected", true);
+		iconAnims[nIcon].Play("ui_icon_select_anim", -1, 1f);
+	}
+
+	// ui related
+	void ToggleConversionUi(bool active)
+	{
+		if (active && !isResting)
+			return;
+		conversionUi.SetActive(active);
+		inConversion = active;
+
+		inventoryI.interactable = !active;
+		iconI.interactable = !active;
+		highlightObj.SetActive(!active);
+		icons.SetActive(!active);
+
+		// back to normal ui
+		if (!active)
+		{
+			iconAnims[nIcon].SetBool("isSelected", true);
+			iconAnims[nIcon].Play("ui_icon_select_anim", -1, 1f);
+			conversionBtn.Select();
+		}
+		else
+			conversionConfirmBtn.Select();
+	}
+	void SetRosaryStringText()
+	{
+		rosaryStringsTxt.text = nRosaryStrings.ToString();
+		rosaryStringsUiTxt.text = nRosaryStrings.ToString();
 	}
 
 	void SetUiHp()
@@ -2734,6 +2839,17 @@ public class PlayerControls : MonoBehaviour
 		}
 		nRosaries = Mathf.Max(0, nRosaries);
 	}
+	public void GainShellShard(int x)
+	{
+		nShellShards += x;
+		if (x > 0 && rosaryCollectPs != null)
+		{
+			rosaryCollectPs.Emit(2);
+			var main = rosaryCollectPs.shape;
+			main.rotation = new Vector3(0,0,UnityEngine.Random.Range(30,90));
+		}
+		nShellShards = Mathf.Clamp(nShellShards, 0, 400);
+	}
 
 
 	[Command("toggle_invincibility", "toggle_invincibility", MonoTargetType.All)] public void toggle_invincibility()
@@ -2846,20 +2962,30 @@ public class PlayerControls : MonoBehaviour
 			case UiShopButton.Upgrade.extraSpool:
 				return (50 * (int) Mathf.Pow(3, nExtraSpoolBonus));
 			case UiShopButton.Upgrade.health:
-				return (50 * (int) Mathf.Pow(3, nBonusHp));
+				return (100 * (int) Mathf.Pow(3, nBonusHp));
 			case UiShopButton.Upgrade.spool:
-				return (50 * (int) Mathf.Pow(3, nBonusSilk));
+				return (100 * (int) Mathf.Pow(3, nBonusSilk));
 		}
 		return -1;
 	}
 	public bool CanAffordPurchase(UiShopButton.Upgrade u)
 	{
-		return nRosaries >= GetCost(u);
+		return (nRosaries + nRosaryStrings) >= GetCost(u);
 	}
 
 	public void MakePurchase(UiShopButton.Upgrade u)
 	{
-		nRosaries -= GetCost(u);
+		// pay with just rosaries
+		if (nRosaries >= GetCost(u))
+			nRosaries -= GetCost(u);
+		// pay with rosaries and rosary strings
+		else
+		{
+			int remainingCost = GetCost(u) - nRosaries;
+			nRosaries = 0;
+			nRosaryStrings -= remainingCost;
+			SetRosaryStringText();
+		}
 		switch (u)
 		{
 			case UiShopButton.Upgrade.pin:
