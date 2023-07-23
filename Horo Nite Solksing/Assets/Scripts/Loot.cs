@@ -7,22 +7,38 @@ public class Loot : MonoBehaviour
     [SerializeField] int value=5;
 	[SerializeField] Rosary rosary;
 
+    [Space] [SerializeField] int nShellShards=1;
+	[SerializeField] ShellShard shellShard;
+
+
 	[Space] [SerializeField] float xForce=8;
 	
 	[Space] [SerializeField] float yMinForce=6;
 	[SerializeField] float yMaxForce=8;
 
-	public void SpawnLoot(int x=-1)
+	public void SpawnLoot(int x=-1, int y=-1)
 	{
 		if (rosary == null)
 			return;
 		
 		if (x == -1)
 			x = value;
+		if (y == -1)
+			y = nShellShards;
 			
 		for (int i=0 ; i<x ; i++)
 		{
 			var o = Instantiate(rosary, transform.position, Quaternion.identity);
+			o.rb.AddForce(new Vector2(
+				Random.Range(-xForce, xForce), 
+				Random.Range(yMinForce, yMaxForce)
+			), ForceMode2D.Impulse);
+			o.transform.rotation = Quaternion.AngleAxis(Random.Range(0, 360), Vector3.forward);
+			// o.sr.sortingOrder = i;
+		}
+		for (int i=0 ; i<y ; i++)
+		{
+			var o = Instantiate(shellShard, transform.position, Quaternion.identity);
 			o.rb.AddForce(new Vector2(
 				Random.Range(-xForce, xForce), 
 				Random.Range(yMinForce, yMaxForce)

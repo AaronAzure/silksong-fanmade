@@ -4,7 +4,7 @@ using UnityEngine;
 
 public abstract class Tool : MonoBehaviour
 {
-	// [SerializeField] protected int uses=4;
+	[HideInInspector] public int usesLeft=0;
 	public int level;
 	[HideInInspector] public bool isMaster;
 	[HideInInspector] public bool inAir;
@@ -12,6 +12,7 @@ public abstract class Tool : MonoBehaviour
 	[SerializeField] int totalusesDiff;
 	[SerializeField] int capTotalDiff=4;
 	public int totaluses=4;
+	public int repairCost=3;
 	public Sprite icon;
 	[field: SerializeField] public bool quickCooldown {get; private set;}
 	private int upgradeCost=50;

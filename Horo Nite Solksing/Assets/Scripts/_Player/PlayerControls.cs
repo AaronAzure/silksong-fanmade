@@ -33,6 +33,7 @@ public class PlayerControls : MonoBehaviour
 	[Space] [SerializeField] int nRosaries;
 	[SerializeField] int nRosaryStrings;
 	[SerializeField] int nShellShards;
+	[SerializeField] int maxShellShards=400;
 	[SerializeField] ParticleSystem rosaryCollectPs;
 	private int oldRosaries=-1;
 	private int oldShellShards=-1;
@@ -40,6 +41,7 @@ public class PlayerControls : MonoBehaviour
 	
 	[Space] [SerializeField] TextMeshProUGUI rosariesTxt;
 	[SerializeField] TextMeshProUGUI rosaryStringsTxt;
+	[SerializeField] TextMeshProUGUI shellShardsTxt;
 
 
 	[Space] [SerializeField] int rosariesReqForConversion=60;
@@ -253,8 +255,8 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] Tool tool1;
 	[SerializeField] Tool tool2;
 	private bool refillUses;
-	private int nToolUses1;
-	private int nToolUses2;
+	// private int tool1.usesLeft;
+	// private int tool2.usesLeft;
 	private float nToolSlowUses1;
 	private float nToolSlowUses2;
 	[Space] [SerializeField] Image toolUses1; // progress bar
@@ -290,8 +292,11 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] GameObject highlightObj;
 	[SerializeField] TextMeshProUGUI rosariesUiTxt;
 	[SerializeField] TextMeshProUGUI rosaryStringsUiTxt;
+	[SerializeField] TextMeshProUGUI shellShardsUiTxt;
+
+
 	private bool inConversion;
-	[SerializeField] GameObject conversionUi;
+	[Space] [SerializeField] GameObject conversionUi;
 	[SerializeField] CanvasGroup inventoryI;
 	[SerializeField] Button conversionBtn;
 	[SerializeField] Button conversionConfirmBtn;
@@ -553,6 +558,12 @@ public class PlayerControls : MonoBehaviour
 			}
 		}
 
+		if (nShellShards != oldShellShards)
+		{
+			oldShellShards = nShellShards;
+			shellShardsTxt.text = nShellShards.ToString();
+			shellShardsUiTxt.text = $"{nShellShards}/{maxShellShards}";
+		}
 		if (calcHeight)
 		{
 			float temp = transform.position.y;
@@ -706,7 +717,7 @@ public class PlayerControls : MonoBehaviour
 				else if (player.GetButtonDown("Tool") && toolCo == null && !anim.GetBool("isAttacking"))
 				{
 					int tool = 0;
-					if (tool == 0 && nToolUses1 > 0)
+					if (tool == 0 && tool1.usesLeft > 0)
 						toolCo = StartCoroutine( UseToolCo(0) );
 				}
 
@@ -865,9 +876,9 @@ public class PlayerControls : MonoBehaviour
 		}
 		if (toolUses1 != null && tool1 != null)
 		{
-			if (nToolSlowUses1 != nToolUses1)
+			if (nToolSlowUses1 != tool1.usesLeft)
 			{
-				nToolSlowUses1 = Mathf.Lerp(nToolSlowUses1, nToolUses1, t1);
+				nToolSlowUses1 = Mathf.Lerp(nToolSlowUses1, tool1.usesLeft, t1);
 				t1 += 0.5f * Time.fixedDeltaTime * (refillUses ? 5 : 1);
 				toolUses1.fillAmount = nToolSlowUses1/tool1.GetTotalUses();
 			}
@@ -879,9 +890,9 @@ public class PlayerControls : MonoBehaviour
 		}
 		if (toolUses2 != null && tool2 != null)
 		{
-			if (nToolSlowUses2 != nToolUses2)
+			if (nToolSlowUses2 != tool2.usesLeft)
 			{
-				nToolSlowUses2 = Mathf.Lerp(nToolSlowUses2, nToolUses2, t2);
+				nToolSlowUses2 = Mathf.Lerp(nToolSlowUses2, tool2.usesLeft, t2);
 				t2 += 0.5f * Time.fixedDeltaTime;
 				toolUses2.fillAmount = nToolSlowUses2/tool2.GetTotalUses();
 			}
@@ -1525,8 +1536,8 @@ public class PlayerControls : MonoBehaviour
 		tool.toRight = IsFacingRight();
 		tool.inAir = !isGrounded;
 		tool.isMaster = true;
-		if (isTool1) nToolUses1--;
-		else nToolUses2--;
+		if (isTool1) tool1.usesLeft--;
+		else tool2.usesLeft--;
 
 		// caltrops only
 		if (tool.isMultiple)
@@ -1793,12 +1804,18 @@ public class PlayerControls : MonoBehaviour
 
 		if (tool1 != null && toolUses1 != null)
 		{
-			nToolUses1 = tool1.GetTotalUses();
-			refillUses = true;
+			int maxReplenished = Mathf.Max(0, tool1.GetTotalUses() - tool1.usesLeft); 
+			if (maxReplenished > 0)
+			{
+				int nReplenished = Mathf.Clamp(nShellShards / tool1.repairCost, 0, maxReplenished);
+				nShellShards -= (nReplenished * tool1.repairCost);
+				tool1.usesLeft += nReplenished;
+				refillUses = true;
+			}
 		}
 		if (tool2 != null && toolUses2 != null)
 		{
-			nToolUses2 = tool2.GetTotalUses();
+			tool2.usesLeft = tool2.GetTotalUses();
 		}
 	}
 
@@ -2841,14 +2858,13 @@ public class PlayerControls : MonoBehaviour
 	}
 	public void GainShellShard(int x)
 	{
-		nShellShards += x;
 		if (x > 0 && rosaryCollectPs != null)
 		{
 			rosaryCollectPs.Emit(2);
 			var main = rosaryCollectPs.shape;
 			main.rotation = new Vector3(0,0,UnityEngine.Random.Range(30,90));
 		}
-		nShellShards = Mathf.Clamp(nShellShards, 0, 400);
+		nShellShards = Mathf.Clamp(nShellShards + x, 0, maxShellShards);
 	}
 
 

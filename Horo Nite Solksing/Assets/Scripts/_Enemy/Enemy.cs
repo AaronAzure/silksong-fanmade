@@ -54,6 +54,7 @@ public abstract class Enemy : MonoBehaviour
 	
 	[Space] [SerializeField] Loot loot;
 	[SerializeField] int nLoot=1;
+	[SerializeField] int nShells=1;
 
 	
 	[Space] [Header("Platformer Related")]
@@ -490,7 +491,10 @@ public abstract class Enemy : MonoBehaviour
 		StopAllCoroutines();
 		if (loot != null)
 		{
-			loot.SpawnLoot( Mathf.RoundToInt(nLoot * target.lootMultiplier) );
+			loot.SpawnLoot( 
+				Mathf.RoundToInt(nLoot * target.lootMultiplier),
+				Mathf.RoundToInt(nShells * target.lootMultiplier)	
+			);
 		}
 		if (closeRangeFinder != null) Destroy(closeRangeFinder);
 		if (distRangeFinder != null) Destroy(distRangeFinder);
