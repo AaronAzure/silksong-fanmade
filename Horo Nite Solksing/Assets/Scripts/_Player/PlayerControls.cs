@@ -33,7 +33,9 @@ public class PlayerControls : MonoBehaviour
 	[Space] [SerializeField] int nRosaries;
 	[SerializeField] int nRosaryStrings;
 	[SerializeField] int nShellShards;
-	[SerializeField] int maxShellShards=400;
+	private int nGoldenWatermelons;
+	
+	[Space] [SerializeField] int maxShellShards=400;
 	[SerializeField] ParticleSystem rosaryCollectPs;
 	private int oldRosaries=-1;
 	private int oldShellShards=-1;
@@ -42,6 +44,7 @@ public class PlayerControls : MonoBehaviour
 	[Space] [SerializeField] TextMeshProUGUI rosariesTxt;
 	[SerializeField] TextMeshProUGUI rosaryStringsTxt;
 	[SerializeField] TextMeshProUGUI shellShardsTxt;
+	[SerializeField] TextMeshProUGUI goldenWatermelonTxt;
 
 
 	[Space] [SerializeField] int rosariesReqForConversion=60;
@@ -157,6 +160,7 @@ public class PlayerControls : MonoBehaviour
 
 	[Space] [SerializeField] float activeMoveSpeed;
 	[SerializeField] float dashSpeed=10;
+	[SerializeField] float airDashMultiplier=1;
 	[SerializeField] float dashBurstSpeed=15;
 	[SerializeField] float dashDuration=0.25f;
 	[SerializeField] float dashCooldownDuration=0.25f;
@@ -254,6 +258,12 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] Tool[] tools;
 	[SerializeField] Tool tool1;
 	[SerializeField] Tool tool2;
+	[SerializeField] GameObject straightPinUi;
+	[SerializeField] GameObject pimpilloToolUi;
+	[SerializeField] GameObject caltropsToolUi;
+	[SerializeField] GameObject shawbladesToolUi;
+	[SerializeField] GameObject shieldToolUi;
+	[SerializeField] GameObject spoolToolUi;
 	private bool refillUses;
 	// private int tool1.usesLeft;
 	// private int tool2.usesLeft;
@@ -300,6 +310,7 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] CanvasGroup inventoryI;
 	[SerializeField] Button conversionBtn;
 	[SerializeField] Button conversionConfirmBtn;
+	[SerializeField] GameObject collectedUi;
 
 	[Space] [SerializeField] GameObject pauseMenu;
 	[SerializeField] Animator pauseAnim;
@@ -753,6 +764,24 @@ public class PlayerControls : MonoBehaviour
 					rb.velocity = new Vector2(0, rb.velocity.y);
 					anim.SetBool("isWalking", false);
 				}
+
+				// Interactable
+				else if (interactable != null && isGrounded && player.GetAxis("Move Vertical") > 0.85f)
+				{
+					interactable.ToggleTextbox(false);
+					interactable.Interact();
+					// if (interactable != null)
+					// {
+					// 	if (nAaronTalked == 0)
+					// 		uiDialogue.SetLines(npc.dialogue[nAaronTalked].lines);
+					// 	if (!uiDialogue.IsDefaultText())
+					// 		nAaronTalked++;
+					// 	uiDialogue.gameObject.SetActive(true);
+					// 	SetMainUI(false);
+					// }
+					rb.velocity = new Vector2(0, rb.velocity.y);
+					anim.SetBool("isWalking", false);
+				}
 			}
 
 			if (player.GetButtonDown("Map") && isGrounded)
@@ -850,8 +879,8 @@ public class PlayerControls : MonoBehaviour
 				if (!inAirDash)
 					Move();
 				// Air dashed
-				else
-					rb.velocity = new Vector2(model.localScale.x * dashSpeed * 0.9f, rb.velocity.y);
+				else if (!isWallJumping)
+					rb.velocity = new Vector2(model.localScale.x * dashSpeed * airDashMultiplier, rb.velocity.y / 2);
 
 				if (jumpDashed && jumped && (isGrounded || isWallSliding || canLedgeGrab))
 					jumpDashed = jumped = false;
@@ -1040,6 +1069,8 @@ public class PlayerControls : MonoBehaviour
 
 	void ResetAllBools()
 	{
+		npc = null;
+		interactable = null;
 		isAtShop = false;
 		isUsingMap = false;
 		anim.SetBool("isUsingMap", false);
@@ -1716,10 +1747,14 @@ public class PlayerControls : MonoBehaviour
 	{
 		if (!movingToNextScene)
 		{
+			anim.SetBool("isAirDash", false);
+			CancelDash();
+			airDashed = false;
 			isWallSliding = false;
+			
 			isWallJumping = true;
 			rb.velocity = new Vector2(
-				(model.localScale.x > 0 ? -1 : 1 )* wallJumpForce.x * wallJumpForceMultiplier.x, 
+				(model.localScale.x > 0 ? -1 : 1) * wallJumpForce.x * wallJumpForceMultiplier.x, 
 				wallJumpForce.y * wallJumpForceMultiplier.y
 			);
 			model.localScale = rb.velocity.x > 0 ? new Vector3(1, 1, 1) : new Vector3(-1, 1, 1);
@@ -1981,6 +2016,10 @@ public class PlayerControls : MonoBehaviour
 			if (npc != null)
 				npc.ToggleTextbox(true);
 		}
+		if (!isDead && other.CompareTag("Interactable") && hurtCo == null)
+		{
+			interactable = other.GetComponent<Interactable>();
+		}
 		if (!isDead && other.CompareTag("Death") && hurtCo == null)
 		{
 			hurtCo = StartCoroutine( InstantDeathCo() );
@@ -2043,6 +2082,10 @@ public class PlayerControls : MonoBehaviour
 			if (npc != null)
 				npc.ToggleTextbox(false);
 			npc = null;
+		}
+		if (other.CompareTag("Interactable"))
+		{
+			interactable = null;
 		}
 	}
 
@@ -2364,6 +2407,8 @@ public class PlayerControls : MonoBehaviour
 		anim.SetBool("isDead", true);
 		rb.gravityScale = origGrav;
 		SetMainUI(false);
+		anim.SetBool("isRespawning", false);
+		isRespawning = false;
 
 		if (saveDeath)
 		{
@@ -2418,6 +2463,8 @@ public class PlayerControls : MonoBehaviour
 		anim.SetBool("isDead", false);
 		anim.SetBool("isHurt", false);
 		anim.SetBool("isStunLock", false);
+		isWallSliding = isWallJumping = false;
+		anim.SetBool("isWallSliding", isWallSliding);
 		Physics2D.IgnoreLayerCollision(whatIsPlayerValue, whatIsPlatformValue, false);
 		beenHurt = false;
 		if (soulLeakPs != null) soulLeakPs.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
@@ -2865,6 +2912,13 @@ public class PlayerControls : MonoBehaviour
 			main.rotation = new Vector3(0,0,UnityEngine.Random.Range(30,90));
 		}
 		nShellShards = Mathf.Clamp(nShellShards + x, 0, maxShellShards);
+	}
+	public void GainCollectable()
+	{
+		nGoldenWatermelons++;
+		goldenWatermelonTxt.text = nGoldenWatermelons.ToString();
+		collectedUi.SetActive(false);
+		collectedUi.SetActive(true);
 	}
 
 

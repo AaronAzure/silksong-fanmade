@@ -58,6 +58,7 @@ public abstract class Enemy : MonoBehaviour
 
 	
 	[Space] [Header("Platformer Related")]
+	[SerializeField] bool isFlying;
 	[SerializeField] protected bool isSmart; // if attacked face direction;
 	[SerializeField] protected bool isStupid; // if attacked face direction;
 	[SerializeField] protected bool controlledByAnim;
@@ -75,7 +76,6 @@ public abstract class Enemy : MonoBehaviour
 	[field: SerializeField] protected  LayerMask whatIsGround;
 	[field: SerializeField] protected  LayerMask finalMask;
 	[SerializeField] protected bool isGrounded;
-	[SerializeField] bool isFlying;
 	[SerializeField] bool cannotTakeYKb;
 	[SerializeField] protected bool idleActionOnly;
 	protected bool beenHurt;
