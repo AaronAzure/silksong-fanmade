@@ -45058,7 +45058,7 @@ MonoBehaviour:
   jumpDashForce: 10
   jumpForce: 8
   jumpingOutOfSceneForce: 8
-  jumpCutoffForce: 0.4
+  jumpCutoffForce: 0.375
   maxJumpCutoffForce: 0.6
   fallSpeed: -2
   fallClampSpeed: -17.5
@@ -45066,9 +45066,12 @@ MonoBehaviour:
   jumpMaxTimer: 0.4
   coyoteThreshold: 0.1
   jumpBufferThreshold: 0.25
+  wallJumpMin: 0.125
+  wallJumpControlThreshold: 0.5
+  wallJumpThreshold: 0.6
   risingForce: 10
-  wallJumpForce: {x: 4, y: 8}
-  wallJumpForceMultiplier: {x: 1.2, y: 1.15}
+  wallJumpForce: {x: 5, y: 8}
+  wallJumpForceMultiplier: {x: 1, y: 1}
   needToRestObj: {fileID: 4518672902730830674}
   stunLockSpeed: 12
   isInvincible: 0
@@ -45100,6 +45103,7 @@ MonoBehaviour:
   ceilingCheckSize: {x: 0.35, y: 0.2}
   activeMoveSpeed: 0
   dashSpeed: 10
+  airDashMultiplier: 1
   dashBurstSpeed: 15
   dashDuration: 0.15
   dashCooldownDuration: 0.1
@@ -45165,6 +45169,12 @@ MonoBehaviour:
   tools: []
   tool1: {fileID: 0}
   tool2: {fileID: 0}
+  straightPinUi: {fileID: 0}
+  pimpilloToolUi: {fileID: 0}
+  caltropsToolUi: {fileID: 0}
+  shawbladesToolUi: {fileID: 0}
+  shieldToolUi: {fileID: 0}
+  spoolToolUi: {fileID: 0}
   toolUses1: {fileID: 3261041534897675780}
   toolUses2: {fileID: 7849423420803668751}
   hasShield: 0

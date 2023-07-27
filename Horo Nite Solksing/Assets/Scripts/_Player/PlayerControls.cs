@@ -93,6 +93,11 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] float coyoteThreshold=0.1f;
 	private float jumpBufferTimer;
 	[SerializeField] float jumpBufferThreshold=0.2f;
+	private float wallJumpTimer;
+	[SerializeField] float wallJumpMin=0.125f; // can be released
+	[SerializeField] float wallJumpControlThreshold=0.25f; // can control
+	[SerializeField] float wallJumpThreshold=0.5f; // max height
+	private float wallJumpDir;
 
 	[Space] [SerializeField] float risingForce=10;
 	[SerializeField] Vector2 wallJumpForce;
@@ -1018,52 +1023,102 @@ public class PlayerControls : MonoBehaviour
 
 	void JumpMechanic()
 	{
-		// First Frame of Jump
-		if (player.GetButtonDown("Jump"))
+		if (isWallJumping)
 		{
-			jumpBufferTimer = 0;
-			jumpRegistered = true;
-		}
-		if (jumpRegistered && jumpBufferTimer < jumpBufferThreshold)
-		{
-			jumpBufferTimer += Time.fixedDeltaTime;
-		}
-		// First Frame of Jump
-		if (!isJumping && jumpBufferTimer < jumpBufferThreshold && coyoteTimer < coyoteThreshold)
-		{
-			jumpRegistered = false;
-			jumpBufferTimer = jumpBufferThreshold;
-			Jump();
-		}
-		// Released jump button
-		else if (player.GetButtonUp("Jump") || CheckIsCeiling())
-		{
-			if (isJumping)
-				rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * jumpCutoffForce);
-			jumpRegistered = isJumping = false;
-			coyoteTimer = coyoteThreshold;
-		}
-		// Holding jump button
-		else if (isJumping && player.GetButton("Jump"))
-		{
-			if (!usingSkill && jumpTimer < jumpMaxTimer)
+			wallJumpTimer += Time.fixedDeltaTime;
+
+			rb.velocity = new Vector2(
+				(model.localScale.x > 0 ? -1 : 1) * wallJumpForce.x * wallJumpForceMultiplier.x, 
+				wallJumpForce.y * wallJumpForceMultiplier.y
+			);
+
+			if (wallJumpTimer < wallJumpControlThreshold)
 			{
-				rb.velocity = new Vector2(rb.velocity.x, jumpForce);
-				jumpTimer += Time.deltaTime;
+				rb.velocity = new Vector2(
+					wallJumpDir * wallJumpForce.x * wallJumpForceMultiplier.x, 
+					wallJumpForce.y * wallJumpForceMultiplier.y
+				);
 			}
-			// jump over
 			else
 			{
-				if (isJumping)
-					rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * maxJumpCutoffForce);
-				isJumping = false;
-				jumpTimer = 0;
+				rb.velocity = new Vector2(
+					moveX * activeMoveSpeed, 
+					wallJumpForce.y * wallJumpForceMultiplier.y
+				);
+				if (!cantRotate && !cantRotate2)
+				{
+					// right
+					if (moveX > 0) 
+						model.localScale = new Vector3(1, 1, 1);
+					// left
+					else if (moveX < 0) 
+						model.localScale = new Vector3(-1, 1, 1);
+					moveDir = model.localScale.x;
+				}
+			}
+
+			if (wallJumpTimer >= wallJumpThreshold)
+			{
+				isWallJumping = false;
+				wallJumpTimer = 0;
+				rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * maxJumpCutoffForce);
+			}
+			else if (!player.GetButton("Jump") && wallJumpTimer >= wallJumpMin)
+			{
+				isWallJumping = false;
+				wallJumpTimer = 0;
+				rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * jumpCutoffForce);
 			}
 		}
-		// wall sliding
-		else if (isWallSliding && player.GetButtonDown("Jump"))
+		else
 		{
-			WallJump();
+			// First Frame of Jump
+			if (player.GetButtonDown("Jump"))
+			{
+				jumpBufferTimer = 0;
+				jumpRegistered = true;
+			}
+			if (jumpRegistered && jumpBufferTimer < jumpBufferThreshold)
+			{
+				jumpBufferTimer += Time.fixedDeltaTime;
+			}
+			// First Frame of Jump
+			if (!isJumping && jumpBufferTimer < jumpBufferThreshold && coyoteTimer < coyoteThreshold)
+			{
+				jumpRegistered = false;
+				jumpBufferTimer = jumpBufferThreshold;
+				Jump();
+			}
+			// Released jump button
+			else if (player.GetButtonUp("Jump") || CheckIsCeiling())
+			{
+				if (isJumping)
+					rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * jumpCutoffForce);
+				jumpRegistered = isJumping = false;
+				coyoteTimer = coyoteThreshold;
+			}
+			// Holding jump button
+			else if (isJumping && player.GetButton("Jump"))
+			{
+				if (!usingSkill && jumpTimer < jumpMaxTimer)
+				{
+					rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+					jumpTimer += Time.deltaTime;
+				}
+				// jump over
+				else
+				{
+					if (isJumping)
+						rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * maxJumpCutoffForce);
+					isJumping = false;
+					jumpTimer = 0;
+				}
+			}
+			// wall sliding
+			else if (isWallSliding && player.GetButtonDown("Jump"))
+			{
+				WallJump();
+			}
 		}
 	}
 
@@ -1086,6 +1141,7 @@ public class PlayerControls : MonoBehaviour
 		rb.gravityScale = origGrav;
 		isWallSliding = false;
 		isWallJumping = false;
+		wallJumpTimer = 0;
 		rb.gravityScale = 1;
 		activeMoveSpeed = moveSpeed;
 		bindCo = null;
@@ -1752,13 +1808,11 @@ public class PlayerControls : MonoBehaviour
 			airDashed = false;
 			isWallSliding = false;
 			
+			wallJumpTimer = 0;
 			isWallJumping = true;
-			rb.velocity = new Vector2(
-				(model.localScale.x > 0 ? -1 : 1) * wallJumpForce.x * wallJumpForceMultiplier.x, 
-				wallJumpForce.y * wallJumpForceMultiplier.y
-			);
-			model.localScale = rb.velocity.x > 0 ? new Vector3(1, 1, 1) : new Vector3(-1, 1, 1);
-			Invoke("ResetWallJump", 0.25f);
+			wallJumpDir = (model.localScale.x > 0 ? -1 : 1);
+			model.localScale = new Vector3(wallJumpDir, 1, 1);
+			// Invoke("ResetWallJump", 0.25f);
 		}
 	}
 
@@ -2464,6 +2518,7 @@ public class PlayerControls : MonoBehaviour
 		anim.SetBool("isHurt", false);
 		anim.SetBool("isStunLock", false);
 		isWallSliding = isWallJumping = false;
+		wallJumpTimer = 0;
 		anim.SetBool("isWallSliding", isWallSliding);
 		Physics2D.IgnoreLayerCollision(whatIsPlayerValue, whatIsPlatformValue, false);
 		beenHurt = false;
@@ -2496,6 +2551,7 @@ public class PlayerControls : MonoBehaviour
 		else
 			nextSceneSpeed = (rb.velocity.x > 0) ? 1 : -1;
 		isWallJumping = isCountingTime = false;
+		wallJumpTimer = 0;
 		yield return new WaitForSeconds(0.1f);
 		gm.transitionAnim.SetTrigger("toBlack");
 
@@ -2518,6 +2574,7 @@ public class PlayerControls : MonoBehaviour
 	{
 		isCountingTime = true;
 		isWallJumping = false;
+		wallJumpTimer = 0;
 		isWallSliding = false;
 		canMoveBegin = canMoveHorz = canMove = false;
 		this.newScenePos = transform.position = newScenePos;
