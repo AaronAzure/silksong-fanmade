@@ -461,7 +461,10 @@ public abstract class Enemy : MonoBehaviour
 		}
 
 		if (isSmart && !attackingPlayer)
+		{
+			Debug.Log("Face Player (" + name + ")");
 			FacePlayer();
+		}
 
 		CallChildOnHurt(dmg, forceDir);
 		yield return new WaitForSeconds(0.2f);
@@ -629,6 +632,25 @@ public abstract class Enemy : MonoBehaviour
 			else if (currentAction == CurrentAction.left)
 				nextDir = 1;
 		}
+		else if (immediateFlip && idleCounter > idleTotalCounter)
+		{
+			idleCounter = 0;
+			currentAction = currentAction + nextDir;
+			if (currentAction == CurrentAction.none)
+			{
+				// looking right
+				if (model.localScale.x > 0)
+					currentAction = CurrentAction.right;
+				// looking left
+				else
+					currentAction = CurrentAction.left;
+			}
+			if (currentAction == CurrentAction.right)
+				nextDir = -1;
+			else if (currentAction == CurrentAction.left)
+				nextDir = 1;
+		}
+
 		// stop moving if about to walk into wall or off cliff
 		else if (isGrounded && !inSight && currentAction != 0 && CheckSurrounding())
 		{

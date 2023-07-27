@@ -14,6 +14,7 @@ public class MelonAerocuba : Enemy
 	[SerializeField] bool inAtkA;
 	[SerializeField] bool inPrepA;
 	[SerializeField] bool inLungeA;
+	[SerializeField] bool isDoneA;
 	[SerializeField] bool lockDirectionA;
 	private Vector2 destPos;
 	private int atkDir;
@@ -60,13 +61,16 @@ public class MelonAerocuba : Enemy
 				{
 					closeDistTimer = 0;
 					rb.velocity = Vector2.zero;
-					atkDir = (model.localScale.x > 0) ? 1 : -1;
 					anim.SetTrigger("attack");
 				}
 				else if (isClose)
 					closeDistTimer += Time.fixedDeltaTime;
 				else if (closeDistTimer > 0)
 					closeDistTimer -= (Time.fixedDeltaTime * 0.5f);
+			}
+			else if (isDoneA && rb.velocity.x != 0)
+			{
+				rb.velocity = new Vector2(rb.velocity.x * 0.9f, rb.velocity.y);
 			}
 			else if (inPrepA)
 			{
@@ -84,6 +88,7 @@ public class MelonAerocuba : Enemy
 			{
 				if (prep)
 				{
+					atkDir = (model.localScale.x > 0) ? 1 : -1;
 					prep = false;
 					rb.velocity = Vector2.zero;
 				}
