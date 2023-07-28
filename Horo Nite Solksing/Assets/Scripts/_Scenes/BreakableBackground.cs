@@ -24,6 +24,8 @@ public class BreakableBackground : Breakable
 
 	protected override void CallChildOnDamage(int dmg)
 	{
+		CinemachineShake.Instance.ShakeCam(0.75f, 0.25f, 0.5f);
+
 		if (visualObj != null)
 		{
 			visualObj.SetActive(false);

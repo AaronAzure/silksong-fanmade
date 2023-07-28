@@ -16,7 +16,14 @@ public class MelonEntombed : Enemy
 			if (!chargingA)
 				WalkAround();
 			else if (!receivingKb)
-				rb.velocity = new Vector2(atkDir * chaseSpeed, rb.velocity.y);
+			{
+				if (CheckSurrounding())
+				{
+					_LOSE_SIGHT();
+				}
+				else
+					rb.velocity = new Vector2(atkDir * chaseSpeed, rb.velocity.y);
+			}
 		}
 		else if (!receivingKb)
 		{
@@ -66,6 +73,7 @@ public class MelonEntombed : Enemy
 			idleCounter = 0;
 			sighted = false;
 			rb.velocity = new Vector2(0, rb.velocity.y);
+			anim.Play("melon_entomb_idle_anim", -1, 0);
 			
 			// continue moving in direction facing
 			if (currentAction == CurrentAction.none)

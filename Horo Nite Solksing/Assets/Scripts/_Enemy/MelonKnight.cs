@@ -113,7 +113,7 @@ public class MelonKnight : Enemy
 		if (isSuperClose)
 		{
 			closeCounter = 0;
-			anim.SetTrigger("attack");
+			anim.SetTrigger("blocked");
 		}
 	}
 

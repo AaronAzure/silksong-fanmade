@@ -36,15 +36,18 @@ public class Loot : MonoBehaviour
 			o.transform.rotation = Quaternion.AngleAxis(Random.Range(0, 360), Vector3.forward);
 			// o.sr.sortingOrder = i;
 		}
-		for (int i=0 ; i<y ; i++)
+		if (shellShard != null)
 		{
-			var o = Instantiate(shellShard, transform.position, Quaternion.identity);
-			o.rb.AddForce(new Vector2(
-				Random.Range(-xForce, xForce), 
-				Random.Range(yMinForce, yMaxForce)
-			), ForceMode2D.Impulse);
-			o.transform.rotation = Quaternion.AngleAxis(Random.Range(0, 360), Vector3.forward);
-			// o.sr.sortingOrder = i;
+			for (int i=0 ; i<y ; i++)
+			{
+				var o = Instantiate(shellShard, transform.position, Quaternion.identity);
+				o.rb.AddForce(new Vector2(
+					Random.Range(-xForce, xForce), 
+					Random.Range(yMinForce, yMaxForce)
+				), ForceMode2D.Impulse);
+				o.transform.rotation = Quaternion.AngleAxis(Random.Range(0, 360), Vector3.forward);
+				// o.sr.sortingOrder = i;
+			}
 		}
 	}
 }

@@ -41,6 +41,7 @@ public abstract class Breakable : MonoBehaviour
 	{
 		if (hp > 0)
 		{
+			CinemachineShake.Instance.ShakeCam(0.75f, 0.25f, 0.5f);
 			hp -= dmg;
 			if (dmgFx != null)
 			{

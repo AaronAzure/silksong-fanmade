@@ -51,10 +51,14 @@ public class MelonBilly : Enemy
 		if (upsideDown)
 		{
 			RaycastHit2D hit = Physics2D.Raycast(model.position, Vector2.down, 7f, finalMask);
-			if (hit)
-				Debug.Log(hit.collider.tag);
+			RaycastHit2D ceilingHit = Physics2D.Raycast(model.position, Vector2.up, 1f, whatIsGround);
+			// if (hit)
+			// 	Debug.Log(hit.collider.tag);
 
 			if (hit && hit.collider.CompareTag("Player"))
+				DropDown();
+
+			if (ceilingHit.collider == null)
 				DropDown();
 		}
 	}
