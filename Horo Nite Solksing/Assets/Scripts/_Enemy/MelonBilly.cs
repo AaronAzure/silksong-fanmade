@@ -6,6 +6,8 @@ public class MelonBilly : Enemy
 {
 	[SerializeField] bool upsideDown;
 	[SerializeField] Transform flippableObj;
+	[SerializeField] Transform playerCheckPos;
+	private bool isFalling;
 
 
 	protected override void CallChildOnHurt(int dmg, Vector2 forceDir)
@@ -21,7 +23,7 @@ public class MelonBilly : Enemy
 			rb.gravityScale = 0;
 			RaycastHit2D hit = Physics2D.Raycast(model.position, Vector2.up, 1f, whatIsGround);
 			if (hit)
-				transform.position = hit.transform.position;
+				transform.position = hit.point;
 		}
 	}
 
@@ -47,13 +49,24 @@ public class MelonBilly : Enemy
 
     protected override void IdleAction()
 	{
-		WalkAround();
+		if (isFalling)
+		{
+			rb.velocity = new Vector2(0, rb.velocity.y);
+			if (isGrounded)
+			{
+				isFalling = false;
+				anim.SetFloat("moveSpeed", 1);
+			}
+		}
+		else
+		{
+			WalkAround();
+		}
+
 		if (upsideDown)
 		{
-			RaycastHit2D hit = Physics2D.Raycast(model.position, Vector2.down, 7f, finalMask);
+			RaycastHit2D hit = Physics2D.Raycast(playerCheckPos.position, Vector2.down, 7f, finalMask);
 			RaycastHit2D ceilingHit = Physics2D.Raycast(model.position, Vector2.up, 1f, whatIsGround);
-			// if (hit)
-			// 	Debug.Log(hit.collider.tag);
 
 			if (hit && hit.collider.CompareTag("Player"))
 				DropDown();
@@ -83,6 +96,8 @@ public class MelonBilly : Enemy
 		if (upsideDown && flippableObj != null)
 		{
 			upsideDown = false;
+			isFalling = true;
+			anim.SetFloat("moveSpeed", 0);
 			flippableObj.localScale = Vector3.one;
 			flippableObj.localPosition = Vector3.zero;
 		}

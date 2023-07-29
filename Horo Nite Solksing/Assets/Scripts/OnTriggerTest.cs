@@ -6,8 +6,14 @@ public class OnTriggerTest : MonoBehaviour
 {
     [SerializeField] GameObject obj;
     private Transform master;
+	private Transform mainHolder;
 
 	[Space] [SerializeField] bool alwaysActive;
+
+	private void Awake() 
+	{
+		mainHolder = transform.parent.parent;
+	}
 
 	private void OnEnable() 
 	{
@@ -21,15 +27,19 @@ public class OnTriggerTest : MonoBehaviour
 	{
 		if (master != null)
 		{
-			if (!thisIsParent)
-				master.parent = null;
 			if (master != null && transform.parent != null)
-				transform.parent = thisIsParent ? null : master;
-			if (thisIsParent)
+				transform.parent = thisIsParent ? mainHolder : master;
+
+			// enemy active
+			if (!thisIsParent)
+				master.parent = mainHolder;
+
+			// enemy hidden
+			else
 			{
 				transform.position = master.position;
 				if (master != null && transform.parent != null)
-					master.parent = transform;
+					master.parent = this.transform;
 			}
 		}
 	}

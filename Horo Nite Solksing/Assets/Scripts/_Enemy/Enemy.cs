@@ -90,7 +90,6 @@ public abstract class Enemy : MonoBehaviour
 	[SerializeField] bool immediateFlip;
 	[SerializeField] [Range(-1,1)] int initDir=-1;
 	[SerializeField] protected bool stillAttacking;
-	protected int nextDir;
 	protected Coroutine jumpCo;
 	protected Coroutine hurtCo;
 	protected bool died;
@@ -207,8 +206,7 @@ public abstract class Enemy : MonoBehaviour
 			phase3 = easyPhase3;
 		}
 		
-		initDir = (int) model.localScale.x;
-		nextDir = -initDir;
+		initDir = (model.localScale.x > 0) ? 1 : -1;
 		currentAction = (initDir == 1) ? CurrentAction.right : CurrentAction.left;
 		
 		if (PlayerControls.Instance != null)
@@ -222,7 +220,6 @@ public abstract class Enemy : MonoBehaviour
 		{
 			CallChildOnInAreaSwap();
 		}
-		// Debug.Log($"initDir = {initDir}, nextDir = {nextDir}");
     }
 
 	public virtual void FixedUpdate()
@@ -574,6 +571,13 @@ public abstract class Enemy : MonoBehaviour
 		{
 			this.enabled = activated = true;
 		}
+		if (other.CompareTag("QuickDeath"))	
+		{
+			TakeDamage(
+				hp, other.transform, (Vector2) self.position - other.ClosestPoint(self.position), 
+				5, true, false, false
+			);
+		}
 	}
 	
 	private void OnTriggerExit2D(Collider2D other) 
@@ -611,59 +615,56 @@ public abstract class Enemy : MonoBehaviour
 		model.localScale = new Vector3(playerDir,1,1);
 	}
 
+	protected void ChooseNextAction()
+	{
+		if (currentAction == CurrentAction.right)
+		{
+			currentAction = immediateFlip ? CurrentAction.left : CurrentAction.none;
+		}
+		else if (currentAction == CurrentAction.left)
+		{
+			currentAction = immediateFlip ? CurrentAction.right : CurrentAction.none;
+		}
+		else
+		{
+			// looking right
+			if (model.localScale.x > 0)
+			{
+				currentAction = CurrentAction.left;
+				model.localScale = new Vector3(-1,1,1);
+			}
+			// looking left
+			else
+			{
+				currentAction = CurrentAction.right;
+				model.localScale = new Vector3(1,1,1);
+			}
+		}
+	}
+
 	protected void WalkAround()
 	{
-		idleCounter += Time.fixedDeltaTime;
-		if (!immediateFlip && idleCounter > idleTotalCounter)
+		if (idleTotalCounter > 0)
 		{
-			idleCounter = 0;
-			currentAction = currentAction + nextDir;
-			if (currentAction == CurrentAction.none)
+			idleCounter += Time.fixedDeltaTime;
+
+			if (idleCounter > idleTotalCounter)
 			{
-				// looking right
-				if (model.localScale.x > 0)
-					currentAction = CurrentAction.right;
-				// looking left
-				else
-					currentAction = CurrentAction.left;
+				idleCounter = 0;
+				ChooseNextAction();
 			}
-			if (currentAction == CurrentAction.right)
-				nextDir = -1;
-			else if (currentAction == CurrentAction.left)
-				nextDir = 1;
-		}
-		else if (immediateFlip && idleCounter > idleTotalCounter)
-		{
-			idleCounter = 0;
-			currentAction = currentAction + nextDir;
-			if (currentAction == CurrentAction.none)
-			{
-				// looking right
-				if (model.localScale.x > 0)
-					currentAction = CurrentAction.right;
-				// looking left
-				else
-					currentAction = CurrentAction.left;
-			}
-			if (currentAction == CurrentAction.right)
-				nextDir = -1;
-			else if (currentAction == CurrentAction.left)
-				nextDir = 1;
 		}
 
 		// stop moving if about to walk into wall or off cliff
-		else if (isGrounded && !inSight && currentAction != 0 && CheckSurrounding())
+		if (isGrounded && !inSight && currentAction != CurrentAction.none && CheckSurrounding())
 		{
+			idleCounter = 0;
 			if (immediateFlip)
 			{
-				if (currentAction == CurrentAction.right)
-					currentAction = CurrentAction.left;
-				else if (currentAction == CurrentAction.left)
-					currentAction = CurrentAction.right;
+				ChooseNextAction();
 			}
 			else
 			{
-				idleCounter = 0;
 				currentAction = CurrentAction.none;
 			}
 		}
@@ -698,21 +699,21 @@ public abstract class Enemy : MonoBehaviour
 
 	protected void FlyAround()
 	{
-		idleCounter += Time.fixedDeltaTime;
-		if (idleCounter > idleTotalCounter)
+		if (idleTotalCounter > 0)
 		{
-			idleCounter = 0;
-			currentAction = currentAction + nextDir;
-			if (currentAction == CurrentAction.right)
-				nextDir = -1;
-			else if (currentAction == CurrentAction.left)
-				nextDir = 1;
-		}
-		// stop moving if about to walk into wall or off cliff
-		else if (!inSight && currentAction != 0 && CheckWall())
-		{
-			idleCounter = 0;
-			currentAction = CurrentAction.none;
+			idleCounter += Time.fixedDeltaTime;
+
+			if (idleCounter > idleTotalCounter)
+			{
+				idleCounter = 0;
+				ChooseNextAction();
+			}
+			// stop moving if about to walk into wall or off cliff
+			else if (!inSight && currentAction != 0 && CheckWall())
+			{
+				idleCounter = 0;
+				currentAction = CurrentAction.none;
+			}
 		}
 
 		if (receivingKb)

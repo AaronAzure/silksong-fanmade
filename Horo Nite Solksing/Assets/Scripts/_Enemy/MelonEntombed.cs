@@ -45,10 +45,7 @@ public class MelonEntombed : Enemy
 		else
 			currentAction = CurrentAction.left;
 
-		if (currentAction == CurrentAction.right)
-			nextDir = -1;
-		else if (currentAction == CurrentAction.left)
-			nextDir = 1;
+		ChooseNextAction();
 	}
 
 	private bool sighted;
@@ -75,20 +72,7 @@ public class MelonEntombed : Enemy
 			rb.velocity = new Vector2(0, rb.velocity.y);
 			anim.Play("melon_entomb_idle_anim", -1, 0);
 			
-			// continue moving in direction facing
-			if (currentAction == CurrentAction.none)
-			{
-				// looking right
-				if (model.localScale.x > 0)
-					currentAction = CurrentAction.right;
-				// looking left
-				else
-					currentAction = CurrentAction.left;
-			}
-			if (currentAction == CurrentAction.right)
-				nextDir = -1;
-			else if (currentAction == CurrentAction.left)
-				nextDir = 1;
+			ChooseNextAction();
 		}
 	}
 }

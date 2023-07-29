@@ -4,49 +4,76 @@ TextureImporter:
   internalIDToNameTable:
   - first:
       213: 3322258623791159257
-    second: vines-background-elements_0
+    second: rock-1
   - first:
       213: -487594424018982227
-    second: vines-background-elements_1
+    second: rock-2
   - first:
       213: -4586622706527819862
-    second: vines-background-elements_2
+    second: giant-vine-1
   - first:
       213: -821797931222128750
-    second: vines-background-elements_3
+    second: giant-vine-2
   - first:
       213: 955194497710849159
-    second: vines-background-elements_4
+    second: stump-1
   - first:
       213: 8182647753449408423
-    second: vines-background-elements_5
+    second: stump-2
   - first:
       213: -1772728932790039189
-    second: vines-background-elements_6
+    second: rock-3
   - first:
       213: 6239024476148226417
-    second: vines-background-elements_7
+    second: rock-4
   - first:
       213: 150709435498824184
-    second: vines-background-elements_8
+    second: stump-3
   - first:
       213: -2267091443619692377
-    second: vines-background-elements_9
+    second: vines-shade-1
   - first:
       213: -7405784165623290746
-    second: vines-background-elements_10
+    second: vines-shade-3
   - first:
       213: 8828647289784166546
-    second: vines-background-elements_11
+    second: vines-shade-4
   - first:
       213: -4725486632394726715
-    second: vines-background-elements_12
+    second: infinite-vine
   - first:
       213: -7443303876499831209
-    second: vines-background-elements_13
+    second: vines-shade-2
   - first:
       213: 6605361741437425515
-    second: vines-background-elements_14
+    second: vines-shade-5
+  - first:
+      213: -7191575572498508409
+    second: rock-shade-1
+  - first:
+      213: 7655854092538023275
+    second: rock-shade-2
+  - first:
+      213: -3794290192826565841
+    second: rock-shade-3
+  - first:
+      213: -7971419748301557948
+    second: rock-shade-4
+  - first:
+      213: 2917888444592279696
+    second: vines-shade-1
+  - first:
+      213: 7385223179297028732
+    second: vines-shade-2
+  - first:
+      213: -6035123293942541708
+    second: vines-shade-3
+  - first:
+      213: 770974126944767161
+    second: vines-shade-4
+  - first:
+      213: -1735632405396165875
+    second: vines-5
   externalObjects: {}
   serializedVersion: 12
   mipmaps:
@@ -111,10 +138,10 @@ TextureImporter:
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 2048
+    maxTextureSize: 4096
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -123,10 +150,10 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
     buildTarget: Standalone
-    maxTextureSize: 2048
+    maxTextureSize: 4096
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -135,10 +162,10 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
     buildTarget: WebGL
-    maxTextureSize: 2048
+    maxTextureSize: 4096
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -149,13 +176,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: vines-background-elements_0
+      name: rock-1
       rect:
         serializedVersion: 2
-        x: 58
-        y: 798
-        width: 219
-        height: 170
+        x: 57
+        y: 1821
+        width: 220
+        height: 171
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -170,12 +197,12 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: vines-background-elements_1
+      name: rock-2
       rect:
         serializedVersion: 2
         x: 308
-        y: 813
-        width: 274
+        y: 1837
+        width: 276
         height: 100
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
@@ -191,13 +218,13 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: vines-background-elements_2
+      name: giant-vine-1
       rect:
         serializedVersion: 2
         x: 667
-        y: 471
+        y: 1495
         width: 266
-        height: 510
+        height: 511
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -212,13 +239,13 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: vines-background-elements_3
+      name: giant-vine-2
       rect:
         serializedVersion: 2
         x: 988
-        y: 483
+        y: 1506
         width: 248
-        height: 469
+        height: 470
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -233,11 +260,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: vines-background-elements_4
+      name: stump-1
       rect:
         serializedVersion: 2
         x: 1319
-        y: 758
+        y: 1782
         width: 219
         height: 160
       alignment: 0
@@ -254,11 +281,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: vines-background-elements_5
+      name: stump-2
       rect:
         serializedVersion: 2
         x: 1594
-        y: 760
+        y: 1784
         width: 233
         height: 168
       alignment: 0
@@ -275,13 +302,13 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: vines-background-elements_6
+      name: rock-3
       rect:
         serializedVersion: 2
-        x: 46
-        y: 619
-        width: 223
-        height: 143
+        x: 45
+        y: 1643
+        width: 224
+        height: 144
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -296,11 +323,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: vines-background-elements_7
+      name: rock-4
       rect:
         serializedVersion: 2
         x: 304
-        y: 612
+        y: 1636
         width: 312
         height: 145
       alignment: 0
@@ -317,11 +344,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: vines-background-elements_8
+      name: stump-3
       rect:
         serializedVersion: 2
         x: 1319
-        y: 536
+        y: 1560
         width: 249
         height: 194
       alignment: 0
@@ -338,13 +365,13 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: vines-background-elements_9
+      name: vines-shade-1
       rect:
         serializedVersion: 2
-        x: 142
-        y: 304
-        width: 333
-        height: 94
+        x: 155
+        y: 1328
+        width: 307
+        height: 87
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -359,13 +386,13 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: vines-background-elements_10
+      name: vines-shade-3
       rect:
         serializedVersion: 2
-        x: 503
-        y: 209
-        width: 330
-        height: 131
+        x: 516
+        y: 1232
+        width: 317
+        height: 126
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -380,13 +407,13 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: vines-background-elements_11
+      name: vines-shade-4
       rect:
         serializedVersion: 2
-        x: 880
-        y: 263
-        width: 299
-        height: 154
+        x: 886
+        y: 1286
+        width: 283
+        height: 155
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -401,13 +428,13 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: vines-background-elements_12
+      name: infinite-vine
       rect:
         serializedVersion: 2
-        x: 1338
-        y: 36
-        width: 595
-        height: 462
+        x: 1339
+        y: 1060
+        width: 594
+        height: 460
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -422,13 +449,13 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: vines-background-elements_13
+      name: vines-shade-2
       rect:
         serializedVersion: 2
-        x: 145
-        y: 166
-        width: 329
-        height: 96
+        x: 166
+        y: 1188
+        width: 291
+        height: 92
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -443,12 +470,12 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: vines-background-elements_14
+      name: vines-shade-5
       rect:
         serializedVersion: 2
         x: 868
-        y: 59
-        width: 313
+        y: 1083
+        width: 287
         height: 154
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
@@ -459,6 +486,195 @@ TextureImporter:
       bones: []
       spriteID: b675553d185faab50800000000000000
       internalID: 6605361741437425515
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: rock-shade-1
+      rect:
+        serializedVersion: 2
+        x: 92
+        y: 846
+        width: 220
+        height: 171
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 78599d19e14623c90800000000000000
+      internalID: -7191575572498508409
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: rock-shade-2
+      rect:
+        serializedVersion: 2
+        x: 356
+        y: 846
+        width: 276
+        height: 100
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b6d03f51cbe0f3a60800000000000000
+      internalID: 7655854092538023275
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: rock-shade-3
+      rect:
+        serializedVersion: 2
+        x: 678
+        y: 845
+        width: 224
+        height: 144
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f2bf2d13c29f75bc0800000000000000
+      internalID: -3794290192826565841
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: rock-shade-4
+      rect:
+        serializedVersion: 2
+        x: 937
+        y: 846
+        width: 312
+        height: 145
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 44fa3fa29f3df5190800000000000000
+      internalID: -7971419748301557948
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: vines-1
+      rect:
+        serializedVersion: 2
+        x: 91
+        y: 681
+        width: 307
+        height: 87
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 090d32aa41c6e7820800000000000000
+      internalID: 2917888444592279696
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: vines-2
+      rect:
+        serializedVersion: 2
+        x: 439
+        y: 642
+        width: 317
+        height: 126
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c7afafc5a559d7660800000000000000
+      internalID: 7385223179297028732
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: vines-3
+      rect:
+        serializedVersion: 2
+        x: 766
+        y: 676
+        width: 291
+        height: 92
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4729ed0f65fee3ca0800000000000000
+      internalID: -6035123293942541708
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: vines-4
+      rect:
+        serializedVersion: 2
+        x: 1090
+        y: 616
+        width: 283
+        height: 155
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9bc4f8732ec03ba00800000000000000
+      internalID: 770974126944767161
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: vines-5
+      rect:
+        serializedVersion: 2
+        x: 1437
+        y: 619
+        width: 287
+        height: 154
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d0b64b7e58bc9e7e0800000000000000
+      internalID: -1735632405396165875
       vertices: []
       indices: 
       edges: []

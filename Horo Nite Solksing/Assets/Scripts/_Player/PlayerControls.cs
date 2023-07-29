@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Assertions;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Rewired;
@@ -367,6 +366,7 @@ public class PlayerControls : MonoBehaviour
 	private bool movingToNextScene;
 	private bool movingVertically;	// jumping or falling through new scene 
 	private bool movingVerticallyJumping;
+	private int jumpExitDir;
 	private bool canMove;
 	private bool canMoveBegin;
 	private bool canMoveHorz;
@@ -808,6 +808,11 @@ public class PlayerControls : MonoBehaviour
 			// Ledge Grab
 			if (canLedgeGrab && !isWallJumping && !isLedgeGrabbing && !ledgeGrab)
 				LedgeGrab();
+		}
+		// manual repair tools
+		else if (isResting && canUnrest && player.GetButtonDown("Attack"))
+		{
+			RepairTools();
 		}
 		// Leave Bench
 		else if (isResting && canUnrest &&
@@ -1480,10 +1485,11 @@ public class PlayerControls : MonoBehaviour
 				atk1 = !atk1;
 			}
 
-			if (crestNum == 1)
-				yield return new WaitForSeconds(0.25f);
-			else
-				yield return new WaitForSeconds(atkDir != 2 ? 0.25f : 0.4f);
+			yield return new WaitForSeconds(0.25f);
+			// if (crestNum == 1)
+			// 	yield return new WaitForSeconds(0.25f);
+			// else
+			// 	yield return new WaitForSeconds(atkDir != 2 ? 0.25f : 0.4f);
 			anim.SetBool("isAttacking", false);
 			anim.SetFloat("crestNum", crestNum);
 		}
@@ -1890,7 +1896,10 @@ public class PlayerControls : MonoBehaviour
 			shieldHp = 2 + nShieldBonus;
 		if (shieldImg != null && (shieldHp) < shieldSprs.Length) 
 			shieldImg.sprite = shieldSprs[(shieldHp == 2 + nShieldBonus) ? (shieldSprs.Length - 1) : shieldHp];
+	}
 
+	public void RepairTools()
+	{
 		if (tool1 != null && toolUses1 != null)
 		{
 			int maxReplenished = Mathf.Max(0, tool1.GetTotalUses() - tool1.usesLeft); 
@@ -2091,6 +2100,7 @@ public class PlayerControls : MonoBehaviour
 			if (movingVertically)
 			{
 				// jumping up to new scene
+				jumpExitDir = n.GetDirection();
 				movingVerticallyJumping = n.transform.position.y - self.position.y > 0;
 			}
 			exitPointInd = n.exitIndex;
@@ -2600,7 +2610,13 @@ public class PlayerControls : MonoBehaviour
 		}
 
 		yield return new WaitForSeconds(movingVertically ? 0.125f: 0.5f);
-		if (movingVertically) stuckToNewScene = false;
+		if (movingVertically)
+		{
+			if (jumpExitDir != 0)
+				model.localScale = new Vector3(jumpExitDir == 1 ? 1 : -1 ,1,1);
+			nextSceneSpeed = (IsFacingRight()) ? 1 : -1;
+			stuckToNewScene = false;
+		} 
 		canMove = true;
 
 		if (movingVertically && movingVerticallyJumping)

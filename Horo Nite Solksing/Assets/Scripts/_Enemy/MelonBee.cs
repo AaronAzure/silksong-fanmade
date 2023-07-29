@@ -19,7 +19,7 @@ public class MelonBee : Enemy
 		{
 			if (canChaseAnim)
 			{
-				Vector2 dir = (target.self.position - transform.position).normalized;
+				Vector2 dir = (target.self.position + new Vector3(0,0.5f) - transform.position).normalized;
 				rb.AddForce(dir * chaseSpeed * 5, ForceMode2D.Force);
 				rb.velocity = new Vector2(
 					Mathf.Clamp(rb.velocity.x, -chaseSpeed, chaseSpeed),
