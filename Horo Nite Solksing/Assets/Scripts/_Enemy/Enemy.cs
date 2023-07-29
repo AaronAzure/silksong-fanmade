@@ -15,7 +15,7 @@ public abstract class Enemy : MonoBehaviour
 	protected bool atPhase3;
 
 
-	[Space] [SerializeField] DmgPopup dmgPopup;
+	[Space] [SerializeField] protected DmgPopup dmgPopup;
 	[SerializeField] protected OnTriggerTest inArea;
 
 
@@ -398,7 +398,7 @@ public abstract class Enemy : MonoBehaviour
 		}
 	}
 
-	IEnumerator TakeDamageCo(int dmg, Transform opponent, Vector2 forceDir, float force, bool canShake)
+	protected virtual void CallChildOnLoseHp(int dmg)
 	{
 		if (!cannotTakeDmg)
 			hp -= dmg;
@@ -415,6 +415,11 @@ public abstract class Enemy : MonoBehaviour
 				dmgPopup.txt.text = $"{dmg}";
 			dmgPopup.gameObject.SetActive(true);
 		}
+	}
+
+	IEnumerator TakeDamageCo(int dmg, Transform opponent, Vector2 forceDir, float force, bool canShake)
+	{
+		CallChildOnLoseHp(dmg);
 		beenHurt = true;
 		if (opponent != null)
 			forceDir = (self.position - opponent.position).normalized;

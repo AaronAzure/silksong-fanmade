@@ -12,7 +12,27 @@ public class OctoMelon : Enemy
 	[SerializeField] Transform shotPos;
 	[SerializeField] float shotForce=5;
 	[SerializeField] EnemyProjectile2 projectile;
+	[SerializeField] bool isHidingA;
 
+	protected override void CallChildOnLoseHp(int dmg)
+	{
+		dmg = isHidingA ? (int)(dmg/2) : dmg;
+		if (!cannotTakeDmg)
+			hp -= dmg;
+		if (GameManager.Instance.showDmg && dmgPopup != null)
+		{
+			// var obj = Instantiate(dmgPopup, transform.position + Vector3.up, Quaternion.identity);
+			if (dmgPopup.gameObject.activeSelf)
+			{
+				dmgPopup.txt.text = $"{dmg + int.Parse(dmgPopup.txt.text)}";
+				dmgPopup.anim.SetTrigger("reset");
+
+			}
+			else
+				dmgPopup.txt.text = $"{dmg}";
+			dmgPopup.gameObject.SetActive(true);
+		}
+	}
 
 	protected override void IdleAction()
 	{
