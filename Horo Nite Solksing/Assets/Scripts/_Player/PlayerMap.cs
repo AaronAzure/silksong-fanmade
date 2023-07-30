@@ -17,8 +17,13 @@ public class PlayerMap : MonoBehaviour
 		{
 			sceneMap = new Dictionary<string, GameObject>();
 			foreach (GameObject scene in scenes)
+			{
 				if (scene != null)
+				{
 					sceneMap.Add(scene.name, scene);
+					scene.SetActive(false);
+				}
+			}
 		}
 	}
 
@@ -36,7 +41,7 @@ public class PlayerMap : MonoBehaviour
 	{
 		if (sceneMap != null && sceneMap.ContainsKey(sceneName))
 		{
-			marker.transform.parent = sceneMap[sceneName].transform;
+			marker.transform.parent = sceneMap[sceneName].transform.GetChild(0);
 			marker.localPosition = Vector3.zero;
 		}
 	}

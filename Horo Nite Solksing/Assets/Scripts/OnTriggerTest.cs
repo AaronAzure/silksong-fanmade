@@ -32,7 +32,10 @@ public class OnTriggerTest : MonoBehaviour
 
 			// enemy active
 			if (!thisIsParent)
+			{
 				master.parent = mainHolder;
+				transform.parent = master;
+			}
 
 			// enemy hidden
 			else

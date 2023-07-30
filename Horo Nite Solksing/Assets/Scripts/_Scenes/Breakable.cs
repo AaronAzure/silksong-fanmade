@@ -4,7 +4,10 @@ using UnityEngine;
 
 public abstract class Breakable : MonoBehaviour
 {
-	[SerializeField] protected Animator anim;
+	[SerializeField] bool canBreak=true;
+
+
+	[Space] [SerializeField] protected Animator anim;
 	[field: SerializeField] public bool hasRecoil {get; private set;}=true;
 	[field: SerializeField] public bool hasShawRecoil {get; private set;}=true;
 	[field: SerializeField] public bool hasDashRecoil {get; private set;}=true;
@@ -22,6 +25,8 @@ public abstract class Breakable : MonoBehaviour
 	[SerializeField] protected GameManager gm;
 	[SerializeField] protected bool isSecret;
 
+	[Space] [SerializeField] protected string exactName;
+
 
     // Start is called before the first frame update
     void Start()
@@ -33,7 +38,7 @@ public abstract class Breakable : MonoBehaviour
 
 	public void Damage(int dmg)
 	{
-		if (canBeHit)
+		if (canBeHit && canBreak)
 			CallChildOnDamage(dmg);
 	}
 
@@ -61,7 +66,13 @@ public abstract class Breakable : MonoBehaviour
 				// Don't respawn
 				if (gm != null)
 				{
-					gm.RegisterDestroyedList(name, isSecret);
+					if (exactName == "")
+						gm.RegisterDestroyedList(name, isSecret);
+					else
+					{
+						gm.RegisterDestroyedList(exactName, isSecret, true);
+						PlayerControls.Instance.SecretPathFoundMap(exactName);
+					}
 				}
 				// Reveal any secrets
 				if (revealAnims != null)

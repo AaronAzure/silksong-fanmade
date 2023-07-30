@@ -2552,6 +2552,10 @@ public class PlayerControls : MonoBehaviour
 		}
 	}
 
+	public void SecretPathFoundMap(string exactName)
+	{
+		playerMap.CheckForSceneInMap(exactName);
+	}
 
 	IEnumerator MoveToNextSceneCo(string newSceneName)
 	{

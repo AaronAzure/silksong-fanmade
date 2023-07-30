@@ -69,6 +69,7 @@ public class MelonKnight : Enemy
 				{
 					closeCounter = 0;
 					anim.SetTrigger("attack");
+					anim.SetFloat("attackSpeed", 1);
 				}
 			}
 			if (!isSuperClose && closeCounter > 0)
@@ -114,6 +115,7 @@ public class MelonKnight : Enemy
 		{
 			closeCounter = 0;
 			anim.SetTrigger("blocked");
+			anim.SetFloat("attackSpeed", 1.2f);
 		}
 	}
 
