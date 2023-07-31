@@ -28,6 +28,13 @@ public abstract class Breakable : MonoBehaviour
 	[Space] [SerializeField] protected string exactName;
 
 
+	[Space] [Header("Wall")]
+	[SerializeField] bool hasExtraWalls;
+	[SerializeField] GameObject fakeWall;
+	[SerializeField] GameObject shakeWall;
+	[SerializeField] GameObject combineWall;
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -74,6 +81,15 @@ public abstract class Breakable : MonoBehaviour
 						PlayerControls.Instance.SecretPathFoundMap(exactName);
 					}
 				}
+				if (hasExtraWalls)
+				{
+					if (fakeWall != null)
+						fakeWall.SetActive(false);
+					if (shakeWall != null)
+						shakeWall.SetActive(false);
+					if (combineWall != null)
+						combineWall.SetActive(true);
+				}
 				// Reveal any secrets
 				if (revealAnims != null)
 				{
@@ -91,7 +107,7 @@ public abstract class Breakable : MonoBehaviour
 				if (extraTiles != null)
 				{
 					foreach (GameObject extraTile in extraTiles)
-							extraTile.SetActive(false);
+						extraTile.SetActive(false);
 				}
 				// Disable colision
 				if (col != null)
