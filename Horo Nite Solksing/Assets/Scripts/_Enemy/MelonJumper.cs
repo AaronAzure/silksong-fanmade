@@ -5,11 +5,18 @@ using UnityEngine;
 public class MelonJumper : Enemy
 {
 	[Space] [SerializeField] float closeCounter;
-	[SerializeField] float jumpSpeedX=3.5f;
-	[SerializeField] float jumpSpeedY=8f;
-	[SerializeField] float closeLimit=0.5f;
+	[SerializeField] bool hasHighJump;
+	[SerializeField] float highJumpSpeedX=2.5f;
+	[SerializeField] float highJumpSpeedY=12f;
+	[SerializeField] float longJumpSpeedX=7f;
+	[SerializeField] float longJumpSpeedY=7f;
+	[SerializeField] float closeDist=6;
+
+	
+	[Space] [SerializeField] float closeLimit=0.5f;
 	[SerializeField] bool inAtkA;
 	[SerializeField] bool inJumpA;
+	[SerializeField] bool isFacingPlayerA;
 	private float jumpTimer;
 	private float jumpThres=0.1f;
 
@@ -21,7 +28,7 @@ public class MelonJumper : Enemy
 
 	protected override void AttackingAction()
 	{
-		if (!inAtkA && !inJumpA && isSuperClose && closeCounter < closeLimit)
+		if (isGrounded && !inAtkA && !inJumpA && isSuperClose && closeCounter < closeLimit)
 		{
 			closeCounter += Time.fixedDeltaTime;
 			if (closeCounter >= closeLimit)
@@ -30,6 +37,9 @@ public class MelonJumper : Enemy
 				anim.SetTrigger("attack");
 			}
 		}
+
+		if (isFacingPlayerA)
+			FacePlayer();
 
 		if (inJumpA)
 		{
@@ -43,7 +53,7 @@ public class MelonJumper : Enemy
 		}
 		else if (!receivingKb)
 		{
-			if (inAtkA || isSuperClose)
+			if (isGrounded && (inAtkA || isSuperClose))
 			{
 				anim.SetBool("isMoving", false);
 				rb.velocity = new Vector2(0, rb.velocity.y);
@@ -53,13 +63,21 @@ public class MelonJumper : Enemy
 				anim.SetBool("isMoving", true);
 				ChasePlayer();
 			}
+			anim.SetFloat("jumpVelocity", rb.velocity.y);
 		}
 	}
 
 	public void _JUMP_ATTACK()
 	{
-		FacePlayer();
-		rb.velocity = new Vector2(jumpSpeedX * model.localScale.x, jumpSpeedY);
+		if (!isGrounded)
+			return;
+			
+		// high jump
+		if (hasHighJump && DistanceToPlayer(false) < closeDist)
+			rb.velocity = new Vector2(highJumpSpeedX * model.localScale.x, highJumpSpeedY);
+		// long jump
+		else
+			rb.velocity = new Vector2(longJumpSpeedX * model.localScale.x, longJumpSpeedY);
 	}
 
 	private bool sighted;
