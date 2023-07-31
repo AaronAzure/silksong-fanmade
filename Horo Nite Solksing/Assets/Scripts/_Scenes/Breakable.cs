@@ -29,9 +29,8 @@ public abstract class Breakable : MonoBehaviour
 
 
 	[Space] [Header("Wall")]
-	[SerializeField] bool hasExtraWalls;
-	[SerializeField] GameObject fakeWall;
 	[SerializeField] GameObject shakeWall;
+	[SerializeField] GameObject fakeWall;
 	[SerializeField] GameObject combineWall;
 
 
@@ -81,15 +80,12 @@ public abstract class Breakable : MonoBehaviour
 						PlayerControls.Instance.SecretPathFoundMap(exactName);
 					}
 				}
-				if (hasExtraWalls)
-				{
-					if (fakeWall != null)
-						fakeWall.SetActive(false);
-					if (shakeWall != null)
-						shakeWall.SetActive(false);
-					if (combineWall != null)
-						combineWall.SetActive(true);
-				}
+				if (fakeWall != null)
+					fakeWall.SetActive(false);
+				if (shakeWall != null)
+					shakeWall.SetActive(false);
+				if (combineWall != null)
+					combineWall.SetActive(true);
 				// Reveal any secrets
 				if (revealAnims != null)
 				{

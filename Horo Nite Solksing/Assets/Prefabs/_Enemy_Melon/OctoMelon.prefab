@@ -194,10 +194,10 @@ MonoBehaviour:
   hasJumpVelocityAnim: 0
   hasIsGroundedAnim: 0
   hasIsMovingAnim: 0
+  hasMoveSpeedAnim: 1
   hasIsDeadAnim: 1
   hasSpawnAnim: 1
   hasSpawningInAnim: 1
-  hasMoveSpeedAnim: 1
   rb: {fileID: 1376537067151301455}
   col: {fileID: 1376537066910156642}
   col2: {fileID: 0}
@@ -210,9 +210,9 @@ MonoBehaviour:
   loot: {fileID: 2828130944199802275}
   nLoot: 3
   nShells: 1
-  isFlying: 0
   isSmart: 1
   isStupid: 0
+  <isFlying>k__BackingField: 0
   controlledByAnim: 0
   cannotTakeKb: 1
   cannotTakeDmg: 0
@@ -380,7 +380,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2828672455616083929}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -0.79, y: 0, z: 0}
   m_LocalScale: {x: 3, y: 3, z: 1}
   m_Children: []
   m_Father: {fileID: 6959111382631180815}
@@ -635,7 +635,7 @@ CircleCollider2D:
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
-  m_Radius: 0.5
+  m_Radius: 0.6
 --- !u!1 &6502570826747816531
 GameObject:
   m_ObjectHideFlags: 0

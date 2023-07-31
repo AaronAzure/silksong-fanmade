@@ -1921,6 +1921,7 @@ public class PlayerControls : MonoBehaviour
 	{
 		isJumping = false;
 		jumpTimer = 0;
+		jumpDashed = false;
 		switch (crestNum)
 		{
 			case 0:
