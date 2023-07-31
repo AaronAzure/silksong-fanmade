@@ -18,7 +18,7 @@ public class GameManager : MonoBehaviour
 	[field: SerializeField] public bool showDmg {get; private set;}
 	[field: SerializeField] public bool easyMode {get; private set;}
 	[field: SerializeField] public bool hardMode {get; private set;}
-	[field: SerializeField] public float invincibilityDuration {get; private set;}=0.75f;
+	[field: SerializeField] public float invincibilityDuration {get; private set;}=1f;
 	public HashSet<string> roomCleared;
 	public HashSet<string> enemiesDefeated;
 	public HashSet<string> bossCleared;
@@ -43,7 +43,7 @@ public class GameManager : MonoBehaviour
 		enemiesDefeated = new HashSet<string>();
 		bossCleared = new HashSet<string>();
 		roomCleared = new HashSet<string>();
-		invincibilityDuration = easyMode ? 1.25f : 0.75f;
+		invincibilityDuration = easyMode ? 1.5f : 1f;
 	}
 
 	public void SetFirstSceneName()
@@ -240,7 +240,7 @@ public class GameManager : MonoBehaviour
 	public bool ToggleEasyMode()
 	{
 		easyMode = !easyMode;
-		invincibilityDuration = easyMode ? 1.25f : 0.75f;
+		invincibilityDuration = easyMode ? 1.5f : 1f;
 		// if (easyMode)
 		// 	invincibilityDuration = 1.25f;
 		return easyMode;

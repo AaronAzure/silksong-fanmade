@@ -7,7 +7,6 @@ public class EnemyProjectile2 : MonoBehaviour
 	[SerializeField] bool rotateInDir;
 	public Rigidbody2D rb;
 	[SerializeField] GameObject breakVfx;
-	private bool inDestroyCo;
 	[SerializeField] bool dontDestroyOnHit;
 
 
@@ -22,19 +21,22 @@ public class EnemyProjectile2 : MonoBehaviour
 
 	private void OnTriggerEnter2D(Collider2D other) 
 	{
-		if (!dontDestroyOnHit && !inDestroyCo && 
-			(other.CompareTag("Ground") || other.CompareTag("Player")))
+		if (!dontDestroyOnHit)
 		{
-			inDestroyCo = true;
-			StartCoroutine( DestroyCo() );
+			if (other.CompareTag("Ground"))
+			{
+				DestroySequence();
+			}
+			else if (other.CompareTag("Player"))
+			{
+				PlayerControls.Instance.CallOnTakeDamage(transform);
+				DestroySequence();
+			}
 		}
 	}
 
-	IEnumerator DestroyCo()
+	void DestroySequence()
 	{
-		yield return new WaitForEndOfFrame();
-		yield return new WaitForEndOfFrame();
-		yield return new WaitForEndOfFrame();
 		if (breakVfx != null)
 			breakVfx.transform.parent = null;
 		Destroy(gameObject);

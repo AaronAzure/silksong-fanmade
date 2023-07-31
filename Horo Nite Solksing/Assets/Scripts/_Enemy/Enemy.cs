@@ -32,10 +32,10 @@ public abstract class Enemy : MonoBehaviour
 	[SerializeField] protected bool hasJumpVelocityAnim=true;
 	[SerializeField] protected bool hasIsGroundedAnim=true;
 	[SerializeField] protected bool hasIsMovingAnim=true;
+	[SerializeField] protected bool hasMoveSpeedAnim=true;
 	[SerializeField] protected bool hasIsDeadAnim=true;
 	[SerializeField] protected bool hasSpawnAnim=true;
 	[SerializeField] protected bool hasSpawningInAnim=true;
-	[SerializeField] protected bool hasMoveSpeedAnim=true;
 	
 	[Space] [SerializeField] protected Rigidbody2D rb;
 	[SerializeField] [Tooltip("Model")] protected Collider2D col;
@@ -58,10 +58,11 @@ public abstract class Enemy : MonoBehaviour
 
 	
 	[Space] [Header("Platformer Related")]
-	[SerializeField] bool isFlying;
 	[SerializeField] protected bool isSmart; // if attacked face direction;
 	[SerializeField] protected bool isStupid; // if attacked face direction;
-	[SerializeField] protected bool controlledByAnim;
+
+	[field: SerializeField] public bool isFlying {get; private set;}
+	[Space] [SerializeField] protected bool controlledByAnim;
 	[SerializeField] protected bool cannotTakeKb;
 	[SerializeField] protected bool cannotTakeDmg;
 	[SerializeField] protected float moveSpeed=2.5f;
@@ -477,7 +478,7 @@ public abstract class Enemy : MonoBehaviour
 		beenHurt = false;
 		receivingKb = false;
 		if (!cannotTakeKb && force != 0)
-			rb.velocity = new Vector2(0, rb.velocity.y);
+			rb.velocity = new Vector2(0, isFlying ? 0 : rb.velocity.y);
 		CallChildOnHurtAfter();
 	}
 
@@ -543,7 +544,7 @@ public abstract class Enemy : MonoBehaviour
 	public void SpawnIn()
 	{
 		summoned = true;
-		Debug.Log("spawning in");
+		// Debug.Log("spawning in");
 		if (hasSpawnAnim && anim != null) 
 			anim.SetTrigger("spawn");
 		if (PlayerControls.Instance != null)

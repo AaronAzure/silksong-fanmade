@@ -5,6 +5,7 @@ using UnityEngine;
 public class RoomSpawner : MonoBehaviour
 {
 	public Room room;
+	[SerializeField] GameObject rustlingObj;
     [Space] public Enemy[] enemies;
 
 	
@@ -17,17 +18,33 @@ public class RoomSpawner : MonoBehaviour
 	{
 		if (x < enemies.Length && enemies[x] != null)
 		{
-			// Debug.Log($"{gameObject.name} spawning");
-			var e = Instantiate(enemies[x], transform.position, Quaternion.identity, transform);
-			e.room = this.room;
-			e.alwaysInRange = true;
-			e.CallChildOnIsSpecial();
-			e.SpawnIn();
+			if (enemies[x].isFlying)
+				StartCoroutine( SpawnEnemyCo(enemies[x], -1, true) );
+			else
+				StartCoroutine( SpawnEnemyCo(enemies[x], 1.5f) );
 		}
 		else
 		{
 			// Debug.Log($"{gameObject.name} nothing to spawn");
 			room.Defeated(true);
 		}
+	}
+
+	IEnumerator SpawnEnemyCo(Enemy enemy, float waitTime, bool skipRustling=false)
+	{
+		if (!skipRustling && rustlingObj != null)
+		{
+			rustlingObj.SetActive(false);
+			rustlingObj.SetActive(true);
+		}
+		if (waitTime > 0)
+		{
+			yield return new WaitForSeconds(waitTime);
+		}
+		var e = Instantiate(enemy, transform.position, Quaternion.identity, transform);
+		e.room = this.room;
+		e.alwaysInRange = true;
+		e.CallChildOnIsSpecial();
+		e.SpawnIn();
 	}
 }

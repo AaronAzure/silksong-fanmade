@@ -7,6 +7,7 @@ public class MelonBlind : Enemy
 	[SerializeField] Vector2 flyDir;
 	private Coroutine changeFlyCo;
 	private bool isStuck;
+	[SerializeField] Collider2D origCol;
 
 	protected override void CallChildOnStart()
 	{
@@ -30,19 +31,32 @@ public class MelonBlind : Enemy
 		}
 	}
 
+	protected override void AttackingAction()
+	{
+		if (!receivingKb)
+		{
+			if (isStuck)
+				rb.velocity = Vector2.zero;
+			else
+				rb.velocity = flyDir * moveSpeed;
+		}
+	}
+
 	private void OnCollisionEnter2D(Collision2D other) 
 	{
-		if (other.gameObject.CompareTag("Ground"))	
+		if (other.gameObject.CompareTag("Ground") || other.gameObject.CompareTag("NewArea"))	
 		{
-			if (changeFlyCo == null)
+			if (changeFlyCo == null && gameObject.activeSelf)
 				changeFlyCo = StartCoroutine( ChangeFlyDirection(other) );
 		}
 	}
 
 	protected override void CallChildOnHurt(int dmg, Vector2 forceDir)
 	{
-		if (changeFlyCo == null)
+		if (changeFlyCo == null && gameObject.activeSelf)
+		{
 			changeFlyCo = StartCoroutine( ChangeFlyDirection(null, target.self) );
+		}
 	}
 
 	IEnumerator ChangeFlyDirection(Collision2D other, Transform pos=null)
@@ -61,10 +75,10 @@ public class MelonBlind : Enemy
 
 		// hit the ceiling
 		if 		(point.y > 0.5f && point.x < 0.5f && point.x > -0.5f)
-			point = new Vector2(point.x + Random.Range(-1f, 1f), point.y);
+			point = new Vector2(point.x + Random.Range(-1f, 1f), point.y + 0.2f);
 		// hit the floor
 		else if (point.y < -0.5f && point.x < 0.5f && point.x > -0.5f)
-			point = new Vector2(point.x + Random.Range(-1f, 1f), point.y);
+			point = new Vector2(point.x + Random.Range(-1f, 1f), point.y - 0.2f);
 		// hit the right wall
 		else if (point.x > 0.5f && point.y < 0.5f && point.y > -0.5f)
 			point = new Vector2(point.x, point.y+ Random.Range(-1f, 1f));
@@ -76,6 +90,9 @@ public class MelonBlind : Enemy
 		if (model.localScale.x != 0)
 			model.localScale = new Vector3(flyDir.x > 0 ? 1 : -1, 1, 1);
 
+		yield return new WaitForSeconds(0.1f);
 		changeFlyCo = null;
+		origCol.enabled = false;
+		origCol.enabled = true;
 	}
 }

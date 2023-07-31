@@ -2032,6 +2032,12 @@ public class PlayerControls : MonoBehaviour
 		if (hunterSpinObj != null) hunterSpinObj.SetActive(false);
 	}
 
+	public void CallOnTakeDamage(Transform other)
+	{
+		if (CanBeHurt() && hurtCo == null)
+			hurtCo = StartCoroutine( TakeDamageCo(other) );
+	}
+
 	private bool CanBeHurt()
 	{
 		return (!isDead && !invulnerable && !invincible && !justParried && !inInvincibleAnim && !movingToNextScene);

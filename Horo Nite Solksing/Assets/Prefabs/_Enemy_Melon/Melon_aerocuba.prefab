@@ -420,10 +420,10 @@ MonoBehaviour:
   hasJumpVelocityAnim: 0
   hasIsGroundedAnim: 0
   hasIsMovingAnim: 0
+  hasMoveSpeedAnim: 0
   hasIsDeadAnim: 1
   hasSpawnAnim: 1
   hasSpawningInAnim: 1
-  hasMoveSpeedAnim: 0
   rb: {fileID: 1376537067151301455}
   col: {fileID: 1376537066910156642}
   col2: {fileID: 0}
@@ -436,9 +436,9 @@ MonoBehaviour:
   loot: {fileID: 2828130944199802275}
   nLoot: 8
   nShells: 4
-  isFlying: 1
   isSmart: 1
   isStupid: 0
+  <isFlying>k__BackingField: 1
   controlledByAnim: 0
   cannotTakeKb: 0
   cannotTakeDmg: 0
@@ -496,6 +496,7 @@ MonoBehaviour:
   inAtkA: 0
   inPrepA: 0
   inLungeA: 0
+  isDoneA: 0
   lockDirectionA: 0
 --- !u!1 &3433202526179080487
 GameObject:

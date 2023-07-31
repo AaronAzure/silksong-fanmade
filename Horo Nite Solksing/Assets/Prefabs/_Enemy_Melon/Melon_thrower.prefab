@@ -283,10 +283,10 @@ MonoBehaviour:
   hasJumpVelocityAnim: 0
   hasIsGroundedAnim: 0
   hasIsMovingAnim: 1
+  hasMoveSpeedAnim: 1
   hasIsDeadAnim: 1
   hasSpawnAnim: 1
   hasSpawningInAnim: 1
-  hasMoveSpeedAnim: 1
   rb: {fileID: 1376537067151301455}
   col: {fileID: 1376537066910156642}
   col2: {fileID: 0}
@@ -301,6 +301,7 @@ MonoBehaviour:
   nShells: 1
   isSmart: 1
   isStupid: 0
+  <isFlying>k__BackingField: 1
   controlledByAnim: 0
   cannotTakeKb: 0
   cannotTakeDmg: 0
@@ -322,7 +323,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 72
   isGrounded: 0
-  isFlying: 0
   cannotTakeYKb: 0
   idleActionOnly: 0
   groundCheck: {fileID: 7452915362852078129}
