@@ -51,14 +51,13 @@ public class MelonEntombed : Enemy
 	private bool sighted;
 	protected override void CallChildOnInSight()
 	{
-		if (!sighted)
+		if (!sighted && !CheckSurrounding())
 		{
 			currentAction = CurrentAction.none;
 			sighted = true;
 			anim.SetTrigger("alert");
 			atkDir = (model.localScale.x > 0) ? 1 : -1;
 		} 
-
 	}
 
 	public void _LOSE_SIGHT()
@@ -72,7 +71,8 @@ public class MelonEntombed : Enemy
 			rb.velocity = new Vector2(0, rb.velocity.y);
 			anim.Play("melon_entomb_idle_anim", -1, 0);
 			
-			ChooseNextAction();
+			// ChooseNextAction();
+			FacePlayer();
 		}
 	}
 }

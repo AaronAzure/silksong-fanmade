@@ -19,7 +19,13 @@ public class MelonJumper : Enemy
 	[SerializeField] bool isFacingPlayerA;
 	private float jumpTimer;
 	private float jumpThres=0.1f;
+	private float origSpeed;
 
+
+	protected override void CallChildOnStart()
+	{
+		origSpeed = moveSpeed;
+	}
 
 	protected override void IdleAction()
 	{
@@ -89,6 +95,7 @@ public class MelonJumper : Enemy
 			sighted = true;
 			anim.SetTrigger("alert");
 			anim.SetBool("isChasing", true);
+			moveSpeed = chaseSpeed;
 		}
 
 	}
@@ -99,6 +106,7 @@ public class MelonJumper : Enemy
 			idleCounter = 0;
 			sighted = false;
 			anim.SetBool("isChasing", false);
+			moveSpeed = origSpeed;
 		}
 	}
 

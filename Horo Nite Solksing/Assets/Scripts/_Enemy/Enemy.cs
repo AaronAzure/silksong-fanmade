@@ -88,6 +88,7 @@ public abstract class Enemy : MonoBehaviour
 	[Space] [SerializeField] protected CurrentAction currentAction=0;
 	protected float idleCounter=0;
 	[SerializeField] float idleTotalCounter=5;
+	[SerializeField] float stationaryThres=2.5f;
 	[SerializeField] bool immediateFlip;
 	[SerializeField] [Range(-1,1)] int initDir=-1;
 	[SerializeField] protected bool stillAttacking;
@@ -309,6 +310,9 @@ public abstract class Enemy : MonoBehaviour
 		}
 	}
 
+	/// <summary>
+	/// Return true if not safe (at wall or at cliff), otherwise Return false
+	/// </summary>
 	protected virtual bool CheckSurrounding()
 	{
 		RaycastHit2D groundInfo = Physics2D.Linecast(
@@ -631,6 +635,7 @@ public abstract class Enemy : MonoBehaviour
 		{
 			currentAction = immediateFlip ? CurrentAction.right : CurrentAction.none;
 		}
+		// stationary
 		else
 		{
 			// looking right
@@ -655,6 +660,17 @@ public abstract class Enemy : MonoBehaviour
 			idleCounter += Time.fixedDeltaTime;
 
 			if (idleCounter > idleTotalCounter)
+			{
+				idleCounter = 0;
+				ChooseNextAction();
+			}
+		}
+		else if (!immediateFlip && stationaryThres > 0 && 
+			currentAction == CurrentAction.none && CheckSurrounding())
+		{
+			idleCounter += Time.fixedDeltaTime;
+
+			if (idleCounter > stationaryThres)
 			{
 				idleCounter = 0;
 				ChooseNextAction();

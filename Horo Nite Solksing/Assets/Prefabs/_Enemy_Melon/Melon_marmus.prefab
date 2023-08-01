@@ -285,7 +285,7 @@ MonoBehaviour:
   cannotTakeKb: 0
   cannotTakeDmg: 0
   moveSpeed: 2
-  chaseSpeed: 4
+  chaseSpeed: 3
   jumpForce: 7
   maxSpeed: 5
   groundDetect: {fileID: 9114477566536772447}
@@ -308,6 +308,7 @@ MonoBehaviour:
   groundCheckSize: {x: 1.15, y: 0.05}
   currentAction: 0
   idleTotalCounter: 3
+  stationaryThres: 2.5
   immediateFlip: 0
   initDir: -1
   stillAttacking: 0
@@ -341,6 +342,7 @@ MonoBehaviour:
   closeLimit: 0.2
   inAtkA: 0
   inJumpA: 0
+  isFacingPlayerA: 0
 --- !u!95 &2808267337458562182
 Animator:
   serializedVersion: 3

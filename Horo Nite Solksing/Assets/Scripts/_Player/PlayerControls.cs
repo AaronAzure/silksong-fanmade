@@ -863,7 +863,7 @@ public class PlayerControls : MonoBehaviour
 
 				CheckIsGrounded();
 				CoyoteTimeMechanic();
-				CheckIsInWater();
+				// CheckIsInWater();
 				CheckIsWalledWhistShaw();
 				if (atkDir == 2 && (isGrounded || isWallSliding))
 				{
@@ -879,7 +879,7 @@ public class PlayerControls : MonoBehaviour
 
 				CheckIsGrounded();
 				CoyoteTimeMechanic();
-				CheckIsInWater();
+				// CheckIsInWater();
 				CheckIsWalled();
 
 				// Dash
@@ -2588,6 +2588,13 @@ public class PlayerControls : MonoBehaviour
 
 	public void MoveOutOfNewScene(Vector2 newScenePos)
 	{
+		if (movingVertically && movingVerticallyJumping)
+		{
+			if (jumpExitDir != 0)
+				model.localScale = new Vector3(jumpExitDir == 1 ? 1 : -1, 1, 1);
+			nextSceneSpeed = (IsFacingRight()) ? 1 : -1;
+		} 
+
 		StartCoroutine( MoveOutOfNewSceneCo(newScenePos) );
 	}
 
@@ -2623,9 +2630,6 @@ public class PlayerControls : MonoBehaviour
 		yield return new WaitForSeconds(movingVertically ? 0.125f: 0.5f);
 		if (movingVertically)
 		{
-			if (jumpExitDir != 0)
-				model.localScale = new Vector3(jumpExitDir == 1 ? 1 : -1 ,1,1);
-			nextSceneSpeed = (IsFacingRight()) ? 1 : -1;
 			stuckToNewScene = false;
 		} 
 		canMove = true;
