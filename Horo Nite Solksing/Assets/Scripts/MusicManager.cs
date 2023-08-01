@@ -28,6 +28,9 @@ public class MusicManager : MonoBehaviour
 	[SerializeField] AudioSource secretAreaSfx;
 	[SerializeField] AudioSource hornetAtkSfx;
 	[SerializeField] AudioSource hornetAtk2Sfx;
+	[SerializeField] AudioSource currencySfx;
+	[SerializeField] AudioSource currency2Sfx;
+	[SerializeField] AudioSource currency3Sfx;
 
 	private AudioSource currentMusic;
 	private AudioSource nextMusic;
@@ -94,6 +97,17 @@ public class MusicManager : MonoBehaviour
 	{
 		if (secretAreaSfx != null)
 			secretAreaSfx.Play();
+	}
+    public void PlayCurrencySFX()
+	{
+		if 		(currencySfx != null && !currencySfx.isPlaying)
+			currencySfx.Play();
+		else if (currency2Sfx != null && !currency2Sfx.isPlaying)
+			currency2Sfx.Play();
+		else if (currency3Sfx != null && !currency3Sfx.isPlaying)
+			currency3Sfx.Play();
+		else
+			currencySfx.Play();
 	}
     public void SoftenBgMusic(float duration=1)
 	{

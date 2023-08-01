@@ -32,10 +32,14 @@ public class CinemachineOverride : MonoBehaviour
 	{
 		if (canExit && newCam != null && other.CompareTag("Player"))	
 		{
-			newCam.m_Priority = -100;
-			if (CinemachineMaster.Instance != null) 
-				CinemachineMaster.Instance.SetCinemachineShakeOnHighestPriority();
+			ExitCamLock();
 		}
 	}
 
+	public void ExitCamLock()
+	{
+		newCam.m_Priority = -100;
+		if (CinemachineMaster.Instance != null) 
+			CinemachineMaster.Instance.SetCinemachineShakeOnHighestPriority();
+	}
 }

@@ -13,6 +13,7 @@ public class Rosary : MonoBehaviour
 		if (other.CompareTag("Player") && PlayerControls.Instance != null)
 		{
 			PlayerControls.Instance.GainCurrency(value);
+			MusicManager.Instance.PlayCurrencySFX();
 			Destroy(gameObject);
 		}
 	}

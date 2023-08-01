@@ -139,12 +139,14 @@ public class PlayerAttack : MonoBehaviour
 			}
 			Enemy target = other.GetComponent<Enemy>();
 
+			float bounceMultiplier = 1.3f;
+
 			if (isShawAttack)
-				p.ShawRetreat(isDashAttack, 2);
+				p.ShawRetreat(isDashAttack, bounceMultiplier);
 			else if (isRisingAttack)
-				p.RisingAtkRetreat(2);
+				p.RisingAtkRetreat(bounceMultiplier);
 			else if (hasRecoil && !p.justParried)
-				p.Recoil(2);
+				p.Recoil(bounceMultiplier);
 		}
 		if (other.CompareTag("SpecialEnemy"))
 		{
