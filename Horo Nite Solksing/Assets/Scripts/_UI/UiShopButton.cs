@@ -10,8 +10,18 @@ public class UiShopButton : MonoBehaviour, ISelectHandler, IPointerEnterHandler
 	[HideInInspector] public Button self;
 	[SerializeField] UiShopHighlight master;
 	public float offset;
+	[SerializeField] GameObject upgradeIcon;
 	[SerializeField] TextMeshProUGUI costTxt;
+	[SerializeField] TextMeshProUGUI titleTxt;
+	[SerializeField] TextMeshProUGUI extraTxt;
+	[SerializeField] TextMeshProUGUI descTxt;
 	private int nPurchased;
+	[SerializeField] int maxPurchases=3;
+	[SerializeField] bool mustUnlockFirst;
+	[SerializeField] int unlockCost=10;
+
+	[Space] [SerializeField] string title;
+	[SerializeField] [TextArea(2,4)] string desc;
 
 
 	public enum Upgrade {
@@ -40,8 +50,16 @@ public class UiShopButton : MonoBehaviour, ISelectHandler, IPointerEnterHandler
 	{
 		if (costTxt != null)
 		{
-			costTxt.text = $"{PlayerControls.Instance.GetCost(upgrade)}";
+			if (mustUnlockFirst)
+				costTxt.text = $"{unlockCost}";
+			else
+				costTxt.text = $"{PlayerControls.Instance.GetCost(upgrade)}";
 		}	
+	}
+
+	private bool CheckIsTool()
+	{
+		return (upgrade != Upgrade.health && upgrade != Upgrade.spool);
 	}
 
 	public void OnPointerEnter(PointerEventData eventData)
@@ -60,22 +78,61 @@ public class UiShopButton : MonoBehaviour, ISelectHandler, IPointerEnterHandler
 			master.offset = this.offset;
 			master.MoveToButton(this);
 		}
+		if (titleTxt != null)
+			titleTxt.text = title;
+		if (extraTxt != null)
+		{
+			if (mustUnlockFirst)
+				extraTxt.text = $"{unlockCost}";
+			else
+				extraTxt.text = $"{PlayerControls.Instance.GetCost(upgrade)}";
+		}
+		if (descTxt != null)
+		{
+			if (mustUnlockFirst)
+				descTxt.text = $"Unlock {title} tool";
+			else
+				descTxt.text = desc;
+		}
 	}
 
 	public void _PURCHASE()
 	{
-		// Is able to purchase
-		if (nPurchased < 3 && PlayerControls.Instance.CanAffordPurchase(upgrade))
+		// unlock tool
+		if (mustUnlockFirst)
 		{
-			PlayerControls.Instance.MakePurchase(upgrade);
-			PlayerControls.Instance.FullRestore();
-			nPurchased++;
-			SetCostText();
+			if (PlayerControls.Instance.CanAffordDirectPurchase(unlockCost))
+			{
+				mustUnlockFirst = false;
+				PlayerControls.Instance.UnlockPurchase(upgrade, unlockCost);
+				PlayerControls.Instance.FullRestore();
+				SetCostText();
+				if (upgradeIcon != null)
+					upgradeIcon.SetActive(true);
+				if (descTxt != null)
+				{
+					if (mustUnlockFirst)
+						descTxt.text = $"Unlock {title} tool";
+					else
+						descTxt.text = desc;
+				}
+			}
 		}
-		if (nPurchased >= 3)
+		else
 		{
-			gameObject.SetActive(false);
-			master.SelectNewButton();
+			// Is able to purchase
+			if (nPurchased < maxPurchases && PlayerControls.Instance.CanAffordPurchase(upgrade))
+			{
+				PlayerControls.Instance.MakePurchase(upgrade);
+				PlayerControls.Instance.FullRestore();
+				nPurchased++;
+				SetCostText();
+			}
+			if (nPurchased >= maxPurchases)
+			{
+				gameObject.SetActive(false);
+				master.SelectNewButton();
+			}
 		}
 	}
 }

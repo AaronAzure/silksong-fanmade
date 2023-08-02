@@ -75,16 +75,16 @@ public class MelonBlind : Enemy
 
 		// hit the ceiling
 		if 		(point.y > 0.5f && point.x < 0.5f && point.x > -0.5f)
-			point = new Vector2(point.x + Random.Range(-1f, 1f), point.y + 0.2f);
+			point = new Vector2(point.x + Random.Range(-1f, 1f), point.y + 0.6f);
 		// hit the floor
 		else if (point.y < -0.5f && point.x < 0.5f && point.x > -0.5f)
-			point = new Vector2(point.x + Random.Range(-1f, 1f), point.y - 0.2f);
+			point = new Vector2(point.x + Random.Range(-1f, 1f), point.y - 0.6f);
 		// hit the right wall
 		else if (point.x > 0.5f && point.y < 0.5f && point.y > -0.5f)
-			point = new Vector2(point.x, point.y+ Random.Range(-1f, 1f));
+			point = new Vector2(point.x + 0.6f, point.y+ Random.Range(-1f, 1f));
 		// hit the left wall
 		else if (point.x < -0.5f && point.y < 0.5f && point.y > -0.5f)
-			point = new Vector2(point.x, point.y+ Random.Range(-1f, 1f));
+			point = new Vector2(point.x - 0.6f, point.y+ Random.Range(-1f, 1f));
 
 		flyDir = -point.normalized;
 		if (model.localScale.x != 0)

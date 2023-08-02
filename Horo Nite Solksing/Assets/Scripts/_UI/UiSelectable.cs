@@ -170,19 +170,24 @@ public class UiSelectable : MonoBehaviour, ISelectHandler
 			// has different for each tool level
 			else
 			{
-				PlayerControls p = PlayerControls.Instance;
-				switch (isShield ? p.nShieldBonus : (isExtraSpool ? p.nExtraSpoolBonus : tool.level))
-				{
-					case 1: 	descTxt.text = desc1;	break;
-					case 2: 	descTxt.text = desc2;	break;
-					case 3: 	descTxt.text = desc3;	break;
-					default: 	descTxt.text = desc;	break;
-				}
+				descTxt.text = GetDesc();
 			}
 		}
 		if (eventSystem != null)
 		{
 			eventSystem.firstSelectedGameObject = this.gameObject;
+		}
+	}
+
+	public string GetDesc(int x=0)
+	{
+		PlayerControls p = PlayerControls.Instance;
+		switch ((isShield ? p.nShieldBonus : (isExtraSpool ? p.nExtraSpoolBonus : tool.level)) + x)
+		{
+			case 1: 	return desc1;
+			case 2: 	return desc2;
+			case 3: 	return desc3;
+			default: 	return desc;
 		}
 	}
 }

@@ -78,7 +78,7 @@ public abstract class Enemy : MonoBehaviour
 	[field: SerializeField] protected  LayerMask finalMask;
 	[SerializeField] protected bool isGrounded;
 	[SerializeField] bool cannotTakeYKb;
-	[SerializeField] protected bool idleActionOnly;
+	public bool idleActionOnly;
 	protected bool beenHurt;
 	protected bool receivingKb;
 	[field: SerializeField] protected Transform groundCheck;
@@ -156,10 +156,11 @@ public abstract class Enemy : MonoBehaviour
 		{
 			Gizmos.color = Color.magenta;
 			Gizmos.DrawWireCube(groundCheck.position, groundCheckSize);
-			// Gizmos.DrawLine(wallDetect.position, wallDetect.position + new Vector3(model.localScale.x * wallDistDetect, 0));
 		}
+		CallChildOnGizmosSelected();
 	}
 
+	protected virtual void CallChildOnGizmosSelected() { }
 	protected virtual void CallChildOnStart() { }
 	public virtual void CallChildOnIsSpecial() { }
 	protected virtual void CallChildOnEarlyUpdate() { }

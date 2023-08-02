@@ -269,10 +269,10 @@ MonoBehaviour:
   hasJumpVelocityAnim: 0
   hasIsGroundedAnim: 1
   hasIsMovingAnim: 1
+  hasMoveSpeedAnim: 0
   hasIsDeadAnim: 1
   hasSpawnAnim: 1
   hasSpawningInAnim: 1
-  hasMoveSpeedAnim: 0
   rb: {fileID: 1376537067151301455}
   col: {fileID: 1376537066910156642}
   col2: {fileID: 0}
@@ -285,9 +285,9 @@ MonoBehaviour:
   loot: {fileID: 2828130944199802275}
   nLoot: 1
   nShells: 1
-  isFlying: 0
   isSmart: 0
   isStupid: 1
+  <isFlying>k__BackingField: 0
   controlledByAnim: 0
   cannotTakeKb: 0
   cannotTakeDmg: 0
@@ -315,6 +315,7 @@ MonoBehaviour:
   groundCheckSize: {x: 0.75, y: 0.05}
   currentAction: 0
   idleTotalCounter: -1
+  stationaryThres: 2.5
   immediateFlip: 1
   initDir: -1
   stillAttacking: 0
@@ -341,6 +342,7 @@ MonoBehaviour:
   upsideDown: 0
   flippableObj: {fileID: 2699669501965455545}
   playerCheckPos: {fileID: 3367857193587328632}
+  distCheck: 5.5
 --- !u!95 &7385008389471508656
 Animator:
   serializedVersion: 3

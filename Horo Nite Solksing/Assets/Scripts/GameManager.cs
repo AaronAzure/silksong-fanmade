@@ -2,12 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using UnityEngine;
+using Rewired;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
 public class GameManager : MonoBehaviour
 {
 	public static GameManager Instance;
+	public Rewired.InputManager rm;
 
 	[field: SerializeField] public Animator transitionAnim {get; private set;}
 	[field: SerializeField] public GameObject remapUi {get; private set;}

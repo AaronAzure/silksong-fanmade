@@ -43,7 +43,8 @@ public class RoomSpawner : MonoBehaviour
 		}
 		var e = Instantiate(enemy, transform.position, Quaternion.identity, transform);
 		e.room = this.room;
-		e.alwaysInRange = true;
+		if (!e.idleActionOnly)
+			e.alwaysInRange = true;
 		e.CallChildOnIsSpecial();
 		e.SpawnIn();
 	}

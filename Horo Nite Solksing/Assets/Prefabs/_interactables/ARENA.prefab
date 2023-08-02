@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 3365555533308578329}
   - component: {fileID: 8584336225375977499}
   - component: {fileID: 4244157787836983234}
+  - component: {fileID: 6608643901188377768}
   m_Layer: 0
   m_Name: Rustling (PS)
   m_TagString: Untagged
@@ -4804,6 +4805,17 @@ ParticleSystemRenderer:
   m_Mesh2: {fileID: 0}
   m_Mesh3: {fileID: 0}
   m_MaskInteraction: 0
+--- !u!210 &6608643901188377768
+SortingGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 917953219577382888}
+  m_Enabled: 1
+  m_SortingLayerID: -1355153031
+  m_SortingLayer: 1
+  m_SortingOrder: 6
 --- !u!1 &2917349696407407824
 GameObject:
   m_ObjectHideFlags: 0
@@ -4814,8 +4826,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2917349696407407825}
   - component: {fileID: 2917349696407407828}
-  - component: {fileID: 2917349696407407831}
-  - component: {fileID: 2917349696407407830}
   m_Layer: 0
   m_Name: Gate
   m_TagString: Ground
@@ -4830,9 +4840,9 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2917349696407407824}
-  m_LocalRotation: {x: 0, y: -0.258819, z: 0, w: 0.9659259}
-  m_LocalPosition: {x: 0, y: -0.09, z: 0}
-  m_LocalScale: {x: 0.7, y: 0.07, z: 1}
+  m_LocalRotation: {x: 0, y: -0.25881898, z: 0, w: 0.9659258}
+  m_LocalPosition: {x: -0.12, y: -0.09, z: 0}
+  m_LocalScale: {x: 1.0822042, y: 0.11818809, z: 1.6273746}
   m_Children: []
   m_Father: {fileID: 2917349697874581676}
   m_RootOrder: 0
@@ -4877,7 +4887,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: -1
-  m_Sprite: {fileID: 21300000, guid: fe1c9cb52ee4e44e4ab462e5c3686a3a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 1b91da8f32e1244ca8967b6cacf514a9, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -4888,53 +4898,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!61 &2917349696407407831
-BoxCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2917349696407407824}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 5.12, y: 5.12}
-    newSize: {x: 5.12, y: 5.12}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1}
-  m_EdgeRadius: 0
---- !u!50 &2917349696407407830
-Rigidbody2D:
-  serializedVersion: 4
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2917349696407407824}
-  m_BodyType: 2
-  m_Simulated: 1
-  m_UseFullKinematicContacts: 0
-  m_UseAutoMass: 0
-  m_Mass: 1
-  m_LinearDrag: 0
-  m_AngularDrag: 0.05
-  m_GravityScale: 1
-  m_Material: {fileID: 0}
-  m_Interpolate: 0
-  m_SleepingMode: 1
-  m_CollisionDetection: 0
-  m_Constraints: 0
 --- !u!1 &2917349696454307995
 GameObject:
   m_ObjectHideFlags: 0
@@ -5099,7 +5062,7 @@ Transform:
   m_Children:
   - {fileID: 3365555533308578329}
   m_Father: {fileID: 2917349697597365758}
-  m_RootOrder: 8
+  m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2917349696524001446
 MonoBehaviour:
@@ -5149,7 +5112,7 @@ Transform:
   m_Children:
   - {fileID: 1665993365994816293}
   m_Father: {fileID: 2917349697597365758}
-  m_RootOrder: 4
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2917349696584985116
 MonoBehaviour:
@@ -5395,7 +5358,7 @@ Transform:
   m_Children:
   - {fileID: 4701458101815271114}
   m_Father: {fileID: 2917349697597365758}
-  m_RootOrder: 7
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2917349697027530910
 MonoBehaviour:
@@ -5443,7 +5406,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 2917349697597365758}
-  m_RootOrder: 9
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2917349697281655299
 GameObject:
@@ -5455,8 +5418,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2917349697281655296}
   - component: {fileID: 2917349697281655303}
-  - component: {fileID: 2917349697281655302}
-  - component: {fileID: 2917349697281655297}
   m_Layer: 0
   m_Name: Gate
   m_TagString: Ground
@@ -5471,9 +5432,9 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2917349697281655299}
-  m_LocalRotation: {x: 0, y: 0.2588191, z: 0, w: 0.9659258}
-  m_LocalPosition: {x: 0, y: -0.09, z: 0}
-  m_LocalScale: {x: 0.7, y: 0.07, z: 1}
+  m_LocalRotation: {x: 0, y: 0.2588191, z: 0, w: 0.9659259}
+  m_LocalPosition: {x: -0.119999886, y: -0.09, z: 0}
+  m_LocalScale: {x: 1.0822042, y: 0.11818809, z: 1.6273746}
   m_Children: []
   m_Father: {fileID: 2917349697696027702}
   m_RootOrder: 0
@@ -5518,7 +5479,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: -1
-  m_Sprite: {fileID: 21300000, guid: fe1c9cb52ee4e44e4ab462e5c3686a3a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 1b91da8f32e1244ca8967b6cacf514a9, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -5529,53 +5490,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!61 &2917349697281655302
-BoxCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2917349697281655299}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 5.12, y: 5.12}
-    newSize: {x: 5.12, y: 5.12}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1}
-  m_EdgeRadius: 0
---- !u!50 &2917349697281655297
-Rigidbody2D:
-  serializedVersion: 4
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2917349697281655299}
-  m_BodyType: 2
-  m_Simulated: 1
-  m_UseFullKinematicContacts: 0
-  m_UseAutoMass: 0
-  m_Mass: 1
-  m_LinearDrag: 0
-  m_AngularDrag: 0.05
-  m_GravityScale: 1
-  m_Material: {fileID: 0}
-  m_Interpolate: 0
-  m_SleepingMode: 1
-  m_CollisionDetection: 0
-  m_Constraints: 0
 --- !u!1 &2917349697403142415
 GameObject:
   m_ObjectHideFlags: 0
@@ -5610,7 +5524,7 @@ RectTransform:
   m_Children:
   - {fileID: 2917349696454307992}
   m_Father: {fileID: 2917349697597365758}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -5739,7 +5653,7 @@ Transform:
   m_Children:
   - {fileID: 2396323425534029515}
   m_Father: {fileID: 2917349697597365758}
-  m_RootOrder: 5
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2917349697498171530
 MonoBehaviour:
@@ -5790,16 +5704,16 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 2917349696926195452}
+  - {fileID: 4907682324767092931}
   - {fileID: 2917349697874581676}
   - {fileID: 2917349697696027702}
   - {fileID: 2917349697403142412}
+  - {fileID: 2917349697166468081}
   - {fileID: 2917349696584985117}
   - {fileID: 2917349697498171531}
   - {fileID: 2917349697659750617}
   - {fileID: 2917349697027530905}
   - {fileID: 2917349696524001441}
-  - {fileID: 2917349697166468081}
-  - {fileID: 4907682324767092931}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -5915,7 +5829,7 @@ Transform:
   m_Children:
   - {fileID: 7055855868583657782}
   m_Father: {fileID: 2917349697597365758}
-  m_RootOrder: 6
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2917349697659750622
 MonoBehaviour:
@@ -5968,7 +5882,7 @@ Transform:
   m_Children:
   - {fileID: 2917349697281655296}
   m_Father: {fileID: 2917349697597365758}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &2917349697696027701
 SpriteRenderer:
@@ -6120,7 +6034,7 @@ Transform:
   m_Children:
   - {fileID: 2917349696407407825}
   m_Father: {fileID: 2917349697597365758}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &2917349697874581679
 SpriteRenderer:
@@ -6250,6 +6164,7 @@ GameObject:
   - component: {fileID: 1665993365994816293}
   - component: {fileID: 5145465855774616106}
   - component: {fileID: 8666688161421228208}
+  - component: {fileID: 2550538749392533628}
   m_Layer: 0
   m_Name: Rustling (PS)
   m_TagString: Untagged
@@ -11043,6 +10958,17 @@ ParticleSystemRenderer:
   m_Mesh2: {fileID: 0}
   m_Mesh3: {fileID: 0}
   m_MaskInteraction: 0
+--- !u!210 &2550538749392533628
+SortingGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4415800709063186937}
+  m_Enabled: 1
+  m_SortingLayerID: -1355153031
+  m_SortingLayer: 1
+  m_SortingOrder: 6
 --- !u!1 &6133500970488145525
 GameObject:
   m_ObjectHideFlags: 0
@@ -11054,6 +10980,7 @@ GameObject:
   - component: {fileID: 2396323425534029515}
   - component: {fileID: 3480497288091626405}
   - component: {fileID: 8690100403290802408}
+  - component: {fileID: 7992797412027182999}
   m_Layer: 0
   m_Name: Rustling (PS)
   m_TagString: Untagged
@@ -15847,6 +15774,17 @@ ParticleSystemRenderer:
   m_Mesh2: {fileID: 0}
   m_Mesh3: {fileID: 0}
   m_MaskInteraction: 0
+--- !u!210 &7992797412027182999
+SortingGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6133500970488145525}
+  m_Enabled: 1
+  m_SortingLayerID: -1355153031
+  m_SortingLayer: 1
+  m_SortingOrder: 6
 --- !u!1 &7919617173748080629
 GameObject:
   m_ObjectHideFlags: 0
@@ -15877,7 +15815,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 2917349697597365758}
-  m_RootOrder: 10
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!60 &5850198838617424782
 PolygonCollider2D:
@@ -15940,6 +15878,7 @@ GameObject:
   - component: {fileID: 4701458101815271114}
   - component: {fileID: 8040165749287313852}
   - component: {fileID: 5438411017233656618}
+  - component: {fileID: 7499829272052122238}
   m_Layer: 0
   m_Name: Rustling (PS)
   m_TagString: Untagged
@@ -20733,6 +20672,17 @@ ParticleSystemRenderer:
   m_Mesh2: {fileID: 0}
   m_Mesh3: {fileID: 0}
   m_MaskInteraction: 0
+--- !u!210 &7499829272052122238
+SortingGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8110229750458161762}
+  m_Enabled: 1
+  m_SortingLayerID: -1355153031
+  m_SortingLayer: 1
+  m_SortingOrder: 6
 --- !u!1 &9146487811622462224
 GameObject:
   m_ObjectHideFlags: 0
@@ -20744,6 +20694,7 @@ GameObject:
   - component: {fileID: 7055855868583657782}
   - component: {fileID: 7025484927535434893}
   - component: {fileID: 1310997530005191503}
+  - component: {fileID: 57954542360299492}
   m_Layer: 0
   m_Name: Rustling (PS)
   m_TagString: Untagged
@@ -25537,3 +25488,14 @@ ParticleSystemRenderer:
   m_Mesh2: {fileID: 0}
   m_Mesh3: {fileID: 0}
   m_MaskInteraction: 0
+--- !u!210 &57954542360299492
+SortingGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9146487811622462224}
+  m_Enabled: 1
+  m_SortingLayerID: -1355153031
+  m_SortingLayer: 1
+  m_SortingOrder: 6

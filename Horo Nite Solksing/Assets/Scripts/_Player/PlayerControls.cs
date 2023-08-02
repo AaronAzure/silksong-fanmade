@@ -17,6 +17,7 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] Animator anim;
 	public static PlayerControls Instance;
 	private GameManager gm;
+	[SerializeField] Rewired.InputManager rm;
 
 
 	[Space] [Header("STATUS")]
@@ -260,8 +261,8 @@ public class PlayerControls : MonoBehaviour
 	[Space] [SerializeField] Transform toolSummonPos;
 	[SerializeField] GameObject toolGaugeUi;
 	[SerializeField] Tool[] tools;
-	[SerializeField] Tool tool1;
-	[SerializeField] Tool tool2;
+	private Tool tool1;
+	private Tool tool2;
 	[SerializeField] GameObject straightPinUi;
 	[SerializeField] GameObject pimpilloToolUi;
 	[SerializeField] GameObject caltropsToolUi;
@@ -394,6 +395,17 @@ public class PlayerControls : MonoBehaviour
 	[Space] [SerializeField] Transform safeZonePos;
 	private Vector2 roomStartPos;
 
+	[Space] [Header("TUTORIALS")]
+	[SerializeField] Tutorial activeTutorial;
+	[SerializeField] Tutorial[] tutorials;
+	// [Space] [SerializeField] Tutorial jumpTutorial;
+	// [SerializeField] Tutorial wallJumpTutorial;
+	// [SerializeField] Tutorial attackTutorial;
+	// [SerializeField] Tutorial dashTutorial;
+	// [SerializeField] Tutorial interactTutorial;
+	// [SerializeField] Tutorial equipTutorial;
+
+
 
 	[Space] [Header("DEBUG")]
 	[SerializeField] [Range(1,10)] int silkMultiplier=1;
@@ -462,6 +474,7 @@ public class PlayerControls : MonoBehaviour
 	{
 		self = transform;
 		tools = new Tool[1];
+		origGrav = rb.gravityScale;
 
 		savedScene = SceneManager.GetActiveScene().name;
 		savedPos = self.position;
@@ -487,7 +500,8 @@ public class PlayerControls : MonoBehaviour
 			iconAnims[nIcon].SetBool("isSelected", true);
 
 		gm = GameManager.Instance;
-		origGrav = rb.gravityScale;
+		if (gm != null)
+			rm = gm.rm;
 
 		if (gm.showDmg)
 		{
@@ -740,6 +754,7 @@ public class PlayerControls : MonoBehaviour
 				// rest on bench
 				else if (!isResting && bench != null && isGrounded && player.GetAxis("Move Vertical") > 0.85f)
 				{
+					DeactivateTutorial(0);
 					isResting = true;
 					needToRestObj.SetActive(false);
 					isDashing = jumpDashed = false;
@@ -2055,6 +2070,7 @@ public class PlayerControls : MonoBehaviour
 			isRespawning = true;
 			if (hurtCo != null)
 			{
+				StopCoroutine(hurtCo);
 				foreach (SpriteRenderer sprite in sprites)
 					sprite.material = defaultMat;
 				hurtCo = null;
@@ -3130,6 +3146,10 @@ public class PlayerControls : MonoBehaviour
 	{
 		return (nRosaries + nRosaryStrings) >= GetCost(u);
 	}
+	public bool CanAffordDirectPurchase(int cost)
+	{
+		return (nRosaries + nRosaryStrings) >= cost;
+	}
 
 	public void MakePurchase(UiShopButton.Upgrade u)
 	{
@@ -3185,8 +3205,94 @@ public class PlayerControls : MonoBehaviour
 		}
 	}
 
+	public void UnlockPurchase(UiShopButton.Upgrade u, int cost)
+	{
+		// pay with just rosaries
+		if (nRosaries >= cost)
+			nRosaries -= cost;
+		// pay with rosaries and rosary strings
+		else
+		{
+			int remainingCost = cost - nRosaries;
+			nRosaries = 0;
+			nRosaryStrings -= remainingCost;
+			SetRosaryStringText();
+		}
+		switch (u)
+		{
+			case UiShopButton.Upgrade.pin:
+				straightPinUi.SetActive(true);
+				break;
+			case UiShopButton.Upgrade.pimpillo:
+				pimpilloToolUi.SetActive(true);
+				break;
+			case UiShopButton.Upgrade.caltrop:
+				caltropsToolUi.SetActive(true);
+				break;
+			case UiShopButton.Upgrade.sawblade:
+				shawbladesToolUi.SetActive(true);
+				break;
+			case UiShopButton.Upgrade.shield:
+				shieldToolUi.SetActive(true);
+				break;
+			case UiShopButton.Upgrade.extraSpool:
+				spoolToolUi.SetActive(true);
+				SetUiSilk();
+				break;
+		}
+	}
+
 	public void _CHEAT_MONEY()
 	{
 		nRosaries = 100000;
 	}
+
+
+
+	// todo ------------------------------------------------------------------
+	// todo ------- TUTORIAL -------------------------------------------------
+
+	public void ActivateTutorial(int index)
+	{
+		if (tutorials.Length > index)
+		{
+			// hide prev tutorial
+			if (activeTutorial != null)
+			{
+				activeTutorial.anim.SetTrigger("close");
+				activeTutorial = null;
+			}
+			// show new tutorial
+			activeTutorial = tutorials[index];
+			if (!activeTutorial.seenTutorial)
+			{
+				activeTutorial.gameObject.SetActive(true);
+			}
+		}
+	}
+
+	public void DeactivateTutorial(int index)
+	{
+		if (tutorials.Length > index)
+		{
+			activeTutorial = tutorials[index];
+			activeTutorial.anim.SetTrigger("close");
+			activeTutorial = null;
+		}
+	}
+
+	public string GetActionElementIdentifierName(string actionName)
+	{
+		if (gm == null)
+			gm = GameManager.Instance;
+		
+		if (player == null)
+			player = ReInput.players.GetPlayer(playerId);
+
+		return player.controllers.maps.GetFirstButtonMapWithAction(actionName, true).elementIdentifierName;
+	}
+
+	
+	// todo ------- TUTORIAL -------------------------------------------------
+	// todo ------------------------------------------------------------------
 }
