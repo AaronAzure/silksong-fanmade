@@ -13,6 +13,7 @@ public class ShellShard : MonoBehaviour
 		if (other.CompareTag("Player") && PlayerControls.Instance != null)
 		{
 			PlayerControls.Instance.GainShellShard(value);
+			MusicManager.Instance.PlayCurrencySFX();
 			Destroy(gameObject);
 		}
 	}

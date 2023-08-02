@@ -9,10 +9,16 @@ public class Tutorial : MonoBehaviour
 	[SerializeField] string[] actionNames;
 	[SerializeField] TextMeshProUGUI[] actionTxts;
 	public bool seenTutorial;
+	[SerializeField] float autoClose=-1;
+
+	[Space] [SerializeField] bool isRepairInstruction;
+	[SerializeField] TextMeshProUGUI costTxt;
 	// bool done;
 
 	private void OnEnable() 
 	{
+		SetRepairCost();
+
 		if (seenTutorial) return;
 
 		for (int i=0 ; i<actionTxts.Length ; i++)	
@@ -27,5 +33,21 @@ public class Tutorial : MonoBehaviour
 			}
 		}
 		seenTutorial = true;
+
+		if (autoClose > 0)
+			StartCoroutine( CloseCo() );
+	}
+
+	public void SetRepairCost()
+	{
+		if (isRepairInstruction && costTxt != null)
+			costTxt.text = $"-{PlayerControls.Instance.GetRepairCost()} ({PlayerControls.Instance.GetNumberOfToolsFixed()})";
+	}
+
+	IEnumerator CloseCo()
+	{
+		yield return new WaitForSeconds(autoClose);
+		if (anim != null)
+			anim.SetTrigger("close");
 	}
 }

@@ -398,12 +398,15 @@ public class PlayerControls : MonoBehaviour
 	[Space] [Header("TUTORIALS")]
 	[SerializeField] Tutorial activeTutorial;
 	[SerializeField] Tutorial[] tutorials;
-	// [Space] [SerializeField] Tutorial jumpTutorial;
-	// [SerializeField] Tutorial wallJumpTutorial;
-	// [SerializeField] Tutorial attackTutorial;
-	// [SerializeField] Tutorial dashTutorial;
-	// [SerializeField] Tutorial interactTutorial;
-	// [SerializeField] Tutorial equipTutorial;
+	[Space] [SerializeField] Tutorial repairTutorial;
+	
+	bool gainSilkFirstTime;
+	bool canUseSkillFirstTime;
+	bool canUseBindFirstTime;
+	bool useSkillFirstTime;
+	bool useBindFirstTime;
+	bool madeFirstPurchase;
+	bool openInventoryFirst;
 
 
 
@@ -518,6 +521,7 @@ public class PlayerControls : MonoBehaviour
 			if (difficultyObj != null)
 				difficultyObj.SetActive(true);
 			maxHp = 8;
+			hp = maxHp + nBonusHp;
 			SetUiHp();
 		}
 
@@ -634,7 +638,8 @@ public class PlayerControls : MonoBehaviour
 		}
 
 		// dialogue
-		if (uiDialogue.gameObject.activeSelf && player.GetButtonDown("Yes"))
+		if (uiDialogue.gameObject.activeSelf && 
+			(player.GetButtonDown("Yes") || player.GetButtonDown("No")))
 		{
 			uiDialogue.NextLine();
 		}
@@ -647,6 +652,11 @@ public class PlayerControls : MonoBehaviour
 			if (iconAnims != null && nIcon < iconAnims.Length && iconAnims[nIcon] != null)
 				iconAnims[nIcon].SetBool("isSelected", true);
 			pauseAnim.SetTrigger("open");
+			if (isResting && madeFirstPurchase && !openInventoryFirst)
+			{
+				openInventoryFirst = true;
+				DeactivateTutorial(8);
+			}
 		}
 		// pause open
 		else if (!isPaused && !isAtShop && pause2Anim != null && player.GetButtonDown("Start"))
@@ -763,6 +773,12 @@ public class PlayerControls : MonoBehaviour
 					anim.SetBool("isResting", true);
 					if (bench != null) bench.ToggleTextbox(false);
 					startPosition = transform.position;
+
+					if (repairTutorial != null && tool1 != null)
+					{
+						repairTutorial.gameObject.SetActive(false);
+						repairTutorial.gameObject.SetActive(true);
+					}
 				}
 
 				// Open Shop
@@ -844,6 +860,10 @@ public class PlayerControls : MonoBehaviour
 			anim.SetBool("isResting", false);
 			if (bench != null)
 				bench.ToggleTextbox(true);
+			if (repairTutorial != null && repairTutorial.gameObject.activeSelf)
+			{
+				repairTutorial.anim.SetTrigger("close");
+			}
 		}
 		// leave shop
 		else if (isAtShop && shopCanvas.activeSelf && player.GetButtonDown("No"))
@@ -1532,6 +1552,12 @@ public class PlayerControls : MonoBehaviour
 		rb.gravityScale = 0;
 		rb.velocity = Vector2.zero;
 
+		if (!useSkillFirstTime)
+		{
+			useSkillFirstTime = true;
+			DeactivateTutorial(6);
+		}
+
 		// stabby stabby strike
 		if (skillDir == 0)
 		{
@@ -1699,6 +1725,11 @@ public class PlayerControls : MonoBehaviour
 			tool1 = tool;
 			nEquipped++;
 			FullRestore();	// equipped
+			if (repairTutorial != null && tool1 != null)
+			{
+				repairTutorial.gameObject.SetActive(false);
+				repairTutorial.gameObject.SetActive(true);
+			}
 			return true;
 		}
 		currToolUi = null;
@@ -1709,6 +1740,10 @@ public class PlayerControls : MonoBehaviour
 		tool1 = null;
 		nEquipped--;
 		FullRestore();
+		if (repairTutorial != null && repairTutorial.gameObject.activeSelf)
+		{
+			repairTutorial.anim.SetTrigger("close");
+		}
 		return false;
 	}
 	public void EquipCrest(int n)
@@ -1930,6 +1965,33 @@ public class PlayerControls : MonoBehaviour
 		{
 			tool2.usesLeft = tool2.GetTotalUses();
 		}
+		if (repairTutorial != null && repairTutorial.gameObject.activeSelf)
+		{
+			repairTutorial.SetRepairCost();
+		}
+	}
+	public int GetRepairCost()
+	{
+		if (tool1 != null && toolUses1 != null)
+		{
+			int maxReplenished = Mathf.Max(0, tool1.GetTotalUses() - tool1.usesLeft); 
+			if (maxReplenished > 0)
+			{
+				int nReplenished = Mathf.Clamp(nShellShards / tool1.repairCost, 0, maxReplenished);
+				return nReplenished * tool1.repairCost;
+			}
+		}
+		return 0;
+	}
+	public string GetNumberOfToolsFixed()
+	{
+		if (tool1 != null)
+		{
+			int maxReplenished = Mathf.Max(0, tool1.GetTotalUses() - tool1.usesLeft); 
+			int nReplenished = Mathf.Clamp(nShellShards / tool1.repairCost, 0, maxReplenished);
+			return $"Craft {tool1.usesLeft + nReplenished}/{tool1.GetTotalUses()} Uses";
+		}
+		return "";
 	}
 
 	public void ShawRetreat(bool dashStrike=false, float multiplier=1)
@@ -2700,6 +2762,11 @@ public class PlayerControls : MonoBehaviour
 			bindCo = null;
 			yield break;
 		} 
+		if (!useBindFirstTime)
+		{
+			useBindFirstTime = true;
+			DeactivateTutorial(7);
+		}
 		anim.SetBool("isBinding", true);
 		if (!infiniteSilk) SetSilk(-GetBindCost());
 		rb.gravityScale = 0;
@@ -2916,6 +2983,27 @@ public class PlayerControls : MonoBehaviour
 			0,
 			totalSilk
 		);
+
+		// tutorial on silk usage
+		if (!gainSilkFirstTime && nSilk > 0)
+		{
+			gainSilkFirstTime = true;
+			ActivateTutorial(5);
+		}
+
+		// tutorial on skill attack
+		if (!canUseSkillFirstTime && nSilk >= 3)
+		{
+			canUseSkillFirstTime = true;
+			ActivateTutorial(6);
+		}
+
+		// tutorial on bind (heal)
+		if (!canUseBindFirstTime && nSilk >= GetBindCost() && hp < (maxHp + nBonusHp))
+		{
+			canUseBindFirstTime = true;
+			ActivateTutorial(7);
+		}
 
 		// cancel if no changes
 		if (prevSilk == nSilk) return;
@@ -3218,6 +3306,13 @@ public class PlayerControls : MonoBehaviour
 			nRosaryStrings -= remainingCost;
 			SetRosaryStringText();
 		}
+
+		if (!madeFirstPurchase)
+		{
+			madeFirstPurchase = true;
+			ActivateTutorial(8);
+		}
+
 		switch (u)
 		{
 			case UiShopButton.Upgrade.pin:
