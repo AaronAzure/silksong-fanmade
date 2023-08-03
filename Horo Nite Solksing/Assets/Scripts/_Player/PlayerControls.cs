@@ -2189,8 +2189,8 @@ public class PlayerControls : MonoBehaviour
 			NewScene n = other.GetComponent<NewScene>();
 
 			// scene exists
-			if (UnityEngine.SceneManagement.SceneUtility.GetBuildIndexByScenePath(n.newSceneName) >= 0)
-			{
+			// if (UnityEngine.SceneManagement.SceneUtility.GetBuildIndexByScenePath(n.newSceneName) >= 0)
+			// {
 				movingVertically = n.isVertical;
 				if (movingVertically)
 				{
@@ -2203,7 +2203,7 @@ public class PlayerControls : MonoBehaviour
 				anim.SetBool("isUsingMap", false);
 				if (mapAnim != null) mapAnim.SetFloat("speed", -2);
 				StartCoroutine( MoveToNextSceneCo(n.newSceneName) );
-			}
+			// }
 		}
 		if (!isFinished && other.CompareTag("Goal"))
 		{
