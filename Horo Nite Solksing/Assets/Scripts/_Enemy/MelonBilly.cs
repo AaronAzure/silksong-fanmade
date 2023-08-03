@@ -19,7 +19,7 @@ public class MelonBilly : Enemy
 
 	protected override void CallChildOnGizmosSelected()
 	{
-		if (playerCheckPos != null)
+		if (upsideDown && playerCheckPos != null)
 		{
 			Gizmos.color = Color.magenta;
 			Gizmos.DrawLine(playerCheckPos.position, playerCheckPos.position + (Vector3.down * distCheck));

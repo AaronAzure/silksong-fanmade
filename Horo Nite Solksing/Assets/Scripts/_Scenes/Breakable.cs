@@ -32,19 +32,25 @@ public abstract class Breakable : MonoBehaviour
 	[SerializeField] GameObject shakeWall;
 	// [SerializeField] GameObject fakeWall;
 	[SerializeField] GameObject combineWall;
+	[SerializeField] Collider2D mustBeInArea;
+	bool playerInArea=true;
 
 
     // Start is called before the first frame update
     void Start()
     {
         CallChildOnStart();
+		if (mustBeInArea != null)
+		{
+			playerInArea = false;
+		}
     }
 
     protected virtual void CallChildOnStart() { }
 
 	public void Damage(int dmg)
 	{
-		if (canBeHit && canBreak)
+		if (canBeHit && canBreak && playerInArea)
 			CallChildOnDamage(dmg);
 	}
 
@@ -127,5 +133,21 @@ public abstract class Breakable : MonoBehaviour
 	{
 		yield return new WaitForSeconds(0.5f);
 		canBeHit = true;
+	}
+
+
+	private void OnTriggerEnter2D(Collider2D other) 
+	{
+		if (mustBeInArea != null && other.CompareTag("Player"))	
+		{
+			playerInArea = true;
+		}
+	}
+	private void OnTriggerExit2D(Collider2D other) 
+	{
+		if (mustBeInArea != null && other.CompareTag("Player"))	
+		{
+			playerInArea = false;
+		}
 	}
 }

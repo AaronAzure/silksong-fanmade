@@ -389,6 +389,7 @@ public class PlayerControls : MonoBehaviour
 	[Space] [Header("MAP")]
 	[SerializeField] bool isUsingMapAnim;
 	[SerializeField] PlayerMap playerMap;
+	[SerializeField] PlayerMap playerWorldMap;
 	[SerializeField] Animator mapAnim;
 
 	
@@ -535,6 +536,11 @@ public class PlayerControls : MonoBehaviour
 		{
 			playerMap.CheckForSceneInMap(SceneManager.GetActiveScene().name);
 			playerMap.PlaceMarker(SceneManager.GetActiveScene().name);
+		}
+		if (playerWorldMap != null) 
+		{
+			playerWorldMap.CheckForSceneInMap(SceneManager.GetActiveScene().name);
+			playerWorldMap.PlaceMarker(SceneManager.GetActiveScene().name);
 		}
 	}
 
@@ -1282,7 +1288,7 @@ public class PlayerControls : MonoBehaviour
 		}
 			
 		// quicker fall speed
-		if (!isGrounded && !inShawAtk && !isJumping && !isWallJumping && rb.velocity.y < fallSpeed)
+		if (!isGrounded && !inShawAtk && !isJumping && !isWallSliding && rb.velocity.y < fallSpeed)
 			rb.gravityScale = fallGrav;
 		else
 			rb.gravityScale = origGrav;
@@ -2048,7 +2054,7 @@ public class PlayerControls : MonoBehaviour
 	}
 	public void Recoil(float multiplier=1)
 	{
-		rb.velocity = Vector2.zero;
+		rb.velocity = new Vector2(0, rb.velocity.y);
 		isDashing = false;
 		jumpDashed = false;
 
@@ -2181,18 +2187,23 @@ public class PlayerControls : MonoBehaviour
 		{
 			movingRight = (other.transform.position.x - self.position.x > 0);
 			NewScene n = other.GetComponent<NewScene>();
-			movingVertically = n.isVertical;
-			if (movingVertically)
+
+			// scene exists
+			if (UnityEngine.SceneManagement.SceneUtility.GetBuildIndexByScenePath(n.newSceneName) >= 0)
 			{
-				// jumping up to new scene
-				jumpExitDir = n.GetDirection();
-				movingVerticallyJumping = n.transform.position.y - self.position.y > 0;
+				movingVertically = n.isVertical;
+				if (movingVertically)
+				{
+					// jumping up to new scene
+					jumpExitDir = n.GetDirection();
+					movingVerticallyJumping = n.transform.position.y - self.position.y > 0;
+				}
+				exitPointInd = n.exitIndex;
+				isUsingMap = false;
+				anim.SetBool("isUsingMap", false);
+				if (mapAnim != null) mapAnim.SetFloat("speed", -2);
+				StartCoroutine( MoveToNextSceneCo(n.newSceneName) );
 			}
-			exitPointInd = n.exitIndex;
-			isUsingMap = false;
-			anim.SetBool("isUsingMap", false);
-			if (mapAnim != null) mapAnim.SetFloat("speed", -2);
-			StartCoroutine( MoveToNextSceneCo(n.newSceneName) );
 		}
 		if (!isFinished && other.CompareTag("Goal"))
 		{
@@ -2595,6 +2606,11 @@ public class PlayerControls : MonoBehaviour
 			playerMap.CheckForSceneInMap(savedScene);
 			playerMap.PlaceMarker(savedScene);
 		}
+		if (playerWorldMap != null) 
+		{
+			playerWorldMap.CheckForSceneInMap(savedScene);
+			playerWorldMap.PlaceMarker(savedScene);
+		}
 
 		if (!saveDeath)
 		{
@@ -2640,6 +2656,7 @@ public class PlayerControls : MonoBehaviour
 	public void SecretPathFoundMap(string exactName)
 	{
 		playerMap.CheckForSceneInMap(exactName);
+		playerWorldMap.CheckForSceneInMap(exactName);
 	}
 
 	IEnumerator MoveToNextSceneCo(string newSceneName)
@@ -2661,6 +2678,11 @@ public class PlayerControls : MonoBehaviour
 		{
 			playerMap.CheckForSceneInMap(newSceneName);
 			playerMap.PlaceMarker(newSceneName);
+		}
+		if (playerWorldMap != null) 
+		{
+			playerWorldMap.CheckForSceneInMap(newSceneName);
+			playerWorldMap.PlaceMarker(newSceneName);
 		}
 	}
 
@@ -3137,6 +3159,11 @@ public class PlayerControls : MonoBehaviour
 		{
 			playerMap.CheckForSceneInMap(savedScene);
 			playerMap.PlaceMarker(savedScene);
+		}
+		if (playerWorldMap != null) 
+		{
+			playerWorldMap.CheckForSceneInMap(savedScene);
+			playerWorldMap.PlaceMarker(savedScene);
 		}
 		gm.transitionAnim.SetTrigger("reset");
 		cacoonObj.SetActive(false);

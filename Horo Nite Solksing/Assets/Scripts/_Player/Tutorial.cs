@@ -27,7 +27,7 @@ public class Tutorial : MonoBehaviour
 			{
 				int startInd = actionTxts[i].text.IndexOf('[') + 1;
 				string elemName = PlayerControls.Instance.GetActionElementIdentifierName(actionNames[i]);
-				Debug.Log(elemName);
+				// Debug.Log(elemName);
 				
 				actionTxts[i].text = actionTxts[i].text.Insert(startInd, elemName);
 			}

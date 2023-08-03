@@ -8,10 +8,26 @@ public class MelonEntombed : Enemy
 	[SerializeField] bool stopMoving;
 	[SerializeField] float atkDir;
 
+	
+	private bool spawnLanded;
+	[Space] [SerializeField] float landIntensity=7.5f;
+	[SerializeField] float landDuration=0.5f;
+	[SerializeField] float landFrequency=0.75f;
+
+
+	protected override void CallChildOnSpawnIn()
+	{
+		spawnLanded = true;
+	}
 
 	protected override void IdleAction()
 	{
-		if (!stopMoving)
+		if (spawnLanded && isGrounded)
+		{
+			spawnLanded = false;
+			CinemachineShake.Instance.ShakeCam(landIntensity, landDuration, landFrequency);
+		}
+		if (isGrounded && !stopMoving)
 		{
 			if (!chargingA)
 				WalkAround();
@@ -51,7 +67,7 @@ public class MelonEntombed : Enemy
 	private bool sighted;
 	protected override void CallChildOnInSight()
 	{
-		if (!sighted && !CheckSurrounding())
+		if (!sighted && !CheckSurrounding() && isGrounded)
 		{
 			currentAction = CurrentAction.none;
 			sighted = true;

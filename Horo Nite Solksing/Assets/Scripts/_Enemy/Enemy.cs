@@ -60,6 +60,7 @@ public abstract class Enemy : MonoBehaviour
 	[Space] [Header("Platformer Related")]
 	[SerializeField] protected bool isSmart; // if attacked face direction;
 	[SerializeField] protected bool isStupid; // if attacked face direction;
+	[SerializeField] protected bool facePlayerOnSpawn;
 
 	[field: SerializeField] public bool isFlying {get; private set;}
 	[Space] [SerializeField] protected bool controlledByAnim;
@@ -162,6 +163,7 @@ public abstract class Enemy : MonoBehaviour
 
 	protected virtual void CallChildOnGizmosSelected() { }
 	protected virtual void CallChildOnStart() { }
+	protected virtual void CallChildOnSpawnIn() { }
 	public virtual void CallChildOnIsSpecial() { }
 	protected virtual void CallChildOnEarlyUpdate() { }
 	protected virtual void CallChildOnFixedUpdate() { }
@@ -208,14 +210,18 @@ public abstract class Enemy : MonoBehaviour
 			phase2 = easyPhase2;
 			phase3 = easyPhase3;
 		}
-		
-		initDir = (model.localScale.x > 0) ? 1 : -1;
-		currentAction = (initDir == 1) ? CurrentAction.right : CurrentAction.left;
-		
+
 		if (PlayerControls.Instance != null)
 		{
 			target = PlayerControls.Instance;
 		}
+
+		if (facePlayerOnSpawn)
+			FacePlayer();
+		
+		initDir = (model.localScale.x > 0) ? 1 : -1;
+		currentAction = (initDir == 1) ? CurrentAction.right : CurrentAction.left;
+		
 
 		CallChildOnStart();
 
@@ -251,7 +257,6 @@ public abstract class Enemy : MonoBehaviour
 				anim.SetFloat("jumpVelocity", rb.velocity.y);
 		}
 
-		// if (alert != null) alert.SetActive( attackingPlayer );
 		CallChildOnFixedUpdate();
     }
 
@@ -549,12 +554,12 @@ public abstract class Enemy : MonoBehaviour
 	public void SpawnIn()
 	{
 		summoned = true;
-		// Debug.Log("spawning in");
 		if (hasSpawnAnim && anim != null) 
 			anim.SetTrigger("spawn");
 		if (PlayerControls.Instance != null)
 			target = PlayerControls.Instance;
 		FacePlayer();
+		CallChildOnSpawnIn();
 		spawningIn = true;
 		if (hasSpawningInAnim && anim != null) 
 			anim.SetBool("spawningIn", true);
