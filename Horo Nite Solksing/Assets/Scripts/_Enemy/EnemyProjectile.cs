@@ -11,20 +11,31 @@ public class EnemyProjectile : MonoBehaviour
 	[SerializeField] float hitBackForce=5;
 	private bool isGrounded;
 	private bool thrown;
-	[SerializeField] bool canBreak;
+	
+	
+	[Space] [SerializeField] bool canBreak;
+	[SerializeField] bool canDestroy;
+	[SerializeField] float breakAfter=-1;
 	[SerializeField] bool breakOnPlayerHit;
 	[SerializeField] GameObject breakVfx;
 
+	
 	[Space] [SerializeField] bool rotateInDir;
 
 	private void Start() 
 	{
 		Invoke("Thrown", 0.1f);
+		if (breakAfter > 0)
+			Invoke("BreakAfter", breakAfter);
 	}
 
 	void Thrown()
 	{
 		thrown = true;
+	}
+	void BreakAfter()
+	{
+		canBreak = true;
 	}
 
 
@@ -73,20 +84,23 @@ public class EnemyProjectile : MonoBehaviour
 		// if (other.CompareTag("Player"))
 		// 	Deactivate();
 
-		if (canHitback && other.CompareTag("Finish"))
+		if (other.CompareTag("Finish"))
 		{
-			if (canBreak)
+			if (canBreak || canDestroy)
 			{
 				if (breakVfx != null)
 					breakVfx.transform.parent = null;
 				Destroy(gameObject);
 			}
-			int x = (other.transform.position.x - transform.position.x > 0) ? -1 : 1;
-			rb.AddForce(
-				new Vector2(x * hitBackForce, 1),
-				ForceMode2D.Impulse
-			);
-			Deactivate();
+			if (canHitback)
+			{
+				int x = (other.transform.position.x - transform.position.x > 0) ? -1 : 1;
+				rb.AddForce(
+					new Vector2(x * hitBackForce, 1),
+					ForceMode2D.Impulse
+				);
+				Deactivate();
+			}
 		}	
 		if (breakOnPlayerHit && other.CompareTag("Player"))
 		{

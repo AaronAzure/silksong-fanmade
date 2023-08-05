@@ -4909,6 +4909,7 @@ MonoBehaviour:
   exactName: 
   shakeWall: {fileID: 2098915075004556617}
   combineWall: {fileID: 8652674565509257497}
+  mustBeInArea: {fileID: 0}
 --- !u!61 &2098915073685714977
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -5148,7 +5149,7 @@ TilemapRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1355153031
   m_SortingLayer: 1
-  m_SortingOrder: 7
+  m_SortingOrder: 8
   m_ChunkSize: {x: 32, y: 32, z: 32}
   m_ChunkCullingBounds: {x: 0, y: 0, z: 0}
   m_MaxChunkCount: 16
@@ -5462,8 +5463,8 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 0.6
-      minScalar: 0.4
+      scalar: 0.3
+      minScalar: 0.2
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -10461,8 +10462,8 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 1.2
-      minScalar: 1
+      scalar: 0.6
+      minScalar: 0.5
       maxCurve:
         serializedVersion: 2
         m_Curve:

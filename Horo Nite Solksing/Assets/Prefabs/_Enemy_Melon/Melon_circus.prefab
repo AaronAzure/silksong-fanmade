@@ -5328,10 +5328,10 @@ MonoBehaviour:
   hasJumpVelocityAnim: 1
   hasIsGroundedAnim: 0
   hasIsMovingAnim: 1
+  hasMoveSpeedAnim: 1
   hasIsDeadAnim: 1
   hasSpawnAnim: 1
   hasSpawningInAnim: 1
-  hasMoveSpeedAnim: 1
   rb: {fileID: 1679674020449486591}
   col: {fileID: 5574384399325105735}
   col2: {fileID: 57079410007508735}
@@ -5342,10 +5342,12 @@ MonoBehaviour:
   defaultMat: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
   sortGroup: {fileID: 5167775765534635674}
   loot: {fileID: 7460076282621286313}
-  nLoot: 4
-  nShells: 1
+  nLoot: 6
+  nShells: 2
   isSmart: 1
   isStupid: 0
+  facePlayerOnSpawn: 0
+  <isFlying>k__BackingField: 0
   controlledByAnim: 0
   cannotTakeKb: 0
   cannotTakeDmg: 0
@@ -5367,13 +5369,13 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 72
   isGrounded: 0
-  isFlying: 0
   cannotTakeYKb: 0
   idleActionOnly: 0
   groundCheck: {fileID: 2870511291045079099}
   groundCheckSize: {x: 0.79, y: 0.05}
   currentAction: 0
   idleTotalCounter: 5
+  stationaryThres: 2.5
   immediateFlip: 0
   initDir: -1
   stillAttacking: 0
@@ -5400,6 +5402,7 @@ MonoBehaviour:
   melonBallObj: {fileID: 1517385774734940620}
   ballAnim: {fileID: 1307366715844961093}
   inAttackAnim: 0
+  mainBody: {fileID: 6026512214403510597}
 --- !u!95 &8759415686820625224
 Animator:
   serializedVersion: 3
@@ -5675,6 +5678,10 @@ PrefabInstance:
       propertyPath: obj
       value: 
       objectReference: {fileID: 1517385774734940620}
+    - target: {fileID: 1661461387032087366, guid: cb2d203c791de404c84fa270c81b21cc, type: 3}
+      propertyPath: isMelonCircus
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3986851362555890851, guid: cb2d203c791de404c84fa270c81b21cc, type: 3}
       propertyPath: m_Name
       value: _CameraDetector

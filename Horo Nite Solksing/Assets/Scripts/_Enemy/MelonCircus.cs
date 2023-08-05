@@ -11,8 +11,11 @@ public class MelonCircus : Enemy
 	private bool chased=true;
 
 
+	[Space] [SerializeField] Rigidbody2D mainBody;
 
-	private void OnEnable()
+
+
+	protected override void CallChildOnStart()
 	{
 		if (melonBallObj != null)
 		{
@@ -84,6 +87,8 @@ public class MelonCircus : Enemy
 		if (melonBallObj != null)
 		{
 			melonBallObj.SetActive(false);
+			if (mainBody != null)
+				mainBody.bodyType = RigidbodyType2D.Dynamic;
 		}
 	}
 

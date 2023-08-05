@@ -10,9 +10,17 @@ public class OnTriggerTest : MonoBehaviour
 
 	[Space] [SerializeField] bool alwaysActive;
 
+	[Space] [SerializeField] bool isMelonCircus;
+	
+
 	private void Awake() 
 	{
-		mainHolder = transform.parent.parent;
+		mainHolder = GetMasterParent();
+	}
+
+	private Transform GetMasterParent()
+	{
+		return isMelonCircus ? transform.parent.parent : transform.parent.parent;
 	}
 
 	private void OnEnable() 
@@ -25,15 +33,16 @@ public class OnTriggerTest : MonoBehaviour
 
 	public void SwapParent(bool thisIsParent=true)
 	{
-		if (master != null)
+		if (master != null && master.gameObject.activeSelf)
 		{
-			if (master != null && transform.parent != null)
+			if (master != null && mainHolder != null && transform.parent != null)
 				transform.parent = thisIsParent ? mainHolder : master;
 
 			// enemy active
 			if (!thisIsParent)
 			{
-				master.parent = mainHolder;
+				if (mainHolder != null)
+					master.parent = mainHolder;
 				transform.parent = master;
 			}
 

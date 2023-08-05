@@ -101,7 +101,7 @@ public class PlayerControls : MonoBehaviour
 
 	[Space] [SerializeField] float risingForce=10;
 	[SerializeField] Vector2 wallJumpForce;
-	[SerializeField] Vector2 wallJumpForceMultiplier=Vector2.one;
+	// [SerializeField] Vector2 wallJumpForceMultiplier=Vector2.one;
 	private float origGrav;
 	private float moveX;
 	private float dashDir;
@@ -112,13 +112,13 @@ public class PlayerControls : MonoBehaviour
 	private bool jumped;
 	private bool jumpDashed;
 	private bool isDashing;
-	private bool isJumping;
+	[Space][SerializeField] bool isJumping;
 	private bool isUsingMap;
-	private bool isWallJumping;
+	[SerializeField] bool isWallJumping;
 
-	private bool isGrounded;
+	[SerializeField] bool isGrounded;
 	private bool isPlatformed;
-	private bool jumpRegistered;
+	[SerializeField] bool jumpRegistered;[Space]
 	private bool inWater;
 	private bool isPogoing;
 	private bool isPaused;
@@ -407,6 +407,7 @@ public class PlayerControls : MonoBehaviour
 	bool useSkillFirstTime;
 	bool useBindFirstTime;
 	bool madeFirstPurchase;
+	bool seenInventoryTutorial;
 	bool openInventoryFirst;
 
 
@@ -532,21 +533,21 @@ public class PlayerControls : MonoBehaviour
 			StartCoroutine( StartCo() );
 
 		PlayBackgroundMusic();
-		if (playerMap != null) 
-		{
-			playerMap.CheckForSceneInMap(SceneManager.GetActiveScene().name);
-			playerMap.PlaceMarker(SceneManager.GetActiveScene().name);
-		}
-		if (playerWorldMap != null) 
-		{
-			playerWorldMap.CheckForSceneInMap(SceneManager.GetActiveScene().name);
-			playerWorldMap.PlaceMarker(SceneManager.GetActiveScene().name);
-		}
+		if (playerWorldMap != null)
+			playerWorldMap.Setup();
+		NewLevelFound(SceneManager.GetActiveScene().name);
 	}
 
 	bool CanControl()
 	{
 		return (!isLedgeGrabbing && !ledgeGrab && !beenHurt && !noControl && !isBinding &&
+			!inAnimation && !isDead && !inStunLock && !isResting && !isPaused && !inRushSkill 
+			&& !isFinished && !isAtShop && !isRespawning
+		);
+	}
+	bool CanControlForJump()
+	{
+		return (!isLedgeGrabbing && !ledgeGrab && !beenHurt && !isBinding &&
 			!inAnimation && !isDead && !inStunLock && !isResting && !isPaused && !inRushSkill 
 			&& !isFinished && !isAtShop && !isRespawning
 		);
@@ -826,15 +827,18 @@ public class PlayerControls : MonoBehaviour
 				}
 			}
 
+			// look at map
 			if (player.GetButtonDown("Map") && isGrounded)
 			{
+				if (activeTutorial == tutorials[9])
+					DeactivateTutorial(9);
 				isUsingMap = true;
 				anim.SetBool("isUsingMap", true);
 				if (mapAnim != null) mapAnim.SetFloat("speed", 1);
 			}
 
 			// jump
-			JumpMechanic();
+			// JumpMechanic();
 
 			// dash
 			DashMechanic();
@@ -874,6 +878,11 @@ public class PlayerControls : MonoBehaviour
 		// leave shop
 		else if (isAtShop && shopCanvas.activeSelf && player.GetButtonDown("No"))
 		{
+			if (madeFirstPurchase && !seenInventoryTutorial)
+			{
+				seenInventoryTutorial = true;
+				ActivateTutorial(8);
+			}
 			if (shopAnim != null)
 				shopAnim.SetTrigger("close");
 			else
@@ -882,6 +891,11 @@ public class PlayerControls : MonoBehaviour
 				shopCam.SetActive(false);
 				isAtShop = false;
 			}
+		}
+	
+		if (CanControlForJump() && !inShawAtk)
+		{
+			JumpMechanic();
 		}
 	}
 
@@ -1069,27 +1083,28 @@ public class PlayerControls : MonoBehaviour
 
 	void JumpMechanic()
 	{
+		// Wall jump
 		if (isWallJumping)
 		{
 			wallJumpTimer += Time.fixedDeltaTime;
 
 			rb.velocity = new Vector2(
-				(model.localScale.x > 0 ? -1 : 1) * wallJumpForce.x * wallJumpForceMultiplier.x, 
-				wallJumpForce.y * wallJumpForceMultiplier.y
+				(model.localScale.x > 0 ? -1 : 1) * wallJumpForce.x, 
+				wallJumpForce.y
 			);
 
 			if (wallJumpTimer < wallJumpControlThreshold)
 			{
 				rb.velocity = new Vector2(
-					wallJumpDir * wallJumpForce.x * wallJumpForceMultiplier.x, 
-					wallJumpForce.y * wallJumpForceMultiplier.y
+					wallJumpDir * wallJumpForce.x, 
+					wallJumpForce.y
 				);
 			}
 			else
 			{
 				rb.velocity = new Vector2(
 					moveX * activeMoveSpeed, 
-					wallJumpForce.y * wallJumpForceMultiplier.y
+					wallJumpForce.y
 				);
 				if (!cantRotate && !cantRotate2)
 				{
@@ -1116,6 +1131,7 @@ public class PlayerControls : MonoBehaviour
 				rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * jumpCutoffForce);
 			}
 		}
+		// Regular jump
 		else
 		{
 			// First Frame of Jump
@@ -1266,6 +1282,12 @@ public class PlayerControls : MonoBehaviour
 
 		if (jumpDashed)
 			rb.velocity = new Vector2(dashDir * jumpDashForce, rb.velocity.y);
+
+		// quicker fall speed
+		if (!jumpDashed && !isGrounded && !inShawAtk && !isJumping && !isWallSliding && rb.velocity.y < fallSpeed)
+			rb.gravityScale = fallGrav;
+		else
+			rb.gravityScale = origGrav;
 			
 		if (isWallJumping || jumpDashed || isLedgeGrabbing || inShawAtk) return;
 
@@ -1287,11 +1309,6 @@ public class PlayerControls : MonoBehaviour
 			moveDir = model.localScale.x;
 		}
 			
-		// quicker fall speed
-		if (!isGrounded && !inShawAtk && !isJumping && !isWallSliding && rb.velocity.y < fallSpeed)
-			rb.gravityScale = fallGrav;
-		else
-			rb.gravityScale = origGrav;
 
 		// Controlled movement
 		if (!isDashing)
@@ -1466,6 +1483,7 @@ public class PlayerControls : MonoBehaviour
 		if (atkDir == 2 && isGrounded)
 			atkDir = 0;
 		this.atkDir = atkDir;
+		coyoteTimer = coyoteThreshold;
 
 		// not rising attack
 		if (crestNum <= 1 && atkDir != 1)
@@ -1488,11 +1506,9 @@ public class PlayerControls : MonoBehaviour
 			anim.SetTrigger("attack");
 			anim.SetBool("isAttacking", true);
 
-			// reaper and beast crest
+			// reaper and beast crest dash attack
 			if (crestNum > 1 && atkDir == 1)
 			{
-				// jumpRegistered = isJumping = false;
-				coyoteTimer = coyoteThreshold;
 				yield return new WaitForSeconds(0.167f);
 			}
 			// shaw attack
@@ -1526,16 +1542,16 @@ public class PlayerControls : MonoBehaviour
 				atk1 = !atk1;
 			}
 
-			yield return new WaitForSeconds(0.25f);
+			// yield return new WaitForSeconds(0.25f);
 			// if (crestNum == 1)
 			// 	yield return new WaitForSeconds(0.25f);
 			// else
-			// 	yield return new WaitForSeconds(atkDir != 2 ? 0.25f : 0.4f);
+				yield return new WaitForSeconds(atkDir != 2 ? 0.25f : 0.4f);
 			anim.SetBool("isAttacking", false);
 			anim.SetFloat("crestNum", crestNum);
 		}
 
-		// atk cooldown
+		// atk cooldown (rising atk)
 		yield return new WaitForSeconds(
 			(crestNum > 1 && atkDir == 1) ? quickAtkCooldownDuration : atkCooldownDuration
 		);
@@ -1798,6 +1814,10 @@ public class PlayerControls : MonoBehaviour
 				return hasShield;
 			// extended spool
 			case 1:
+				int totalSilk = 
+					(!hasExtraSpool ? maxSilk + nBonusSilk + 3 + nExtraSpoolBonus : maxSilk + nBonusSilk);
+				if (nSilk > totalSilk)
+					SetSilk(totalSilk - nSilk);
 				hasExtraSpool = !hasExtraSpool;
 				hasShield = false;
 				shieldImg.gameObject.SetActive(false);
@@ -2023,7 +2043,7 @@ public class PlayerControls : MonoBehaviour
 				}
 				else
 				{
-					rb.velocity = new Vector2(rb.velocity.x , 0);
+					rb.velocity = new Vector2(rb.velocity.x , 1);
 					rb.AddForce( new Vector2(0, shawForce * multiplier), ForceMode2D.Impulse);
 				}
 				break;
@@ -2601,16 +2621,7 @@ public class PlayerControls : MonoBehaviour
 			deathAnimObj.SetActive(false);
 		gm.transitionAnim.SetFloat("speed", 1);
 		loadExitPoint = true;
-		if (playerMap != null) 
-		{
-			playerMap.CheckForSceneInMap(savedScene);
-			playerMap.PlaceMarker(savedScene);
-		}
-		if (playerWorldMap != null) 
-		{
-			playerWorldMap.CheckForSceneInMap(savedScene);
-			playerWorldMap.PlaceMarker(savedScene);
-		}
+		NewLevelFound(savedScene);
 
 		if (!saveDeath)
 		{
@@ -2653,6 +2664,19 @@ public class PlayerControls : MonoBehaviour
 		}
 	}
 
+	public void NewLevelFound(string exactName)
+	{
+		if (playerMap != null)
+		{
+			playerMap.CheckForSceneInMap(exactName);
+			playerMap.PlaceMarker(exactName);
+		}
+		if (playerWorldMap != null)
+		{
+			playerWorldMap.CheckForSceneInMap(exactName);
+			playerWorldMap.PlaceMarker(exactName);
+		}
+	}
 	public void SecretPathFoundMap(string exactName)
 	{
 		playerMap.CheckForSceneInMap(exactName);
@@ -2674,16 +2698,7 @@ public class PlayerControls : MonoBehaviour
 		yield return new WaitForSeconds(0.25f);
 		AsyncOperation loadingOperation = SceneManager.LoadSceneAsync(newSceneName);
 		rb.velocity = Vector2.zero;
-		if (playerMap != null) 
-		{
-			playerMap.CheckForSceneInMap(newSceneName);
-			playerMap.PlaceMarker(newSceneName);
-		}
-		if (playerWorldMap != null) 
-		{
-			playerWorldMap.CheckForSceneInMap(newSceneName);
-			playerWorldMap.PlaceMarker(newSceneName);
-		}
+		NewLevelFound(newSceneName);
 	}
 
 	public void MoveOutOfNewScene(Vector2 newScenePos)
@@ -3133,6 +3148,7 @@ public class PlayerControls : MonoBehaviour
 		goldenWatermelonTxt.text = nGoldenWatermelons.ToString();
 		collectedUi.SetActive(false);
 		collectedUi.SetActive(true);
+		StartCoroutine( FlashCo() );
 	}
 
 
@@ -3155,16 +3171,7 @@ public class PlayerControls : MonoBehaviour
 	{
 		transform.position = savedPos;
 		SceneManager.LoadScene(savedScene);
-		if (playerMap != null) 
-		{
-			playerMap.CheckForSceneInMap(savedScene);
-			playerMap.PlaceMarker(savedScene);
-		}
-		if (playerWorldMap != null) 
-		{
-			playerWorldMap.CheckForSceneInMap(savedScene);
-			playerWorldMap.PlaceMarker(savedScene);
-		}
+		NewLevelFound(savedScene);
 		gm.transitionAnim.SetTrigger("reset");
 		cacoonObj.SetActive(false);
 		isFinished = inStunLock = isDead = false;
@@ -3337,7 +3344,6 @@ public class PlayerControls : MonoBehaviour
 		if (!madeFirstPurchase)
 		{
 			madeFirstPurchase = true;
-			ActivateTutorial(8);
 		}
 
 		switch (u)

@@ -5111,8 +5111,8 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 0.6
-      minScalar: 0.4
+      scalar: 0.3
+      minScalar: 0.2
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -10104,14 +10104,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df9dce8aedbbc4e4a92107cf5ddaeabf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  canBreak: 1
   anim: {fileID: 3656110503869785883}
+  <hasRecoil>k__BackingField: 1
+  <hasShawRecoil>k__BackingField: 1
+  <hasDashRecoil>k__BackingField: 1
+  <canBeHit>k__BackingField: 1
   hp: 25
   dmgFx: {fileID: 179015749272594289}
   minEmit: 25
   maxEmit: 35
   destroyedObj: {fileID: 7273642726799424015}
   revealAnims: []
+  breakables: []
+  extraTiles: []
   col: {fileID: 0}
+  gm: {fileID: 0}
+  isSecret: 0
+  exactName: 
+  shakeWall: {fileID: 0}
+  combineWall: {fileID: 0}
+  mustBeInArea: {fileID: 0}
 --- !u!1 &8367271302512349065
 GameObject:
   m_ObjectHideFlags: 0
@@ -10524,8 +10537,8 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 1.2
-      minScalar: 1
+      scalar: 0.6
+      minScalar: 0.5
       maxCurve:
         serializedVersion: 2
         m_Curve:
