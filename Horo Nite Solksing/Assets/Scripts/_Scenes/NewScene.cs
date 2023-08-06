@@ -4,6 +4,8 @@ public class NewScene : MonoBehaviour
 {
 	[field: SerializeField] public string newSceneName {get; private set;}
 	[field: SerializeField] public bool isVertical {get; private set;}
+	[field: SerializeField] public bool isDoorEntrance {get; private set;}
+	[field: SerializeField] public bool isDoorExit {get; private set;}
 	[field: SerializeField] public int exitIndex {get; private set;}
 
 	public enum Dir {left=-1, none=0, right=1}

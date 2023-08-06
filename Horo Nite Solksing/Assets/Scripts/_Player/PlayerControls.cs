@@ -191,6 +191,7 @@ public class PlayerControls : MonoBehaviour
 	private Coroutine bindCo;
 	private Coroutine parryCo;
 	private Coroutine pauseCo;
+	private Coroutine moveThruCo;
 	[SerializeField] int bindCost=9;
 	[SerializeField] int harpBindCost=6;
 	[SerializeField] int skillStabCost=2;
@@ -364,14 +365,16 @@ public class PlayerControls : MonoBehaviour
 	private float nextSceneSpeed;
 	[HideInInspector] public bool started=true;
 	[HideInInspector] public bool loadExitPoint=true;
+	private bool isDoorEntrance;
+	private bool isDoorExit;
 	private bool movingToNextScene;
+	[SerializeField] bool moveOutOfDoor;
 	private bool movingVertically;	// jumping or falling through new scene 
 	private bool movingVerticallyJumping;
 	private int jumpExitDir;
 	private bool canMove;
 	private bool canMoveBegin;
 	private bool canMoveHorz;
-	private bool movingRight;
 
 
 	[Space] [Header("SHOP")]
@@ -761,7 +764,7 @@ public class PlayerControls : MonoBehaviour
 					bindCo = StartCoroutine( BindCo() );
 
 				// tools
-				else if (player.GetButtonDown("Tool") && toolCo == null && !anim.GetBool("isAttacking"))
+				else if (tool1 != null && player.GetButtonDown("Tool") && toolCo == null && !anim.GetBool("isAttacking"))
 				{
 					int tool = 0;
 					if (tool == 0 && tool1.usesLeft > 0)
@@ -1273,7 +1276,7 @@ public class PlayerControls : MonoBehaviour
 			// moving left or right
 			else
 			{
-				if (canMove)
+				if (canMove && !moveOutOfDoor)
 				{
 					rb.velocity = new Vector2(
 						nextSceneSpeed * activeMoveSpeed, 
@@ -2249,12 +2252,14 @@ public class PlayerControls : MonoBehaviour
 		}
 		if (!isDead && !movingToNextScene && other.CompareTag("NewArea"))
 		{
-			movingRight = (other.transform.position.x - self.position.x > 0);
 			NewScene n = other.GetComponent<NewScene>();
 
 			// scene exists
 			// if (UnityEngine.SceneManagement.SceneUtility.GetBuildIndexByScenePath(n.newSceneName) >= 0)
 			// {
+			if (!n.isDoorEntrance)
+			{
+				isDoorExit = n.isDoorExit;
 				movingVertically = n.isVertical;
 				if (movingVertically)
 				{
@@ -2267,6 +2272,7 @@ public class PlayerControls : MonoBehaviour
 				anim.SetBool("isUsingMap", false);
 				if (mapAnim != null) mapAnim.SetFloat("speed", -2);
 				StartCoroutine( MoveToNextSceneCo(n.newSceneName) );
+			}
 			// }
 		}
 		if (!isFinished && other.CompareTag("Goal"))
@@ -2727,6 +2733,48 @@ public class PlayerControls : MonoBehaviour
 		playerWorldMap.CheckForSceneInMap(exactName);
 	}
 
+	public void MoveThruDoor(NewScene newScene)
+	{
+		if (moveThruCo == null)
+		{
+			isDoorExit = newScene.isDoorExit;
+			movingVertically = false;
+			exitPointInd = newScene.exitIndex;
+			isUsingMap = false;
+			anim.SetBool("isUsingMap", false);
+			if (mapAnim != null) 
+				mapAnim.SetFloat("speed", -2);
+			nextSceneSpeed = newScene.GetDirection() == 1 ? 1 : -1;
+			
+			anim.SetBool("isEntering", true);
+			moveThruCo = StartCoroutine( MoveThruDoorCo(newScene.newSceneName) );
+			interactable = null;
+		}
+	}
+
+	IEnumerator MoveThruDoorCo(string newSceneName)
+	{
+		canMoveBegin = movingToNextScene = invulnerable = true;
+		isWallJumping = isCountingTime = false;
+		wallJumpTimer = 0;
+		yield return new WaitForSeconds(0.1f);
+		gm.transitionAnim.SetTrigger("toBlack");
+
+		yield return new WaitForSeconds(0.25f);
+		anim.SetBool("isEntering", false);
+		anim.SetBool("isWalking", true);
+		// right
+		if (nextSceneSpeed > 0) 
+			model.localScale = new Vector3(1, 1, 1);
+		// left
+		else 
+			model.localScale = new Vector3(-1, 1, 1);
+		AsyncOperation loadingOperation = SceneManager.LoadSceneAsync(newSceneName);
+		rb.velocity = Vector2.zero;
+		NewLevelFound(newSceneName);
+		moveThruCo = null;
+	}
+
 	IEnumerator MoveToNextSceneCo(string newSceneName)
 	{
 		canMoveBegin = canMove = movingToNextScene = invulnerable = true;
@@ -2767,6 +2815,13 @@ public class PlayerControls : MonoBehaviour
 		this.newScenePos = transform.position = newScenePos;
 		if (movingVertically) stuckToNewScene = true;
 		gm.transitionAnim.SetTrigger("reset");
+		moveOutOfDoor = isDoorExit;
+		if (moveOutOfDoor)
+		{
+			anim.SetBool("isWalking", false);
+			anim.SetBool("isDashing", false);
+			anim.SetFloat("moveSpeed", 1);
+		}
 
 		CheckForCacoon();
 		if (wallSlideTrailPsRight != null)
@@ -2786,6 +2841,7 @@ public class PlayerControls : MonoBehaviour
 			soulLeakPs.Play();
 		}
 
+		// black screen over
 		yield return new WaitForSeconds(movingVertically ? 0.125f: 0.5f);
 		if (movingVertically)
 		{
@@ -2800,7 +2856,7 @@ public class PlayerControls : MonoBehaviour
 		}
 		
 		yield return new WaitForSeconds(0.5f);
-		canMoveHorz = canMove = movingToNextScene = invulnerable = false;
+		moveOutOfDoor = canMoveHorz = canMove = movingToNextScene = invulnerable = false;
 		roomStartPos = self.position;
 	}
 
@@ -3461,7 +3517,17 @@ public class PlayerControls : MonoBehaviour
 		if (player == null)
 			player = ReInput.players.GetPlayer(playerId);
 
-		return player.controllers.maps.GetFirstButtonMapWithAction(actionName, true).elementIdentifierName;
+		Debug.Log($"<color=cyan>{player.controllers.Joysticks.Count}</color>");
+
+		ActionElementMap aem = player.controllers.maps.GetFirstButtonMapWithAction(actionName, true);
+		if (aem.elementType == ControllerElementType.Axis)
+		{
+			return aem.elementIdentifierName;
+		}
+		if (aem == null)
+			return "unassigned";
+
+		return aem.elementIdentifierName;
 	}
 
 	
