@@ -5,8 +5,11 @@ using UnityEngine;
 public class MelonCircus : Enemy
 {
 	private float momentumSpeed;
-	[SerializeField] GameObject melonBallObj;
+	[SerializeField] bool dontFallOff;
+
+	[Space] [SerializeField] GameObject melonBallObj;
 	[SerializeField] Animator ballAnim;
+	private float ballSpeed;
 	[SerializeField] bool inAttackAnim;
 	private bool chased=true;
 
@@ -29,14 +32,36 @@ public class MelonCircus : Enemy
 	{
 		if (ballAnim != null)
 		{
-			ballAnim.SetFloat("moveSpeed", Mathf.Abs(rb.velocity.x));
+			if (!CheckWall())
+				ballSpeed = Mathf.Abs(rb.velocity.x);
+			ballAnim.SetFloat("moveSpeed", ballSpeed);
 		}
 	}
 
 	protected override void CallChildOnInAreaSwap()
 	{
 		inArea.SwapParent();
-		melonBallObj.SetActive(false);
+		if (!died)
+			melonBallObj.SetActive(false);
+	}
+
+	protected override bool CallChildOnIsPlayerInSight() 
+	{ 
+		if (target == null || (!inRange && !alwaysInRange) || CheckWall() || (dontFallOff && !CheckCliff())) return false;
+		
+		RaycastHit2D playerInfo = Physics2D.Linecast(
+			(eyes != null) ? eyes.position : self.position, 
+			target.self.position, 
+			finalMask
+		);
+		bool canSeePlayer = (playerInfo.collider != null && playerInfo.collider.gameObject.CompareTag("Player"));
+		if (canSeePlayer)
+		{
+			CallChildOnInSight();
+			attackingPlayer = true;
+			searchCounter = 0;
+		} 
+		return canSeePlayer;
 	}
 
     protected override void IdleAction()
@@ -76,6 +101,11 @@ public class MelonCircus : Enemy
 	{
 		currentAction = CurrentAction.none;
 	}
+	protected override void CallChildOnLostSight()
+	{
+		ballSpeed = 0;
+		ChooseNextAction();
+	}
 
 	protected override void CallChildOnHurt(int dmg, Vector2 forceDir)
 	{
@@ -96,15 +126,22 @@ public class MelonCircus : Enemy
 	{
 		int playerDir = (target.self.position.x - self.position.x > 0) ? 1 : -1;
 		FacePlayer( playerDir );
-		Debug.Log("chasing");
 		if (!receivingKb)
 		{
-			rb.AddForce(new Vector2(chaseSpeed * playerDir * 5, 0), ForceMode2D.Force);
-			rb.velocity = new Vector2(
-				Mathf.Clamp(rb.velocity.x, -maxSpeed, maxSpeed), 
-				rb.velocity.y 
-			);
-			momentumSpeed = rb.velocity.x;
+			if (dontFallOff && !CheckCliff())
+			{
+				rb.velocity = new Vector2(0, rb.velocity.y);
+			}
+			else
+			{
+				rb.AddForce(new Vector2(chaseSpeed * playerDir * 5, 0), ForceMode2D.Force);
+				rb.velocity = new Vector2(
+					Mathf.Clamp(rb.velocity.x, -maxSpeed, maxSpeed), 
+					rb.velocity.y 
+				);
+				momentumSpeed = rb.velocity.x;
+			}
+
 		}
 		
 		if (anim != null) 

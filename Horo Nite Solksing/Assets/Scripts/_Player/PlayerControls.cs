@@ -907,6 +907,10 @@ public class PlayerControls : MonoBehaviour
 		{
 			transform.position = this.newScenePos;
 		}
+		if (CanControlForJump() && !inShawAtk)
+		{
+			JumpCalculation();
+		}
 		if (CanControl())
 		{
 			if (inShawAtk)
@@ -1081,49 +1085,22 @@ public class PlayerControls : MonoBehaviour
 		activeMoveSpeed = moveSpeed;
 	}
 
+	private bool holdingJumpButton;
 	void JumpMechanic()
 	{
 		// Wall jump
 		if (isWallJumping)
 		{
-			wallJumpTimer += Time.fixedDeltaTime;
+			// wallJumpTimer += Time.deltaTime;
 
-			rb.velocity = new Vector2(
-				(model.localScale.x > 0 ? -1 : 1) * wallJumpForce.x, 
-				wallJumpForce.y
-			);
-
-			if (wallJumpTimer < wallJumpControlThreshold)
-			{
-				rb.velocity = new Vector2(
-					wallJumpDir * wallJumpForce.x, 
-					wallJumpForce.y
-				);
-			}
-			else
-			{
-				rb.velocity = new Vector2(
-					moveX * activeMoveSpeed, 
-					wallJumpForce.y
-				);
-				if (!cantRotate && !cantRotate2)
-				{
-					// right
-					if (moveX > 0) 
-						model.localScale = new Vector3(1, 1, 1);
-					// left
-					else if (moveX < 0) 
-						model.localScale = new Vector3(-1, 1, 1);
-					moveDir = model.localScale.x;
-				}
-			}
-
+			// reach jump hold threshold
 			if (wallJumpTimer >= wallJumpThreshold)
 			{
 				isWallJumping = false;
 				wallJumpTimer = 0;
 				rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * maxJumpCutoffForce);
 			}
+			// release jump button
 			else if (!player.GetButton("Jump") && wallJumpTimer >= wallJumpMin)
 			{
 				isWallJumping = false;
@@ -1140,10 +1117,10 @@ public class PlayerControls : MonoBehaviour
 				jumpBufferTimer = 0;
 				jumpRegistered = true;
 			}
-			if (jumpRegistered && jumpBufferTimer < jumpBufferThreshold)
-			{
-				jumpBufferTimer += Time.fixedDeltaTime;
-			}
+			// if (jumpRegistered && jumpBufferTimer < jumpBufferThreshold)
+			// {
+			// 	jumpBufferTimer += Time.fixedDeltaTime;
+			// }
 			// First Frame of Jump
 			if (!isJumping && jumpBufferTimer < jumpBufferThreshold && coyoteTimer < coyoteThreshold)
 			{
@@ -1152,7 +1129,7 @@ public class PlayerControls : MonoBehaviour
 				Jump();
 			}
 			// Released jump button
-			else if (player.GetButtonUp("Jump") || CheckIsCeiling())
+			else if (player.GetButtonUp("Jump") || CheckIsCeiling() || isLedgeGrabbing)
 			{
 				if (isJumping)
 					rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * jumpCutoffForce);
@@ -1161,6 +1138,42 @@ public class PlayerControls : MonoBehaviour
 			}
 			// Holding jump button
 			else if (isJumping && player.GetButton("Jump"))
+			{
+				// if (!usingSkill && jumpTimer < jumpMaxTimer)
+				// {
+				// 	rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+				// 	jumpTimer += Time.deltaTime;
+				// }
+				// // jump over
+				// else
+				// {
+				// 	if (isJumping)
+				// 		rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * maxJumpCutoffForce);
+				// 	isJumping = false;
+				// 	jumpTimer = 0;
+				// }
+			}
+			// wall sliding
+			else if (isWallSliding && player.GetButtonDown("Jump"))
+			{
+				WallJump();
+			}
+		}
+	}
+
+	void JumpCalculation()
+	{
+		if (isWallJumping)
+		{
+			wallJumpTimer += Time.fixedDeltaTime;
+		}
+		else
+		{
+			if (jumpRegistered && jumpBufferTimer < jumpBufferThreshold)
+			{
+				jumpBufferTimer += Time.fixedDeltaTime;
+			}
+			if (isJumping && player.GetButton("Jump"))
 			{
 				if (!usingSkill && jumpTimer < jumpMaxTimer)
 				{
@@ -1175,11 +1188,6 @@ public class PlayerControls : MonoBehaviour
 					isJumping = false;
 					jumpTimer = 0;
 				}
-			}
-			// wall sliding
-			else if (isWallSliding && player.GetButtonDown("Jump"))
-			{
-				WallJump();
 			}
 		}
 	}
@@ -1288,6 +1296,39 @@ public class PlayerControls : MonoBehaviour
 			rb.gravityScale = fallGrav;
 		else
 			rb.gravityScale = origGrav;
+
+		if (isWallJumping)
+		{
+			rb.velocity = new Vector2(
+				(model.localScale.x > 0 ? -1 : 1) * wallJumpForce.x, 
+				wallJumpForce.y
+			);
+
+			if (wallJumpTimer < wallJumpControlThreshold)
+			{
+				rb.velocity = new Vector2(
+					wallJumpDir * wallJumpForce.x, 
+					wallJumpForce.y
+				);
+			}
+			else
+			{
+				rb.velocity = new Vector2(
+					moveX * activeMoveSpeed, 
+					wallJumpForce.y
+				);
+				if (!cantRotate && !cantRotate2)
+				{
+					// right
+					if (moveX > 0) 
+						model.localScale = new Vector3(1, 1, 1);
+					// left
+					else if (moveX < 0) 
+						model.localScale = new Vector3(-1, 1, 1);
+					moveDir = model.localScale.x;
+				}
+			}
+		}
 			
 		if (isWallJumping || jumpDashed || isLedgeGrabbing || inShawAtk) return;
 
@@ -1570,7 +1611,7 @@ public class PlayerControls : MonoBehaviour
 		usingSkill = true;
 
 		CancelDash();
-		jumpDashed = false;
+		isWallJumping = jumpDashed = false;
 		rb.gravityScale = 0;
 		rb.velocity = Vector2.zero;
 
@@ -1913,7 +1954,10 @@ public class PlayerControls : MonoBehaviour
 
 	void LedgeGrab()
 	{
-		isJumping = jumped = false;
+		isWallJumping = jumpRegistered = isJumping = jumped = false;
+		wallJumpTimer = 0;
+		coyoteTimer = coyoteThreshold;
+		jumpBufferTimer  = jumpBufferThreshold;
 		jumpTimer = 0;
 		anim.SetBool("isAirDash", false);
 		CancelDash();
@@ -1930,9 +1974,9 @@ public class PlayerControls : MonoBehaviour
 	public void GRAB_LEDGE()
 	{
 		transform.position += new Vector3(moveDir * 0.5f, 0.8f);
-		isWallSliding = canLedgeGrab = ledgeGrab = false;
+		isJumping = isWallSliding = canLedgeGrab = ledgeGrab = false;
 		dashCooldownCounter = dashCounter = 0;
-		rb.gravityScale = 1;
+		rb.gravityScale = fallGrav;
 		rb.velocity = Vector2.zero;
 		anim.SetBool("isLedgeGrabbing", false);
 		if (player.GetButton("Dash"))

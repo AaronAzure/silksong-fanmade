@@ -178,6 +178,24 @@ public abstract class Enemy : MonoBehaviour
 	protected virtual void CallChildOnShielded() { }
 	public virtual void CallChildOnSuperClose() { }
 
+	protected virtual bool CallChildOnIsPlayerInSight() 
+	{ 
+		if (target == null || (!inRange && !alwaysInRange)) return false;
+		
+		RaycastHit2D playerInfo = Physics2D.Linecast(
+			(eyes != null) ? eyes.position : self.position, 
+			target.self.position, 
+			finalMask
+		);
+		bool canSeePlayer = (playerInfo.collider != null && playerInfo.collider.gameObject.CompareTag("Player"));
+		if (canSeePlayer)
+		{
+			CallChildOnInSight();
+			attackingPlayer = true;
+			searchCounter = 0;
+		} 
+		return canSeePlayer;
+	}
 	protected virtual void CallChildOnInAreaSwap() 
 	{ 
 		inArea.SwapParent();
@@ -245,7 +263,7 @@ public abstract class Enemy : MonoBehaviour
 
 		if (!isStupid)
 		{
-			inSight = PlayerInSight();
+			inSight = CallChildOnIsPlayerInSight();
 			KeepLookingForPlayer();
 		}
 
@@ -259,25 +277,6 @@ public abstract class Enemy : MonoBehaviour
 
 		CallChildOnFixedUpdate();
     }
-
-	protected bool PlayerInSight()
-	{
-		if (target == null || (!inRange && !alwaysInRange)) return false;
-		
-		RaycastHit2D playerInfo = Physics2D.Linecast(
-			(eyes != null) ? eyes.position : self.position, 
-			target.self.position, 
-			finalMask
-		);
-		bool canSeePlayer = (playerInfo.collider != null && playerInfo.collider.gameObject.CompareTag("Player"));
-		if (canSeePlayer)
-		{
-			CallChildOnInSight();
-			attackingPlayer = true;
-			searchCounter = 0;
-		} 
-		return canSeePlayer;
-	}
 
 	protected bool FacingPlayer()
 	{
@@ -333,6 +332,10 @@ public abstract class Enemy : MonoBehaviour
 		);
 		return (groundInfo.collider == null || wallInfo.collider != null);
 	}
+
+	/// <summary>
+	/// Return true if there is a wall, otherwise Return false
+	/// </summary>
 	protected bool CheckWall()
 	{
 		RaycastHit2D wallInfo = Physics2D.Linecast(

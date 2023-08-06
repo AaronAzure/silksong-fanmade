@@ -5,8 +5,8 @@ using UnityEngine;
 public class OnTriggerTest : MonoBehaviour
 {
     [SerializeField] GameObject obj;
-    private Transform master;
-	private Transform mainHolder;
+    [SerializeField] Transform master;
+	[SerializeField] Transform mainHolder;
 
 	[Space] [SerializeField] bool alwaysActive;
 
@@ -33,7 +33,7 @@ public class OnTriggerTest : MonoBehaviour
 
 	public void SwapParent(bool thisIsParent=true)
 	{
-		if (master != null && master.gameObject.activeSelf)
+		if (master != null)
 		{
 			if (master != null && mainHolder != null && transform.parent != null)
 				transform.parent = thisIsParent ? mainHolder : master;
