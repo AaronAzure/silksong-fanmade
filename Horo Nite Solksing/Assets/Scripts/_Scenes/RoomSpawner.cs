@@ -6,7 +6,11 @@ public class RoomSpawner : MonoBehaviour
 {
 	public Room room;
 	[SerializeField] GameObject rustlingObj;
-    [Space] public Enemy[] enemies;
+
+    [Space] [SerializeField] bool isSpecial;
+    [SerializeField] bool alwaysInRange=true;
+	public Enemy[] enemies;
+
 
 	
 	public bool CheckIfHasMoreSpawns(int x)
@@ -43,9 +47,10 @@ public class RoomSpawner : MonoBehaviour
 		}
 		var e = Instantiate(enemy, transform.position, Quaternion.identity, transform);
 		e.room = this.room;
-		if (!e.idleActionOnly)
+		if (isSpecial)
+			e.CallChildOnIsSpecial();
+		if (alwaysInRange && !e.idleActionOnly)
 			e.alwaysInRange = true;
-		e.CallChildOnIsSpecial();
 		e.SpawnIn();
 	}
 }

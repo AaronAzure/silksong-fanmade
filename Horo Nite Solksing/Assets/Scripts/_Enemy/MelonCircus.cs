@@ -28,6 +28,11 @@ public class MelonCircus : Enemy
 		}
 	}
 
+	public override void CallChildOnIsSpecial()
+	{
+		dontFallOff = true;
+	}
+
 	protected bool CheckCliffBehind()
 	{
 		if (behindDetect == null)

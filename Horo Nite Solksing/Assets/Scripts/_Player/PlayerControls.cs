@@ -191,7 +191,6 @@ public class PlayerControls : MonoBehaviour
 	private Coroutine bindCo;
 	private Coroutine parryCo;
 	private Coroutine pauseCo;
-	private Coroutine moveThruCo;
 	[SerializeField] int bindCost=9;
 	[SerializeField] int harpBindCost=6;
 	[SerializeField] int skillStabCost=2;
@@ -366,17 +365,20 @@ public class PlayerControls : MonoBehaviour
 	private float nextSceneSpeed;
 	[HideInInspector] public bool started=true;
 	[HideInInspector] public bool loadExitPoint=true;
-	private bool isDoorEntrance;
-	private bool isDoorExit;
-	private bool movingToNextScene;
-	private bool moveIntoDoor;
-	private bool moveOutOfDoor;
 	private bool movingVertically;	// jumping or falling through new scene 
 	private bool movingVerticallyJumping;
 	private int jumpExitDir;
 	private bool canMove;
 	private bool canMoveBegin;
 	private bool canMoveHorz;
+
+
+	[Space] [Header("DOOR")]
+	[SerializeField] bool isDoorExit;
+	[SerializeField] bool movingToNextScene;
+	[SerializeField] bool moveIntoDoor;
+	[SerializeField] bool moveOutOfDoor;
+	[SerializeField] Coroutine moveThruCo;
 
 
 	[Space] [Header("SHOP")]
@@ -815,19 +817,11 @@ public class PlayerControls : MonoBehaviour
 				}
 
 				// Interactable
-				else if (interactable != null && isGrounded && player.GetAxis("Move Vertical") > 0.85f)
+				else if (interactable != null && isGrounded && !movingToNextScene && 
+					player.GetAxis("Move Vertical") > 0.85f)
 				{
 					interactable.ToggleTextbox(false);
 					interactable.Interact();
-					// if (interactable != null)
-					// {
-					// 	if (nAaronTalked == 0)
-					// 		uiDialogue.SetLines(npc.dialogue[nAaronTalked].lines);
-					// 	if (!uiDialogue.IsDefaultText())
-					// 		nAaronTalked++;
-					// 	uiDialogue.gameObject.SetActive(true);
-					// 	SetMainUI(false);
-					// }
 					rb.velocity = new Vector2(0, rb.velocity.y);
 					anim.SetBool("isWalking", false);
 				}
@@ -1228,7 +1222,7 @@ public class PlayerControls : MonoBehaviour
 	void CalcMove()
 	{
 		float temp = player.GetAxis("Move Horizontal");
-		moveX = (temp < 0.3f && temp > -0.3f) ? 0 : temp;
+		moveX = (temp < 0.4f && temp > -0.4f) ? 0 : temp;
 	}
 
 	float NewSceneJumpMovement()
@@ -2253,7 +2247,7 @@ public class PlayerControls : MonoBehaviour
 			bench = other.GetComponent<Bench>();
 			t = 0;
 		}
-		if (!isDead && !movingToNextScene && other.CompareTag("NewArea"))
+		if (!isDead && !moveOutOfDoor && !movingToNextScene && moveThruCo == null && other.CompareTag("NewArea"))
 		{
 			NewScene n = other.GetComponent<NewScene>();
 
@@ -2738,8 +2732,9 @@ public class PlayerControls : MonoBehaviour
 
 	public void MoveThruDoor(NewScene newScene)
 	{
-		if (moveThruCo == null)
+		if (!movingToNextScene && moveThruCo == null)
 		{
+			canMoveBegin = movingToNextScene = invulnerable = true;
 			isDoorExit = newScene.isDoorExit;
 			movingVertically = false;
 			exitPointInd = newScene.exitIndex;
@@ -2748,9 +2743,9 @@ public class PlayerControls : MonoBehaviour
 			if (mapAnim != null) 
 				mapAnim.SetFloat("speed", -2);
 			nextSceneSpeed = newScene.GetDirection() == 1 ? 1 : -1;
+			moveThruCo = StartCoroutine( MoveThruDoorCo(newScene.newSceneName) );
 			
 			anim.SetBool("isEntering", true);
-			moveThruCo = StartCoroutine( MoveThruDoorCo(newScene.newSceneName) );
 			interactable = null;
 			moveIntoDoor = true;
 		}
@@ -2758,14 +2753,12 @@ public class PlayerControls : MonoBehaviour
 
 	IEnumerator MoveThruDoorCo(string newSceneName)
 	{
-		canMoveBegin = movingToNextScene = invulnerable = true;
 		isWallJumping = isCountingTime = false;
 		wallJumpTimer = 0;
 		yield return new WaitForSeconds(0.1f);
 		gm.transitionAnim.SetTrigger("toBlack");
 
 		yield return new WaitForSeconds(0.25f);
-		anim.SetBool("isEntering", false);
 		anim.SetBool("isWalking", true);
 		// right
 		if (nextSceneSpeed > 0) 
@@ -2776,7 +2769,6 @@ public class PlayerControls : MonoBehaviour
 		AsyncOperation loadingOperation = SceneManager.LoadSceneAsync(newSceneName);
 		rb.velocity = Vector2.zero;
 		NewLevelFound(newSceneName);
-		moveThruCo = null;
 	}
 
 	IEnumerator MoveToNextSceneCo(string newSceneName)
@@ -2829,6 +2821,7 @@ public class PlayerControls : MonoBehaviour
 		}
 		if (moveIntoDoor)
 		{
+			anim.SetBool("isEntering", false);
 			PlayBackgroundMusic();
 		}
 
@@ -2851,12 +2844,13 @@ public class PlayerControls : MonoBehaviour
 		}
 
 		// black screen over
-		yield return new WaitForSeconds(movingVertically ? 0.125f: 0.5f);
+		yield return new WaitForSeconds((movingVertically || moveOutOfDoor) ? 0.125f: 0.5f);
 		if (movingVertically)
 		{
 			stuckToNewScene = false;
 		} 
 		canMove = true;
+		moveThruCo = null;
 
 		if (movingVertically && movingVerticallyJumping)
 		{
@@ -2864,8 +2858,9 @@ public class PlayerControls : MonoBehaviour
 			canMoveHorz = true;
 		}
 		
-		yield return new WaitForSeconds(0.5f);
-		moveIntoDoor = moveOutOfDoor = canMoveHorz = canMove = movingToNextScene = invulnerable = false;
+		yield return new WaitForSeconds(moveOutOfDoor ? 0.125f : 0.5f);
+		isDoorExit = moveIntoDoor = moveOutOfDoor = canMoveHorz = canMove = 
+			movingToNextScene = invulnerable = false;
 		roomStartPos = self.position;
 	}
 

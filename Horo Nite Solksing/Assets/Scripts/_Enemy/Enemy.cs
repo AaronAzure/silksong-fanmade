@@ -233,10 +233,10 @@ public abstract class Enemy : MonoBehaviour
 		if (PlayerControls.Instance != null)
 		{
 			target = PlayerControls.Instance;
+			if (facePlayerOnSpawn)
+				FacePlayer();
 		}
 
-		if (facePlayerOnSpawn)
-			FacePlayer();
 		
 		initDir = (model.localScale.x > 0) ? 1 : -1;
 		currentAction = (initDir == 1) ? CurrentAction.right : CurrentAction.left;

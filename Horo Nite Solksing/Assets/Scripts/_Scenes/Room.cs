@@ -13,7 +13,9 @@ public class Room : MonoBehaviour
 	[SerializeField] GameObject ui;
 	[SerializeField] bool alwaysLockCam;
 	private bool checkedIfCleared;
+
 	[Space] [SerializeField] GameObject otherObj;
+	[SerializeField] GameObject invisibleWall;
 
 	
 	[Space] [Header("Waves")] 
@@ -127,6 +129,8 @@ public class Room : MonoBehaviour
 	IEnumerator RoomClearedCo()
 	{
 		if (done) yield break;
+		if (invisibleWall != null)
+			invisibleWall.SetActive(false);
 		// Debug.Log("<color=green>Room Cleared</color>");
 
 		if (canBeCleared)
@@ -178,6 +182,8 @@ public class Room : MonoBehaviour
 			}
 			foreach (GameObject wall in walls)
 				wall.SetActive(true);
+			if (invisibleWall != null)
+				invisibleWall.SetActive(true);
 
 			MusicManager m = MusicManager.Instance;
 			m.PlayMusic(

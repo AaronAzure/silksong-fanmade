@@ -5331,7 +5331,7 @@ MonoBehaviour:
   hasIsMovingAnim: 1
   hasMoveSpeedAnim: 1
   hasIsDeadAnim: 1
-  hasSpawnAnim: 1
+  hasSpawnAnim: 0
   hasSpawningInAnim: 1
   rb: {fileID: 1679674020449486591}
   col: {fileID: 5574384399325105735}
@@ -6354,6 +6354,10 @@ PrefabInstance:
     - target: {fileID: 3866434572035261597, guid: cf08518ce21db420c8a42646d6199dc6, type: 3}
       propertyPath: m_LocalScale.y
       value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3866434572035261597, guid: cf08518ce21db420c8a42646d6199dc6, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 4325173646380593052, guid: cf08518ce21db420c8a42646d6199dc6, type: 3}
       propertyPath: m_LocalRotation.w
