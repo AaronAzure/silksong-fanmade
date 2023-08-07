@@ -56,6 +56,14 @@ public class OnTriggerTest : MonoBehaviour
 		}
 	}
 
+	public void OnMasterDeath()
+	{
+		if (master != null && mainHolder != null)
+			master.parent = mainHolder;
+		transform.parent = null;
+		Destroy(this);
+	}
+
 	private void OnTriggerEnter2D(Collider2D other) 
 	{
 		if (obj != null && other.CompareTag("MainCamera"))	

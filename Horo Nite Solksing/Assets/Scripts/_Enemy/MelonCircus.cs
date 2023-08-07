@@ -6,6 +6,7 @@ public class MelonCircus : Enemy
 {
 	private float momentumSpeed;
 	[SerializeField] bool dontFallOff;
+	[SerializeField] Transform behindDetect;
 
 	[Space] [SerializeField] GameObject melonBallObj;
 	[SerializeField] Animator ballAnim;
@@ -25,6 +26,18 @@ public class MelonCircus : Enemy
 			melonBallObj.transform.parent = null;
 			transform.parent = melonBallObj.transform;
 		}
+	}
+
+	protected bool CheckCliffBehind()
+	{
+		if (behindDetect == null)
+			return false;
+		RaycastHit2D groundInfo = Physics2D.Linecast(
+			behindDetect.position, 
+			behindDetect.position + new Vector3(0, -groundDistDetect), 
+			whatIsGround
+		);
+		return (groundInfo.collider != null);
 	}
 
 
@@ -106,6 +119,10 @@ public class MelonCircus : Enemy
 		ballSpeed = 0;
 		ChooseNextAction();
 	}
+	protected override void CallChildOnIdleStop()
+	{
+		ballSpeed = 0;
+	}
 
 	protected override void CallChildOnHurt(int dmg, Vector2 forceDir)
 	{
@@ -114,12 +131,8 @@ public class MelonCircus : Enemy
 
 	protected override void CallChildOnDeath()
 	{
-		if (melonBallObj != null)
-		{
-			melonBallObj.SetActive(false);
-			if (mainBody != null)
-				mainBody.bodyType = RigidbodyType2D.Dynamic;
-		}
+		if (mainBody != null)
+			mainBody.bodyType = RigidbodyType2D.Dynamic;
 	}
 
 	protected override void ChasePlayer()
@@ -128,9 +141,9 @@ public class MelonCircus : Enemy
 		FacePlayer( playerDir );
 		if (!receivingKb)
 		{
-			if (dontFallOff && !CheckCliff())
+			if (dontFallOff && (!CheckCliff() || (!CheckCliffBehind() && Mathf.Abs(rb.velocity.x) > 1)))
 			{
-				rb.velocity = new Vector2(0, rb.velocity.y);
+				rb.velocity = new Vector2(rb.velocity.x / 2, rb.velocity.y);
 			}
 			else
 			{

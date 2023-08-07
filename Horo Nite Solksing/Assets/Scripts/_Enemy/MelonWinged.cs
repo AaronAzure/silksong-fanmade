@@ -15,6 +15,7 @@ public class MelonWinged : Enemy
 	[SerializeField] float horzForce=5;
 	[SerializeField] EnemyProjectile melonObj;
 	[SerializeField] float distToPlayer=2.5f;
+	[SerializeField] float slowChaseSpeed=1.5f;
 	private Vector2 destPos;
 
 	protected override void CallChildOnStart()
@@ -73,9 +74,10 @@ public class MelonWinged : Enemy
 				else if (closeDistTimer > 0)
 					closeDistTimer -= (Time.fixedDeltaTime * 0.5f);
 			}
-			else
+			else if (DistanceToPlayer() > slowChaseSpeed)
 			{
-				rb.velocity = Vector2.zero;
+				FacePlayer();
+				rb.velocity = new Vector2(PlayerIsToTheRight() ? slowChaseSpeed : -slowChaseSpeed, 0);
 			}
 
 		}
@@ -86,19 +88,22 @@ public class MelonWinged : Enemy
 		if (melonObj != null)
 		{
 			FacePlayer();
+			float forceOffset = (model.localScale.x > 0) ? 0.5f : -0.5f;
+			if (DistanceToPlayer() < 1)
+				forceOffset = 0;
 			if (GameManager.Instance.hardMode)
 			{
 				var obj3 = Instantiate(melonObj, spawnPos.position, Quaternion.identity);
-				obj3.rb.AddForce( new Vector2(horzForce / 2, throwForce), ForceMode2D.Impulse);
+				obj3.rb.AddForce( new Vector2(horzForce / 2 + forceOffset, throwForce), ForceMode2D.Impulse);
 				var obj4 = Instantiate(melonObj, spawnPos.position, Quaternion.identity);
-				obj4.rb.AddForce( new Vector2(-horzForce / 2, throwForce), ForceMode2D.Impulse);
+				obj4.rb.AddForce( new Vector2(-horzForce / 2 + forceOffset, throwForce), ForceMode2D.Impulse);
 			}
 			var obj = Instantiate(melonObj, spawnPos.position, Quaternion.identity);
-			obj.rb.AddForce( new Vector2(0, throwForce), ForceMode2D.Impulse);
+			obj.rb.AddForce( new Vector2(0 + forceOffset, throwForce), ForceMode2D.Impulse);
 			var obj1 = Instantiate(melonObj, spawnPos.position, Quaternion.identity);
-			obj1.rb.AddForce( new Vector2(horzForce, throwForce), ForceMode2D.Impulse);
+			obj1.rb.AddForce( new Vector2(horzForce + forceOffset, throwForce), ForceMode2D.Impulse);
 			var obj2 = Instantiate(melonObj, spawnPos.position, Quaternion.identity);
-			obj2.rb.AddForce( new Vector2(-horzForce, throwForce), ForceMode2D.Impulse);
+			obj2.rb.AddForce( new Vector2(-horzForce + forceOffset, throwForce), ForceMode2D.Impulse);
 		}
 	}
 

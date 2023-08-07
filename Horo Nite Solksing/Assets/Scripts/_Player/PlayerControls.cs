@@ -203,6 +203,7 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] GameObject cacoonObj;
 	[SerializeField] GameObject deathAnimObj;
 	[SerializeField] GameObject areaCanvas;
+	[SerializeField] TextMeshProUGUI areaCanvasTxt;
 
 
 	[Space] [Header("SOUND EFFECTS")]
@@ -368,7 +369,8 @@ public class PlayerControls : MonoBehaviour
 	private bool isDoorEntrance;
 	private bool isDoorExit;
 	private bool movingToNextScene;
-	[SerializeField] bool moveOutOfDoor;
+	private bool moveIntoDoor;
+	private bool moveOutOfDoor;
 	private bool movingVertically;	// jumping or falling through new scene 
 	private bool movingVerticallyJumping;
 	private int jumpExitDir;
@@ -412,6 +414,7 @@ public class PlayerControls : MonoBehaviour
 	bool madeFirstPurchase;
 	bool seenInventoryTutorial;
 	bool openInventoryFirst;
+	bool firstTimeInTemple;
 
 
 
@@ -2749,6 +2752,7 @@ public class PlayerControls : MonoBehaviour
 			anim.SetBool("isEntering", true);
 			moveThruCo = StartCoroutine( MoveThruDoorCo(newScene.newSceneName) );
 			interactable = null;
+			moveIntoDoor = true;
 		}
 	}
 
@@ -2821,6 +2825,11 @@ public class PlayerControls : MonoBehaviour
 			anim.SetBool("isWalking", false);
 			anim.SetBool("isDashing", false);
 			anim.SetFloat("moveSpeed", 1);
+			PlayBackgroundMusic();
+		}
+		if (moveIntoDoor)
+		{
+			PlayBackgroundMusic();
 		}
 
 		CheckForCacoon();
@@ -2856,7 +2865,7 @@ public class PlayerControls : MonoBehaviour
 		}
 		
 		yield return new WaitForSeconds(0.5f);
-		moveOutOfDoor = canMoveHorz = canMove = movingToNextScene = invulnerable = false;
+		moveIntoDoor = moveOutOfDoor = canMoveHorz = canMove = movingToNextScene = invulnerable = false;
 		roomStartPos = self.position;
 	}
 
@@ -3195,9 +3204,25 @@ public class PlayerControls : MonoBehaviour
 	{
 		MusicManager m = MusicManager.Instance;
 		if (SceneManager.GetActiveScene().name.StartsWith("Melon"))
+		{
 			m.PlayMusic(m.melonBgMusic, m.melonBgMusicVol);
+		}
+		else if (SceneManager.GetActiveScene().name.StartsWith("Temple"))
+		{
+			m.PlayMusic(m.melonBgMusic2, m.melonBgMusicVol2);
+			if (!firstTimeInTemple)
+			{
+				firstTimeInTemple = true;
+				areaCanvas.SetActive(false);
+				areaCanvas.SetActive(true);
+				areaCanvasTxt.text = "Watermelon Temple";
+			}
+		}
 		else
+		{
 			m.PlayMusic(m.bgMusic, m.bgMusicVol);
+
+		}
 	}
 
 	public IEnumerator ParryCo()

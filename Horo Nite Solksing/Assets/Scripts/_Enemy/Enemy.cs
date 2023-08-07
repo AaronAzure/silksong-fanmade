@@ -167,6 +167,7 @@ public abstract class Enemy : MonoBehaviour
 	public virtual void CallChildOnIsSpecial() { }
 	protected virtual void CallChildOnEarlyUpdate() { }
 	protected virtual void CallChildOnFixedUpdate() { }
+	protected virtual void CallChildOnIdleStop() { }
 	protected virtual void CallChildOnPhase2() { }
 	protected virtual void CallChildOnPhase3() { }
 	protected virtual void CallChildOnInSight() { }
@@ -495,6 +496,24 @@ public abstract class Enemy : MonoBehaviour
 		CallChildOnHurtAfter();
 	}
 
+	public IEnumerator _APPEAR_IN_CO()
+	{
+		Color newColor = new Color(0,0,0,1);
+		if (sprites != null)
+			foreach (SpriteRenderer sprite in sprites)
+				sprite.color = newColor;
+				
+		yield return new WaitForSeconds(0.3f);
+		for (float i=0.1f ; i<=1 ; i += 0.05f)
+		{
+			newColor = new Color(i, i, i, 1);
+			if (sprites != null)
+				foreach (SpriteRenderer sprite in sprites)
+					sprite.color = newColor;
+			yield return new WaitForSeconds(0.05f);
+		}
+	}
+
 	public IEnumerator FlashCo()
 	{
 		foreach (SpriteRenderer sprite in sprites)
@@ -520,8 +539,7 @@ public abstract class Enemy : MonoBehaviour
 		if (superCloseRangeFinder != null) Destroy(superCloseRangeFinder);
 		if (inArea != null) 
 		{
-			transform.parent = null;
-			Destroy(inArea);
+			inArea.OnMasterDeath();
 		}
 		if (shake) CinemachineShake.Instance.ShakeCam(2.5f, 0.5f);
 		StartCoroutine( DiedCo() );
@@ -690,6 +708,7 @@ public abstract class Enemy : MonoBehaviour
 		if (isGrounded && !inSight && currentAction != CurrentAction.none && CheckSurrounding())
 		{
 			idleCounter = 0;
+			CallChildOnIdleStop();
 			if (immediateFlip)
 			{
 				ChooseNextAction();
