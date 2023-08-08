@@ -415,6 +415,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   room: {fileID: 640473470}
   rustlingObj: {fileID: 600513637}
+  isSpecial: 0
+  alwaysInRange: 1
   enemies:
   - {fileID: 1248326090283420467, guid: beb1ae0688f804a8da97b933d26d5d93, type: 3}
   - {fileID: 0}
@@ -22548,6 +22550,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   room: {fileID: 640473470}
   rustlingObj: {fileID: 394771536}
+  isSpecial: 0
+  alwaysInRange: 1
   enemies:
   - {fileID: 0}
   - {fileID: 0}
@@ -27833,6 +27837,80 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2917349697166468081, guid: 1806c8671ddcd4a8caac294adc2430d2, type: 3}
   m_PrefabInstance: {fileID: 640473469}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &701947976
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 716931232}
+    m_Modifications:
+    - target: {fileID: 957387221026195238, guid: 8238ab84288c6473eb155b49dbcc89a3, type: 3}
+      propertyPath: dontFallOff
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 957387221026195238, guid: 8238ab84288c6473eb155b49dbcc89a3, type: 3}
+      propertyPath: facePlayerOnSpawn
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6026512214049058153, guid: 8238ab84288c6473eb155b49dbcc89a3, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6026512214403510598, guid: 8238ab84288c6473eb155b49dbcc89a3, type: 3}
+      propertyPath: m_RootOrder
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 6026512214403510598, guid: 8238ab84288c6473eb155b49dbcc89a3, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 29.400002
+      objectReference: {fileID: 0}
+    - target: {fileID: 6026512214403510598, guid: 8238ab84288c6473eb155b49dbcc89a3, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.3299999
+      objectReference: {fileID: 0}
+    - target: {fileID: 6026512214403510598, guid: 8238ab84288c6473eb155b49dbcc89a3, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6026512214403510598, guid: 8238ab84288c6473eb155b49dbcc89a3, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6026512214403510598, guid: 8238ab84288c6473eb155b49dbcc89a3, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6026512214403510598, guid: 8238ab84288c6473eb155b49dbcc89a3, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6026512214403510598, guid: 8238ab84288c6473eb155b49dbcc89a3, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6026512214403510598, guid: 8238ab84288c6473eb155b49dbcc89a3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6026512214403510598, guid: 8238ab84288c6473eb155b49dbcc89a3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6026512214403510598, guid: 8238ab84288c6473eb155b49dbcc89a3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6026512214403510601, guid: 8238ab84288c6473eb155b49dbcc89a3, type: 3}
+      propertyPath: m_Name
+      value: Melon_circus (1)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 8238ab84288c6473eb155b49dbcc89a3, type: 3}
+--- !u!4 &701947977 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6026512214403510598, guid: 8238ab84288c6473eb155b49dbcc89a3, type: 3}
+  m_PrefabInstance: {fileID: 701947976}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &702831059
 GameObject:
   m_ObjectHideFlags: 0
@@ -28961,6 +29039,7 @@ Transform:
   - {fileID: 2015383545}
   - {fileID: 1672421608}
   - {fileID: 306327705}
+  - {fileID: 701947977}
   m_Father: {fileID: 0}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -29464,6 +29543,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   room: {fileID: 640473470}
   rustlingObj: {fileID: 1138510928}
+  isSpecial: 0
+  alwaysInRange: 1
   enemies:
   - {fileID: 1248326090283420467, guid: beb1ae0688f804a8da97b933d26d5d93, type: 3}
   - {fileID: 0}
@@ -46039,6 +46120,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   room: {fileID: 640473470}
   rustlingObj: {fileID: 142561159}
+  isSpecial: 0
+  alwaysInRange: 1
   enemies:
   - {fileID: 0}
   - {fileID: 0}

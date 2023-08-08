@@ -71,9 +71,15 @@ public class PlayerControls : MonoBehaviour
 	public Transform model;
 	public Transform camTarget;
 
+	[Space] [SerializeField] ParticleSystem leafTrailPs;
+	[SerializeField] ParticleSystem leafWallSlideTrailPsRight;
+	[SerializeField] ParticleSystem leafWallSlideTrailPsLeft;
+
 	[Space] [SerializeField] ParticleSystem dustTrailPs;
-	[SerializeField] ParticleSystem wallSlideTrailPsRight;
-	[SerializeField] ParticleSystem wallSlideTrailPsLeft;
+	[SerializeField] ParticleSystem dustWallSlideTrailPsRight;
+	[SerializeField] ParticleSystem dustWallSlideTrailPsLeft;
+
+	private bool inTemple;
 	private bool isDustTrailPlaying=true;
 	private bool isWallSlideTrailPlaying=true;
 	[SerializeField] float moveSpeed=5;
@@ -1001,6 +1007,118 @@ public class PlayerControls : MonoBehaviour
 		}
 	}
 
+	void SetDustTrail(bool isLeafTrail)
+	{
+		if (leafTrailPs != null)
+			leafTrailPs.gameObject.SetActive(isLeafTrail);
+		if (leafWallSlideTrailPsLeft != null)
+			leafWallSlideTrailPsLeft.gameObject.SetActive(isLeafTrail);
+		if (leafWallSlideTrailPsRight != null)
+			leafWallSlideTrailPsRight.gameObject.SetActive(isLeafTrail);
+		if (dustTrailPs != null)
+			dustTrailPs.gameObject.SetActive(!isLeafTrail);
+		if (dustWallSlideTrailPsLeft != null)
+			dustWallSlideTrailPsLeft.gameObject.SetActive(!isLeafTrail);
+		if (dustWallSlideTrailPsRight != null)
+			dustWallSlideTrailPsRight.gameObject.SetActive(!isLeafTrail);
+	}
+
+	void PlayFloorDustTrail()
+	{
+		if (!inTemple)
+		{
+			if (leafTrailPs != null)
+			{
+				if (isDustTrailPlaying && !isGrounded)
+				{
+					isDustTrailPlaying = false;
+					leafTrailPs.Stop(false, ParticleSystemStopBehavior.StopEmitting);
+				}
+				else if (!isDustTrailPlaying && isGrounded && !isPlatformed)
+				{
+					isDustTrailPlaying = true;
+					leafTrailPs.Play();
+					leafTrailPs.Emit(10);
+				}
+			}
+		}
+		else
+		{
+			if (dustTrailPs != null)
+			{
+				if (isDustTrailPlaying && !isGrounded)
+				{
+					isDustTrailPlaying = false;
+					dustTrailPs.Stop(false, ParticleSystemStopBehavior.StopEmitting);
+				}
+				else if (!isDustTrailPlaying && isGrounded && !isPlatformed)
+				{
+					isDustTrailPlaying = true;
+					dustTrailPs.Play();
+					dustTrailPs.Emit(10);
+				}
+			}
+		}
+	}
+
+
+	void PlayWallDustTrail()
+	{
+		if (!inTemple)
+		{
+			if (leafWallSlideTrailPsRight != null && leafWallSlideTrailPsLeft != null)
+			{
+				if (isWallSlideTrailPlaying && !isWallSliding)
+				{
+					isWallSlideTrailPlaying = false;
+					leafWallSlideTrailPsRight.Stop(false, ParticleSystemStopBehavior.StopEmitting);
+					leafWallSlideTrailPsLeft.Stop(false, ParticleSystemStopBehavior.StopEmitting);
+				}
+				else if (!isWallSlideTrailPlaying && isWallSliding)
+				{
+					isWallSlideTrailPlaying = true;
+					if (IsFacingRight())
+					{
+						leafWallSlideTrailPsLeft.Emit(10);
+						leafWallSlideTrailPsLeft.Play();
+					}
+					else
+					{
+						leafWallSlideTrailPsRight.Emit(10);
+						leafWallSlideTrailPsRight.Play();
+					}
+				}
+			}
+		}
+		else
+		{
+			if (dustWallSlideTrailPsRight != null && dustWallSlideTrailPsLeft != null)
+			{
+				if (isWallSlideTrailPlaying && !isWallSliding)
+				{
+					isWallSlideTrailPlaying = false;
+					dustWallSlideTrailPsRight.Stop(false, ParticleSystemStopBehavior.StopEmitting);
+					dustWallSlideTrailPsLeft.Stop(false, ParticleSystemStopBehavior.StopEmitting);
+				}
+				else if (!isWallSlideTrailPlaying && isWallSliding)
+				{
+					isWallSlideTrailPlaying = true;
+					if (IsFacingRight())
+					{
+						dustWallSlideTrailPsLeft.Emit(10);
+						dustWallSlideTrailPsLeft.Play();
+					}
+					else
+					{
+						dustWallSlideTrailPsRight.Emit(10);
+						dustWallSlideTrailPsRight.Play();
+					}
+				}
+			}
+		}
+	}
+
+
 	void DashMechanic(bool alreadyRegistered=false)
 	{
 		// First frame of pressing dash button
@@ -1405,20 +1523,7 @@ public class PlayerControls : MonoBehaviour
 		else
 			isGrounded = Physics2D.OverlapBox(groundCheck.position, groundCheckSize, 0, whatIsGround);
 
-		if (dustTrailPs != null)
-		{
-			if (isDustTrailPlaying && !isGrounded)
-			{
-				isDustTrailPlaying = false;
-				dustTrailPs.Stop(false, ParticleSystemStopBehavior.StopEmitting);
-			}
-			else if (!isDustTrailPlaying && isGrounded && !isPlatformed)
-			{
-				isDustTrailPlaying = true;
-				dustTrailPs.Play();
-				dustTrailPs.Emit(10);
-			}
-		}
+		PlayFloorDustTrail();
 		if (isGrounded && nShaw != 0)
 			nShaw = 0;
 		if (isGrounded && isPogoing)
@@ -1455,29 +1560,7 @@ public class PlayerControls : MonoBehaviour
 				dashCooldownCounter = 0;
 			}
 		}
-		if (wallSlideTrailPsRight != null && wallSlideTrailPsLeft != null)
-		{
-			if (isWallSlideTrailPlaying && !isWallSliding)
-			{
-				isWallSlideTrailPlaying = false;
-				wallSlideTrailPsRight.Stop(false, ParticleSystemStopBehavior.StopEmitting);
-				wallSlideTrailPsLeft.Stop(false, ParticleSystemStopBehavior.StopEmitting);
-			}
-			else if (!isWallSlideTrailPlaying && isWallSliding)
-			{
-				isWallSlideTrailPlaying = true;
-				if (IsFacingRight())
-				{
-					wallSlideTrailPsLeft.Emit(10);
-					wallSlideTrailPsLeft.Play();
-				}
-				else
-				{
-					wallSlideTrailPsRight.Emit(10);
-					wallSlideTrailPsRight.Play();
-				}
-			}
-		}
+		PlayWallDustTrail();
 	}
 	bool CheckIsCeiling()
 	{
@@ -2826,12 +2909,21 @@ public class PlayerControls : MonoBehaviour
 		}
 
 		CheckForCacoon();
-		if (wallSlideTrailPsRight != null)
-			wallSlideTrailPsRight.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
-		if (wallSlideTrailPsLeft != null)
-			wallSlideTrailPsLeft.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
+
+		// clear dust trail PS
+		if (leafWallSlideTrailPsRight != null)
+			leafWallSlideTrailPsRight.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
+		if (leafWallSlideTrailPsLeft != null)
+			leafWallSlideTrailPsLeft.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
+		if (leafTrailPs != null)
+			leafTrailPs.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
 		if (dustTrailPs != null)
 			dustTrailPs.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
+		if (dustWallSlideTrailPsRight != null)
+			dustWallSlideTrailPsRight.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
+		if (dustWallSlideTrailPsLeft != null)
+			dustWallSlideTrailPsLeft.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
+
 		if (hp > 1 && soulLeakShortPs != null)
 		{
 			soulLeakShortPs.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
@@ -3201,10 +3293,14 @@ public class PlayerControls : MonoBehaviour
 		if (SceneManager.GetActiveScene().name.StartsWith("Melon"))
 		{
 			m.PlayMusic(m.melonBgMusic, m.melonBgMusicVol);
+			inTemple = false;
+			SetDustTrail(true);
 		}
 		else if (SceneManager.GetActiveScene().name.StartsWith("Temple"))
 		{
 			m.PlayMusic(m.melonBgMusic2, m.melonBgMusicVol2);
+			inTemple = true;
+			SetDustTrail(false);
 			if (!firstTimeInTemple)
 			{
 				firstTimeInTemple = true;
@@ -3216,7 +3312,6 @@ public class PlayerControls : MonoBehaviour
 		else
 		{
 			m.PlayMusic(m.bgMusic, m.bgMusicVol);
-
 		}
 	}
 
