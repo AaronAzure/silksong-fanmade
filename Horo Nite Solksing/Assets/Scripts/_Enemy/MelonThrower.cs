@@ -67,7 +67,7 @@ public class MelonThrower : Enemy
 			else
 				rb.velocity = new Vector2(0, rb.velocity.y);
 		}
-		else if (justBackDashed && !isBackDashing)
+		else if (!receivingKb && justBackDashed && !isBackDashing)
 		{
 			justBackDashed = false;
 			rb.velocity = new Vector2(0, rb.velocity.y);
@@ -82,7 +82,7 @@ public class MelonThrower : Enemy
 			currentAction = CurrentAction.none;
 			sighted = true;
 			anim.SetBool("isAttacking", true);
-			rb.velocity = Vector2.zero;
+			rb.velocity = new Vector2(0, rb.velocity.y);
 		}
 
 	}

@@ -10,6 +10,8 @@ public class MelonCircus : Enemy
 
 	[Space] [SerializeField] GameObject melonBallObj;
 	[SerializeField] Animator ballAnim;
+	[SerializeField] Collider2D ballCol;
+	[SerializeField] Rigidbody2D ballRb;
 	private float ballSpeed;
 	[SerializeField] bool inAttackAnim;
 	private bool chased=true;
@@ -103,7 +105,7 @@ public class MelonCircus : Enemy
 			else
 				RetainMomentum();
 		}
-		else
+		else if (!receivingKb)
 		{
 			if (!chased && anim != null)
 			{
@@ -138,6 +140,10 @@ public class MelonCircus : Enemy
 	{
 		if (mainBody != null)
 			mainBody.bodyType = RigidbodyType2D.Dynamic;
+		if (ballRb != null)
+			ballRb.bodyType = RigidbodyType2D.Static;
+		if (ballCol != null)
+			ballCol.enabled = false;
 	}
 
 	protected override void ChasePlayer()

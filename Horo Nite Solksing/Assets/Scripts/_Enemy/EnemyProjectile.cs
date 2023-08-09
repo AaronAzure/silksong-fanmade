@@ -6,6 +6,7 @@ public class EnemyProjectile : MonoBehaviour
 {
 	[SerializeField] Collider2D hurtBox;
 	public Rigidbody2D rb;
+	public Animator anim;
 	[SerializeField] SpriteRenderer sr;
 	[SerializeField] bool canHitback=true;
 	[SerializeField] float hitBackForce=5;
@@ -15,6 +16,8 @@ public class EnemyProjectile : MonoBehaviour
 	
 	[Space] [SerializeField] bool canBreak;
 	[SerializeField] bool canDestroy;
+	[SerializeField] bool deactivateOnGrounded=true;
+	[SerializeField] bool destroyOnStop;
 	[SerializeField] float breakAfter=-1;
 	[SerializeField] bool breakOnPlayerHit;
 	[SerializeField] GameObject breakVfx;
@@ -38,17 +41,23 @@ public class EnemyProjectile : MonoBehaviour
 		canBreak = true;
 	}
 
-
+	bool done;
 	private void FixedUpdate() 
 	{
-		if (isGrounded)
+		if (isGrounded && deactivateOnGrounded)
 			Deactivate();
 		if (rotateInDir)
 		{
 			float angle = Mathf.Atan2(rb.velocity.y, rb.velocity.x) * Mathf.Rad2Deg;
 			transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
 		}
-		// Debug.Log(rb.velocity);	
+		if (destroyOnStop && !done && rb.velocity.x == 0)
+		{
+			done = true;
+			if (breakVfx != null)
+				breakVfx.transform.parent = null;
+			Destroy(gameObject);
+		}
 	}
 
 	void Deactivate()
@@ -81,10 +90,7 @@ public class EnemyProjectile : MonoBehaviour
 
 	private void OnTriggerEnter2D(Collider2D other) 
 	{
-		// if (other.CompareTag("Player"))
-		// 	Deactivate();
-
-		if (other.CompareTag("Finish"))
+		if (other.CompareTag("Finish") || other.CompareTag("Respawn"))
 		{
 			if (canBreak || canDestroy)
 			{

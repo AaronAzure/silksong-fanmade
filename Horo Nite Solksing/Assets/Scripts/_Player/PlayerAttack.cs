@@ -20,6 +20,7 @@ public class PlayerAttack : MonoBehaviour
 
 
 	[Space] [SerializeField] bool ensureSingleHit;
+	[SerializeField] Collider2D col;
 	private HashSet<GameObject> alreadyHit;
 
 	private void Awake() 
@@ -36,6 +37,8 @@ public class PlayerAttack : MonoBehaviour
 		{
 			alreadyHit.Clear();
 		}
+		if (col != null)
+			col.enabled = true;
 	}
 
 	private void OnTriggerEnter2D(Collider2D other) 
@@ -55,7 +58,28 @@ public class PlayerAttack : MonoBehaviour
 			else if (isRisingAttack)
 				p.RisingAtkRetreat();
 		}
-		if (other.CompareTag("Enemy"))
+		if (other.CompareTag("Bouncy"))
+		{
+			if (ensureSingleHit)
+			{
+				if (alreadyHit.Contains(other.gameObject))
+					return;
+				else
+					alreadyHit.Add(other.gameObject);
+			}
+			if (col != null)
+				col.enabled = false;
+
+			float bounceMultiplier = 1.3f;
+
+			if (isShawAttack)
+				p.ShawRetreat(isDashAttack, bounceMultiplier);
+			else if (isRisingAttack)
+				p.RisingAtkRetreat(bounceMultiplier);
+			else if (hasRecoil && !p.justParried)
+				p.Recoil(bounceMultiplier);
+		}
+		else if (other.CompareTag("Enemy"))
 		{
 			if (ensureSingleHit)
 			{
@@ -128,26 +152,7 @@ public class PlayerAttack : MonoBehaviour
 					p.Recoil();
 			}
 		}
-		if (other.CompareTag("Bouncy"))
-		{
-			if (ensureSingleHit)
-			{
-				if (alreadyHit.Contains(other.gameObject))
-					return;
-				else
-					alreadyHit.Add(other.gameObject);
-			}
-			Enemy target = other.GetComponent<Enemy>();
-
-			float bounceMultiplier = 1.3f;
-
-			if (isShawAttack)
-				p.ShawRetreat(isDashAttack, bounceMultiplier);
-			else if (isRisingAttack)
-				p.RisingAtkRetreat(bounceMultiplier);
-			else if (hasRecoil && !p.justParried)
-				p.Recoil(bounceMultiplier);
-		}
+		
 		if (other.CompareTag("SpecialEnemy"))
 		{
 			if (ensureSingleHit)
