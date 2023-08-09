@@ -9,6 +9,7 @@ public class RoomSpawner : MonoBehaviour
 
     [Space] [SerializeField] bool isSpecial;
     [SerializeField] bool alwaysInRange=true;
+    [SerializeField] bool neverLoseSight=true;
 	public Enemy[] enemies;
 
 
@@ -51,6 +52,8 @@ public class RoomSpawner : MonoBehaviour
 			e.CallChildOnIsSpecial();
 		if (alwaysInRange && !e.idleActionOnly)
 			e.alwaysInRange = true;
+		if (neverLoseSight && !e.idleActionOnly)
+			e.neverLoseSight = true;
 		e.SpawnIn();
 	}
 }

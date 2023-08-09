@@ -115,7 +115,7 @@ public class MelonKnight : Enemy
 		{
 			closeCounter = 0;
 			anim.SetTrigger("blocked");
-			anim.SetFloat("attackSpeed", 1.2f);
+			anim.SetFloat("attackSpeed", 1.5f);
 		}
 	}
 
@@ -140,5 +140,10 @@ public class MelonKnight : Enemy
 			idleCounter = 0;
 			anim.SetBool("isChasing", false);
 		}
+	}
+
+	public void _RESET_ATTACK_SPEED()
+	{
+		anim.SetFloat("attackSpeed", 1f);
 	}
 }

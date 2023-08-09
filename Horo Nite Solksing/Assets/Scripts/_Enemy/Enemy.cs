@@ -102,6 +102,7 @@ public abstract class Enemy : MonoBehaviour
 	public PlayerControls target;
 	protected Transform targetDest;
 	public bool alwaysInRange;
+	public bool neverLoseSight;
 	public bool inRange; // player in area
 	public bool inSight; // player in line of sight within area
 	public bool isClose; // player in close area
@@ -265,7 +266,8 @@ public abstract class Enemy : MonoBehaviour
 		if (!isStupid)
 		{
 			inSight = CallChildOnIsPlayerInSight();
-			KeepLookingForPlayer();
+			if (!neverLoseSight)
+				KeepLookingForPlayer();
 		}
 
 		if (!isFlying)

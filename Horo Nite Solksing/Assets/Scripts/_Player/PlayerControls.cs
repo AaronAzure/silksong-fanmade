@@ -1352,7 +1352,7 @@ public class PlayerControls : MonoBehaviour
 				return rb.velocity.x;
 			// preset velocity
 			if (canMoveHorz)
-				return nextSceneSpeed * activeMoveSpeed;
+				return nextSceneSpeed * activeMoveSpeed * 1.1f;
 		}
 		else
 		{
