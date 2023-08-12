@@ -29,6 +29,7 @@ public class UiShopButton : MonoBehaviour, ISelectHandler, IPointerEnterHandler
 		pimpillo,
 		caltrop,
 		sawblade,
+		syringe,
 		shield,
 		extraSpool,
 		lootCharm,

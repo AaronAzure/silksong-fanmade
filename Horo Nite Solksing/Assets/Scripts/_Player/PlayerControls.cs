@@ -24,6 +24,7 @@ public class PlayerControls : MonoBehaviour
 	private int maxHp=6;
 	[SerializeField] int hp;
 	public int nBonusHp;
+	[SerializeField] int nTempHp;
 
 	private int maxSilk=9;
 	[SerializeField] int nSilk;
@@ -59,11 +60,13 @@ public class PlayerControls : MonoBehaviour
 	public int rushDmg=20;
 	[SerializeField] Animator[] silks;
 	[SerializeField] GameObject[] hpMasks;
+	[SerializeField] GameObject[] tempHps;
 	[SerializeField] GameObject silkGlowNorm;
 	[SerializeField] GameObject silkGlowHarp;
 	[SerializeField] SpriteRenderer[] sprites;
 	[SerializeField] Material defaultMat;
 	[SerializeField] Material dmgMat;
+	[SerializeField] Material greenMat;
 	[SerializeField] Material flashMat;
 
 
@@ -271,6 +274,7 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] Pimpillo pimpillo;
 	[SerializeField] Caltrops caltrops;
 	[SerializeField] SawBlade sawBlade;
+	[SerializeField] Syringe syringe;
 
 	[Space] [SerializeField] Transform toolSummonPos;
 	[SerializeField] GameObject toolGaugeUi;
@@ -281,13 +285,14 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] GameObject pimpilloToolUi;
 	[SerializeField] GameObject caltropsToolUi;
 	[SerializeField] GameObject shawbladesToolUi;
+	[SerializeField] GameObject syringeToolUi;
 	[SerializeField] GameObject shieldToolUi;
 	[SerializeField] GameObject spoolToolUi;
 	[SerializeField] GameObject lootCharmToolUi;
-	[SerializeField] GameObject lootCharmToolShopUi;
+
+	[Space] [SerializeField] GameObject lootCharmToolShopUi;
+	[Space] [SerializeField] GameObject syringeToolShopUi;
 	private bool refillUses;
-	// private int tool1.usesLeft;
-	// private int tool2.usesLeft;
 	private float nToolSlowUses1;
 	private float nToolSlowUses2;
 	[Space] [SerializeField] Image toolUses1; // progress bar
@@ -1394,12 +1399,12 @@ public class PlayerControls : MonoBehaviour
 	{
 		float temp = player.GetAxis("Move Vertical");
 		
-		if (lookLerpTimer <= 0 && player.GetButtonDown("Attack"))
+		if (!isGrounded || (lookLerpTimer <= 0 && player.GetButtonDown("Attack")))
 		{
 			lookTimer = 0;
 		}
 
-		if (temp >= 0.85f || temp <= -0.85f)
+		if (isGrounded && (temp >= 0.85f || temp <= -0.85f))
 		{
 			if (!camOffsetReset)
 			{
@@ -1875,20 +1880,33 @@ public class PlayerControls : MonoBehaviour
 	{
 		if (toolCo != null) yield break;
 		isTool1 = (tool == 0);
+		bool isSyringe = ((isTool1 || tool2 == null ? tool1 : tool2) == syringe);
 		
 		if (isWallSliding)
 			Flip();
 
 		CancelDash();
-		atkDir = 4;
+		
+		// syringe tool
+		if (isSyringe)
+		{
+			rb.gravityScale = 0;
+			rb.velocity = Vector2.zero;
+			atkDir = 5;
+		}
+		// ordinary tool
+		else
+			atkDir = 4;
 
 		anim.SetFloat("atkDir", atkDir);
 		anim.SetTrigger("attack");
 		anim.SetBool("isAttacking", true);
 		MusicManager.Instance.PlayHornetAtkSfx(atk1);
 
-		yield return new WaitForSeconds(0.25f);
+		yield return new WaitForSeconds(isSyringe ? 0.5f : 0.25f);
 		anim.SetBool("isAttacking", false);
+		if (isSyringe)
+			rb.gravityScale = fallGrav;
 
 		// atk cooldown
 		yield return new WaitForSeconds(
@@ -1899,32 +1917,45 @@ public class PlayerControls : MonoBehaviour
 
 	public void USE_TOOL()
 	{
-		var tool = Instantiate( 
-			isTool1 || tool2 == null ? tool1 : tool2, 
-			toolSummonPos.position, 
-			Quaternion.identity
-		);
-		tool.toRight = IsFacingRight();
-		tool.inAir = !isGrounded;
-		tool.isMaster = true;
-		if (!infiniteToolUses)
+		// syringe tool
+		if ((isTool1 || tool2 == null ? tool1 : tool2) == syringe)
 		{
-			if (isTool1) tool1.usesLeft--;
-			else tool2.usesLeft--;
-		}
-
-		// caltrops only
-		if (tool.isMultiple)
-		{
-			for (int i=1; i<tool.nCopies+tool.level ; i++)
+			if (!infiniteToolUses)
 			{
-				var toolCopy = Instantiate( 
-					isTool1 || tool2 == null ? tool1 : tool2, 
-					toolSummonPos.position, 
-					Quaternion.identity
-				);
-				toolCopy.velocityMultiplier = UnityEngine.Random.Range(0.7f,1.3f);
-				toolCopy.toRight = IsFacingRight();
+				if (isTool1) tool1.usesLeft--;
+				else tool2.usesLeft--;
+			}
+		}
+		// ordinary tools
+		else
+		{
+			var tool = Instantiate( 
+				isTool1 || tool2 == null ? tool1 : tool2, 
+				toolSummonPos.position, 
+				Quaternion.identity
+			);
+			tool.toRight = IsFacingRight();
+			tool.inAir = !isGrounded;
+			tool.isMaster = true;
+			if (!infiniteToolUses)
+			{
+				if (isTool1) tool1.usesLeft--;
+				else tool2.usesLeft--;
+			}
+
+			// caltrops only
+			if (tool.isMultiple)
+			{
+				for (int i=1; i<tool.nCopies+tool.level ; i++)
+				{
+					var toolCopy = Instantiate( 
+						isTool1 || tool2 == null ? tool1 : tool2, 
+						toolSummonPos.position, 
+						Quaternion.identity
+					);
+					toolCopy.velocityMultiplier = UnityEngine.Random.Range(0.7f,1.3f);
+					toolCopy.toRight = IsFacingRight();
+				}
 			}
 		}
 	}
@@ -2517,14 +2548,47 @@ public class PlayerControls : MonoBehaviour
 		}
 	}
 
+	public void _GAIN_TEMP_HP(int tempHpToGain)
+	{
+		for (int i=0 ; i<tempHpToGain ; i++)
+		{
+			if (tempHps.Length > nTempHp && tempHps[nTempHp] != null)
+			{
+				tempHps[nTempHp].SetActive(true);
+			}
+			nTempHp++;
+		}
+	}
+	public void LoseAllTempHp()
+	{
+		int n = nTempHp;
+		for (int i=0 ; i<n ; i++)
+		{
+			nTempHp = Mathf.Max(0, nTempHp - 1);
+			if (tempHps.Length > nTempHp && tempHps[nTempHp] != null)
+			{
+				tempHps[nTempHp].SetActive(false);
+			}
+		}
+	}
+
 	void LoseHp(int dmg=1)
 	{
 		if (!infiniteHp)
 		{
 			for (int i=0 ; i<dmg ; i++)
 			{
+				// Take temp damage
+				if (nTempHp > 0)
+				{
+					nTempHp = Mathf.Max(0, nTempHp - 1);
+					if (tempHps.Length > nTempHp && tempHps[nTempHp] != null)
+					{
+						tempHps[nTempHp].SetActive(false);
+					}
+				}
 				// Take shield damage
-				if (hasShield && hp == 1 && shieldHp > 0)
+				else if (hasShield && hp == 1 && shieldHp > 0)
 				{
 					shieldHp = Mathf.Max(0, shieldHp - 1);
 					if (shieldImg != null && (shieldHp) < shieldSprs.Length) 
@@ -3148,6 +3212,7 @@ public class PlayerControls : MonoBehaviour
 		SpawnExistingObjAtSelf(bindPs);
 		if (isResting)
 		{
+			LoseAllTempHp();
 			FullRestore(true); // rest
 			canUnrest = true;
 			SetUiHp();
@@ -3158,6 +3223,18 @@ public class PlayerControls : MonoBehaviour
 		foreach (SpriteRenderer sprite in sprites)
 			sprite.material = defaultMat;
 		anim.SetBool("isBinding", false);
+	}
+	public IEnumerator GreenGlowCo()
+	{
+		foreach (SpriteRenderer sprite in sprites)
+			sprite.material = greenMat;
+
+		// SpawnExistingObjAtSelf(bindPs);
+
+		yield return new WaitForSeconds(0.1f);
+		foreach (SpriteRenderer sprite in sprites)
+			sprite.material = defaultMat;
+		// anim.SetBool("isBinding", false);
 	}
 
 	void SetMainUI(bool active)
@@ -3402,7 +3479,7 @@ public class PlayerControls : MonoBehaviour
 			switch (nGoldenWatermelonsTraded)
 			{
 				case 1:  lootCharmToolUi.SetActive(true); lootCharmToolShopUi.SetActive(true); break;
-				case 2:  break;
+				case 2:  syringeToolUi.SetActive(true); syringeToolShopUi.SetActive(true); break;
 				case 3:  break;
 			}
 		}
@@ -3610,6 +3687,8 @@ public class PlayerControls : MonoBehaviour
 				return (50 * (int) Mathf.Pow(3, caltrops.level));
 			case UiShopButton.Upgrade.sawblade:
 				return (50 * (int) Mathf.Pow(3, sawBlade.level));
+			case UiShopButton.Upgrade.syringe:
+				return (50 * (int) Mathf.Pow(3, syringe.level));
 			case UiShopButton.Upgrade.shield:
 				return (50 * (int) Mathf.Pow(3, nShieldBonus));
 			case UiShopButton.Upgrade.extraSpool:
@@ -3658,6 +3737,9 @@ public class PlayerControls : MonoBehaviour
 				break;
 			case UiShopButton.Upgrade.sawblade:
 				sawBlade.level++;
+				break;
+			case UiShopButton.Upgrade.syringe:
+				syringe.level++;
 				break;
 			case UiShopButton.Upgrade.shield:
 				nShieldBonus++;
@@ -3725,6 +3807,9 @@ public class PlayerControls : MonoBehaviour
 				break;
 			case UiShopButton.Upgrade.sawblade:
 				shawbladesToolUi.SetActive(true);
+				break;
+			case UiShopButton.Upgrade.syringe:
+				syringeToolUi.SetActive(true);
 				break;
 			case UiShopButton.Upgrade.shield:
 				shieldToolUi.SetActive(true);
