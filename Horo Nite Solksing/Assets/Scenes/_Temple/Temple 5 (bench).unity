@@ -363,6 +363,7 @@ MonoBehaviour:
   rustlingObj: {fileID: 600513637}
   isSpecial: 0
   alwaysInRange: 1
+  neverLoseSight: 1
   enemies:
   - {fileID: 1248326090283420467, guid: beb1ae0688f804a8da97b933d26d5d93, type: 3}
   - {fileID: 0}
@@ -20186,6 +20187,7 @@ MonoBehaviour:
   rustlingObj: {fileID: 394771536}
   isSpecial: 0
   alwaysInRange: 1
+  neverLoseSight: 1
   enemies:
   - {fileID: 0}
   - {fileID: 0}
@@ -25970,6 +25972,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2917349697166468081, guid: 1806c8671ddcd4a8caac294adc2430d2, type: 3}
   m_PrefabInstance: {fileID: 640473469}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &640473473 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2917349696926195442, guid: 1806c8671ddcd4a8caac294adc2430d2, type: 3}
+  m_PrefabInstance: {fileID: 640473469}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45e653bab7fb20e499bda25e1b646fea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &646163956
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -27905,6 +27918,7 @@ MonoBehaviour:
   rustlingObj: {fileID: 1138510928}
   isSpecial: 0
   alwaysInRange: 1
+  neverLoseSight: 1
   enemies:
   - {fileID: 1248326090283420467, guid: beb1ae0688f804a8da97b933d26d5d93, type: 3}
   - {fileID: 0}
@@ -28317,12 +28331,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5da7241729b644a71b7df1ac10a825d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  vcams:
+  - {fileID: 508854333}
+  - {fileID: 943731785}
+  - {fileID: 485690478}
+  - {fileID: 1092745410}
+  - {fileID: 640473473}
   vShakes:
   - {fileID: 508854332}
   - {fileID: 943731784}
   - {fileID: 1092745413}
   - {fileID: 485690477}
   - {fileID: 1761858583}
+  ct: {fileID: 0}
 --- !u!4 &809117325
 Transform:
   m_ObjectHideFlags: 0
@@ -43289,6 +43310,7 @@ MonoBehaviour:
   rustlingObj: {fileID: 142561159}
   isSpecial: 0
   alwaysInRange: 1
+  neverLoseSight: 1
   enemies:
   - {fileID: 0}
   - {fileID: 0}

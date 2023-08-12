@@ -12,7 +12,9 @@ public class NPC : MonoBehaviour
 	
 	[SerializeField] Animator textboxAnim;
 	public Dialogue[] dialogue;
+	public Dialogue[] soldDialogue;
 	public Dialogue[] endDialogue;
+	public Dialogue[] goldenMelonDialogue;
 	
 
 	public void ToggleTextbox(bool active)

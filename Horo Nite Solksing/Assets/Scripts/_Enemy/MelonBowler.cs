@@ -59,6 +59,7 @@ public class MelonBowler : Enemy
 			if (keepFacingPlayer)
 			{
 				FacePlayer();
+				anim.SetFloat("atkDir", model.localScale.x > 0 ? 1 : -1);
 			}
 			if (!receivingKb)
 			{

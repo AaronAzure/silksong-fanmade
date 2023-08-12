@@ -31,6 +31,7 @@ public class UiShopButton : MonoBehaviour, ISelectHandler, IPointerEnterHandler
 		sawblade,
 		shield,
 		extraSpool,
+		lootCharm,
 		health,
 		spool
 	}

@@ -34,6 +34,7 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] int nRosaryStrings;
 	[SerializeField] int nShellShards;
 	private int nGoldenWatermelons;
+	private int nGoldenWatermelonsTraded;
 	
 	[Space] [SerializeField] int maxShellShards=400;
 	[SerializeField] ParticleSystem rosaryCollectPs;
@@ -104,6 +105,14 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] float wallJumpControlThreshold=0.25f; // can control
 	[SerializeField] float wallJumpThreshold=0.5f; // max height
 	private float wallJumpDir;
+	private float lookTimer;
+	[SerializeField] float lookThreshold=0.5f;
+	[SerializeField] float lookOffset=2.5f;
+	[SerializeField] float lookOffsetMultiplier=2.5f;
+	private Vector3 camOffset;
+	private bool camOffsetReset;
+	private float lookLerpTimer;
+	private float lookLerpThres=1;
 
 	[Space] [SerializeField] float risingForce=10;
 	[SerializeField] Vector2 wallJumpForce;
@@ -151,9 +160,7 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] float ledgeGrabDist=0.3f;
 
 	[Space] [SerializeField] Transform groundCheck;
-	// [SerializeField] Transform closeToGroundCheck;
 	[SerializeField] Vector2 groundCheckSize;
-	// [SerializeField] Vector2 closeToGroundCheckSize;
 	[SerializeField] Vector2 waterCheckSize;
 	[SerializeField] LayerMask whatIsPlayer;
 	private int whatIsPlayerValue;
@@ -276,6 +283,8 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] GameObject shawbladesToolUi;
 	[SerializeField] GameObject shieldToolUi;
 	[SerializeField] GameObject spoolToolUi;
+	[SerializeField] GameObject lootCharmToolUi;
+	[SerializeField] GameObject lootCharmToolShopUi;
 	private bool refillUses;
 	// private int tool1.usesLeft;
 	// private int tool2.usesLeft;
@@ -292,7 +301,8 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] Sprite shieldUndmgSpr;
 	[SerializeField] Sprite[] shieldSprs;
 	private int shieldHp;
-	[SerializeField] bool hasExtraSpool;
+
+	[Space] [SerializeField] bool hasExtraSpool;
 	public int nExtraSpoolBonus;
 	[SerializeField] GameObject[] spoolObj;
 	[SerializeField] GameObject[] extraSpoolObj;
@@ -304,6 +314,9 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] Sprite extraMidMarkerSpr;
 	[SerializeField] Sprite extraBindMarkerSpr;
 	[SerializeField] GameObject spoolEndObj;
+
+	[Space] [SerializeField] bool hasLootCharm;
+	public int nLootCharmBonus;
 
 
 	[Space] [Header("UI")]
@@ -397,6 +410,7 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] GameObject shopCam;
 	[SerializeField] Animator shopAnim;
 	[SerializeField] UiDialogue uiDialogue;
+	[SerializeField] UiShopHighlight uiShopHighlight;
 
 
 	[Space] [Header("MAP")]
@@ -432,7 +446,9 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] bool invincible;
 	[SerializeField] bool infiniteHp;
 	[SerializeField] bool infiniteSilk;
-	[SerializeField] bool canParry=true;
+	[SerializeField] bool infiniteToolUses;
+	
+	[Space] [SerializeField] bool canParry=true;
 	[SerializeField] bool calcHeight;
 	private float peakHeight=-9999;
 	private float shawDir=-0.85f;
@@ -588,7 +604,7 @@ public class PlayerControls : MonoBehaviour
 		yield return null;
 		if (isAtShop && npc != null)
 			npc.ToggleTextbox(true);
-		isAtShop = isPaused = false;
+		isPaused = false;
 		pauseCo = null;
 	}
 
@@ -748,7 +764,7 @@ public class PlayerControls : MonoBehaviour
 					pause2Anim.SetTrigger("close");
 			}
 		}
-		// basic movement
+		// map
 		else if (isUsingMapAnim && isUsingMap)
 		{
 			if (!player.GetButton("Map") || !isGrounded)
@@ -778,7 +794,7 @@ public class PlayerControls : MonoBehaviour
 				else if (tool1 != null && player.GetButtonDown("Tool") && toolCo == null && !anim.GetBool("isAttacking"))
 				{
 					int tool = 0;
-					if (tool == 0 && tool1.usesLeft > 0)
+					if (infiniteToolUses || (tool == 0 && tool1.usesLeft > 0))
 						toolCo = StartCoroutine( UseToolCo(0) );
 				}
 
@@ -807,10 +823,29 @@ public class PlayerControls : MonoBehaviour
 				{
 					if (npc != null)
 					{
+						// Introduction chat
 						if (nAaronTalked == 0)
 							uiDialogue.SetLines(npc.dialogue[nAaronTalked].lines);
+
 						if (!uiDialogue.IsDefaultText())
 							nAaronTalked++;
+
+						// sold out
+						if (uiShopHighlight != null && !uiShopHighlight.HasStuffToPurchase())
+						{
+							if (nGoldenWatermelons > 0)
+							{
+								uiDialogue.SetLines(npc.goldenMelonDialogue[0].lines);
+								uiDialogue.isGoldenWatermelonAfter = true;
+							}
+							else
+							{
+								uiDialogue.SetLines(npc.soldDialogue[0].lines);
+								uiDialogue.isShopAfter = false;
+							}
+						}
+						else
+							uiDialogue.isShopAfter = true;
 						uiDialogue.gameObject.SetActive(true);
 						SetMainUI(false);
 						npc.ToggleTextbox(false);
@@ -895,7 +930,25 @@ public class PlayerControls : MonoBehaviour
 			{
 				shopCanvas.SetActive(false);
 				shopCam.SetActive(false);
-				isAtShop = false;
+			}
+			if (npc != null)
+			{
+				SetMainUI(false);
+				// has golden watermelons
+				if (nGoldenWatermelons > 0)
+				{
+					uiDialogue.SetLines(npc.goldenMelonDialogue[0].lines);
+					uiDialogue.isGoldenWatermelonAfter = true;
+				}
+				// goodbye text
+				else
+				{
+					uiDialogue.SetLines(npc.endDialogue[0].lines);
+					uiDialogue.isGoldenWatermelonAfter = false;
+				}
+				uiDialogue.isShopAfter = false;
+				uiDialogue.gameObject.SetActive(true);
+				npc.ToggleTextbox(false);
 			}
 		}
 	
@@ -949,6 +1002,7 @@ public class PlayerControls : MonoBehaviour
 
 				// Dash
 				CalcDash();
+				LookAround();
 
 				// Normal movement
 				if (!inAirDash)
@@ -1320,7 +1374,6 @@ public class PlayerControls : MonoBehaviour
 		if (mapAnim != null) mapAnim.SetFloat("speed", -2);
 		shopCanvas.SetActive(false);
 		shopCam.SetActive(false);
-		isAtShop = false;
 		stuckToNewScene = false;
 		isJumping = jumpDashed = jumped = false;
 		airDashed = isDashing = false;
@@ -1335,6 +1388,44 @@ public class PlayerControls : MonoBehaviour
 		bindCo = null;
 		noControl = false;
 		anim.SetBool("isAirDash", false);
+	}
+
+	void LookAround()
+	{
+		float temp = player.GetAxis("Move Vertical");
+		
+		if (lookLerpTimer <= 0 && player.GetButtonDown("Attack"))
+		{
+			lookTimer = 0;
+		}
+
+		if (temp >= 0.85f || temp <= -0.85f)
+		{
+			if (!camOffsetReset)
+			{
+				camOffsetReset = true;
+				camOffset = new Vector3(0,temp > 0 ? lookOffset : -lookOffset);
+			}
+			if (lookTimer < lookThreshold)
+			{
+				lookTimer += Time.deltaTime;
+			}
+			else if (lookLerpTimer < lookLerpThres)
+			{
+				lookLerpTimer = Mathf.Min(1, lookLerpTimer + Time.deltaTime * lookOffsetMultiplier);
+				CinemachineMaster.Instance.SetCamOffset(camOffset, lookLerpTimer);
+			}
+		}
+		else if (lookTimer > 0 || lookLerpTimer > 0)
+		{
+			if (camOffsetReset)
+			{
+				camOffsetReset = false;
+			}
+			lookTimer = 0;
+			lookLerpTimer = Mathf.Max(0, lookLerpTimer - Time.deltaTime * lookOffsetMultiplier * 2);
+			CinemachineMaster.Instance.SetCamOffset(camOffset, lookLerpTimer);
+		}
 	}
 
 	void CalcMove()
@@ -1816,8 +1907,11 @@ public class PlayerControls : MonoBehaviour
 		tool.toRight = IsFacingRight();
 		tool.inAir = !isGrounded;
 		tool.isMaster = true;
-		if (isTool1) tool1.usesLeft--;
-		else tool2.usesLeft--;
+		if (!infiniteToolUses)
+		{
+			if (isTool1) tool1.usesLeft--;
+			else tool2.usesLeft--;
+		}
 
 		// caltrops only
 		if (tool.isMultiple)
@@ -1928,6 +2022,10 @@ public class PlayerControls : MonoBehaviour
 					shieldImg.gameObject.SetActive(true);
 					if (shieldImg != null && shieldHp < shieldSprs.Length) 
 						shieldImg.sprite = shieldSprs[(shieldHp == 2 + nShieldBonus) ? (shieldSprs.Length - 1) : shieldHp];
+					int totalSilk1 = 
+						(!hasExtraSpool ? maxSilk + nBonusSilk + 3 + nExtraSpoolBonus : maxSilk + nBonusSilk);
+					if (nSilk > totalSilk1)
+						SetSilk(totalSilk1 - nSilk);
 				}
 				else
 				{
@@ -1935,6 +2033,7 @@ public class PlayerControls : MonoBehaviour
 					shieldImg.gameObject.SetActive(false);
 				}
 				ChangeSpoolNotch();
+				SetUiSilk();
 				return hasShield;
 			// extended spool
 			case 1:
@@ -1948,6 +2047,25 @@ public class PlayerControls : MonoBehaviour
 				ChangeSpoolNotch();
 				SetUiSilk();
 				return hasExtraSpool;
+			// loot multiplier
+			case 2:
+				hasExtraSpool = false;
+				hasShield = false;
+
+				// equip/unequip
+				hasLootCharm = !hasLootCharm;
+				if (hasLootCharm)
+				{
+					lootMultiplier = 1.5f + (nLootCharmBonus * 0.5f);
+				}
+				else
+				{
+					lootMultiplier = 1f;
+				}
+				shieldImg.gameObject.SetActive(false);
+				ChangeSpoolNotch();
+				SetUiSilk();
+				return hasLootCharm;
 			default:
 				return false;
 		}
@@ -3274,6 +3392,30 @@ public class PlayerControls : MonoBehaviour
 			SetMainUI(true);
 	}
 
+	public void TradeGoldenWatermelon(bool isTrading)
+	{
+		if (isTrading)
+		{
+			nGoldenWatermelons = Mathf.Max(0, nGoldenWatermelons - 1);
+			nGoldenWatermelonsTraded++;
+			goldenWatermelonTxt.text = nGoldenWatermelons.ToString();
+			switch (nGoldenWatermelonsTraded)
+			{
+				case 1:  lootCharmToolUi.SetActive(true); lootCharmToolShopUi.SetActive(true); break;
+				case 2:  break;
+				case 3:  break;
+			}
+		}
+		isAtShop = false;
+		SetMainUI(true);
+	}
+
+  	public void ToggleMainUi(bool active)
+	{
+		isAtShop = false;
+		SetMainUI(active);
+	}
+
 	public void CollectCacoon()
 	{
 		collectedCacoon = true;
@@ -3472,6 +3614,8 @@ public class PlayerControls : MonoBehaviour
 				return (50 * (int) Mathf.Pow(3, nShieldBonus));
 			case UiShopButton.Upgrade.extraSpool:
 				return (50 * (int) Mathf.Pow(3, nExtraSpoolBonus));
+			case UiShopButton.Upgrade.lootCharm:
+				return (50 * (int) Mathf.Pow(3, nLootCharmBonus));
 			case UiShopButton.Upgrade.health:
 				return (100 * (int) Mathf.Pow(3, nBonusHp));
 			case UiShopButton.Upgrade.spool:
@@ -3529,6 +3673,13 @@ public class PlayerControls : MonoBehaviour
 			case UiShopButton.Upgrade.extraSpool:
 				nExtraSpoolBonus++;
 				SetUiSilk();
+				break;
+			case UiShopButton.Upgrade.lootCharm:
+				nLootCharmBonus++;
+				if (hasLootCharm)
+				{
+					lootMultiplier = 1.5f + (nLootCharmBonus * 0.5f);
+				}
 				break;
 			case UiShopButton.Upgrade.health:
 				nBonusHp++;

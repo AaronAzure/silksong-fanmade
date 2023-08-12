@@ -153,6 +153,12 @@ public class PlayerAttack : MonoBehaviour
 			}
 		}
 		
+		if (other.CompareTag("Shield"))
+		{
+			other.GetComponent<EnemyShield>().Attacked(!canGoThruShield);
+		}
+		
+
 		if (other.CompareTag("SpecialEnemy"))
 		{
 			if (ensureSingleHit)

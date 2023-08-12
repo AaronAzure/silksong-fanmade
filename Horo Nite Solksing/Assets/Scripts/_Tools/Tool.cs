@@ -32,6 +32,7 @@ public abstract class Tool : MonoBehaviour
 	[Space] [SerializeField] bool destroyOnWallHit;
 	[SerializeField] bool destroyOnEnemyHit;
 	[SerializeField] bool destroyOnSpecialHit;
+	[SerializeField] bool canGoThruShield;
 	[HideInInspector] public bool justThrown;
 	[Space] [SerializeField] bool noStart;
 	[SerializeField] protected float destroyAfter;
@@ -75,7 +76,12 @@ public abstract class Tool : MonoBehaviour
 		}
 		else 
 		{
-			if (destroyOnWallHit && (other.CompareTag("Ground") || other.CompareTag("Breakable")))
+			if (canGoThruShield && other.CompareTag("Shield"))
+			{
+				other.GetComponent<EnemyShield>().Attacked(false);
+			}
+			if (destroyOnWallHit && 
+				(other.CompareTag("Ground") || other.CompareTag("Breakable") || other.CompareTag("Shield")))
 				CallChildOnHit();
 			if (other.CompareTag("Enemy"))
 			{

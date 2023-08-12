@@ -41,6 +41,11 @@ public class UiShopHighlight : MonoBehaviour
 	{
 		rect.anchorMin = prevAnchor;
 		rect.anchorMax = prevAnchor;
+		if (currButton != null && !currButton.gameObject.activeSelf)
+		{
+			Debug.Log("SOLD OUT - Select New Button");
+			SelectNewButton();
+		}
 	}
 
 	public void MoveToButton(UiShopButton o)
@@ -84,8 +89,10 @@ public class UiShopHighlight : MonoBehaviour
 				shopButtons.Remove(currButton);
 				if (ind == shopButtons.Count)
 					prevButton = shopButtons[ind-1];
-				else
+				else if (shopButtons[ind] != null && shopButtons[ind].gameObject.activeSelf)
 					prevButton = shopButtons[ind];
+				else
+					prevButton = shopButtons[ind-1];
 			}
 		}
 		else
@@ -96,7 +103,7 @@ public class UiShopHighlight : MonoBehaviour
 		{
 			currButton = prevButton;
 			SetButtonOffset();
-			if (prevButton != null)
+			if (prevButton != null && prevButton.self != null)
 				prevButton.self.Select();
 			prevButton = null;
 		}
@@ -117,5 +124,19 @@ public class UiShopHighlight : MonoBehaviour
 					isMoving = false;
 			}
 		}
+	}
+
+	public bool HasStuffToPurchase()
+	{
+		// at least one button is active
+		if (shopButtons.Count > 0)
+		{
+			foreach (UiShopButton btn in shopButtons)
+			{
+				if (btn.gameObject.activeSelf)
+					return true;
+			}
+		}
+		return false;
 	}
 }

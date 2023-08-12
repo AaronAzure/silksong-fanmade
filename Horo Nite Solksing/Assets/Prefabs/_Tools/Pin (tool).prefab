@@ -180,17 +180,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f3deeb46fd704f1d936be3a03308eca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  usesLeft: 0
   level: 0
   isMaster: 0
   inAir: 0
   isVarTotaluses: 1
   totalusesDiff: 2
+  capTotalDiff: 4
   totaluses: 12
+  repairCost: 3
   icon: {fileID: 21300000, guid: 1f01837e54231473b881dca598076882, type: 3}
   <quickCooldown>k__BackingField: 1
   dmg: 12
   toRight: 1
-  dir: {x: 20, y: 0}
+  dir: {x: 18, y: 0}
   velocityMultiplier: 1
   force: 1
   kbDir: {x: 0, y: 0}
@@ -202,6 +205,7 @@ MonoBehaviour:
   destroyOnWallHit: 1
   destroyOnEnemyHit: 1
   destroyOnSpecialHit: 1
+  canGoThruShield: 0
   justThrown: 0
   noStart: 0
   destroyAfter: 0

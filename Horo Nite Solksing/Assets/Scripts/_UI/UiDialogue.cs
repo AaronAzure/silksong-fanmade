@@ -8,6 +8,8 @@ public class UiDialogue : MonoBehaviour
 	[SerializeField] TextMeshProUGUI txt;
 	[SerializeField] float textSpeed=0.05f;
 	[SerializeField] Animator dialogueAnim;
+	public bool isShopAfter;
+	public bool isGoldenWatermelonAfter;
 	[Space] [SerializeField] string[] lines;
 	[Space] [SerializeField] string[] defaultText;
 	private int index=0;
@@ -77,12 +79,27 @@ public class UiDialogue : MonoBehaviour
 		return lines == defaultText;
 	}
 
+	// ui fade over
 	public void _CLOSE()
 	{
 		gameObject.SetActive(false);
 		if (PlayerControls.Instance != null)
 		{
-			PlayerControls.Instance.ToggleShop(true);
+			if (isShopAfter)
+			{
+				Debug.Log(" - UiDialogue = ToggleShop");
+				PlayerControls.Instance.ToggleShop(true);
+			}
+			else if (isGoldenWatermelonAfter)
+			{
+				Debug.Log(" - UiDialogue = TradeGoldenWatermelon");
+				PlayerControls.Instance.TradeGoldenWatermelon(true);
+			}
+			else
+			{
+				Debug.Log(" - UiDialogue = ToggleMainUi");
+				PlayerControls.Instance.ToggleMainUi(true);
+			}
 		}
 		lines = defaultText;
 		index = 0;

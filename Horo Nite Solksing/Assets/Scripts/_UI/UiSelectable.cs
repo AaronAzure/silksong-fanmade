@@ -43,6 +43,7 @@ public class UiSelectable : MonoBehaviour, ISelectHandler
 
 	[SerializeField] bool isShield;
 	[SerializeField] bool isExtraSpool;
+	[SerializeField] bool isLootCharm;
 
 
 	public void OnEnable() 
@@ -62,6 +63,16 @@ public class UiSelectable : MonoBehaviour, ISelectHandler
 			else if (isExtraSpool)
 			{
 				switch (PlayerControls.Instance.nExtraSpoolBonus)
+				{
+					case 0: verTxt.text = "I"; break;
+					case 1: verTxt.text = "II"; break;
+					case 2: verTxt.text = "III"; break;
+					case 3: verTxt.text = "IV"; break;
+				}
+			}
+			else if (isLootCharm)
+			{
+				switch (PlayerControls.Instance.nLootCharmBonus)
 				{
 					case 0: verTxt.text = "I"; break;
 					case 1: verTxt.text = "II"; break;
@@ -182,12 +193,45 @@ public class UiSelectable : MonoBehaviour, ISelectHandler
 	public string GetDesc(int x=0)
 	{
 		PlayerControls p = PlayerControls.Instance;
-		switch ((isShield ? p.nShieldBonus : (isExtraSpool ? p.nExtraSpoolBonus : tool.level)) + x)
+		if (isShield)
 		{
-			case 1: 	return desc1;
-			case 2: 	return desc2;
-			case 3: 	return desc3;
-			default: 	return desc;
+			switch (p.nShieldBonus + x)
+			{
+				case 1: 	return desc1;
+				case 2: 	return desc2;
+				case 3: 	return desc3;
+				default: 	return desc;
+			}
+		}
+		else if (isExtraSpool)
+		{
+			switch (p.nExtraSpoolBonus + x)
+			{
+				case 1: 	return desc1;
+				case 2: 	return desc2;
+				case 3: 	return desc3;
+				default: 	return desc;
+			}
+		}
+		else if (isLootCharm)
+		{
+			switch (p.nLootCharmBonus + x)
+			{
+				case 1: 	return desc1;
+				case 2: 	return desc2;
+				case 3: 	return desc3;
+				default: 	return desc;
+			}
+		}
+		else
+		{
+			switch (tool.level + x)
+			{
+				case 1: 	return desc1;
+				case 2: 	return desc2;
+				case 3: 	return desc3;
+				default: 	return desc;
+			}
 		}
 	}
 }

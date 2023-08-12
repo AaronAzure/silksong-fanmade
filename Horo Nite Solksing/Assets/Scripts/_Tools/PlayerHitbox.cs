@@ -58,6 +58,10 @@ public class PlayerHitbox : MonoBehaviour
 				}
 			}
 		}
+		if (other.CompareTag("Shield"))
+		{
+			other.GetComponent<EnemyShield>().Attacked(false);
+		}
 	}
 
 

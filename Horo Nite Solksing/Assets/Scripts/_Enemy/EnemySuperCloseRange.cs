@@ -8,7 +8,14 @@ public class EnemySuperCloseRange : MonoBehaviour
 	[SerializeField] bool reactToTools;
 	private bool playerIsSuperClose;
 	private bool toolIsSuperClose;
+	private int nToolSuperClose;
 
+
+
+	private void OnDisable() 
+	{
+		nToolSuperClose = 0;
+	}
 
     private void OnTriggerEnter2D(Collider2D other) 
 	{
@@ -21,7 +28,8 @@ public class EnemySuperCloseRange : MonoBehaviour
 			}
 			if (reactToTools && other.CompareTag("Respawn"))
 			{
-				toolIsSuperClose = enemy.isSuperClose = true;	
+				toolIsSuperClose = enemy.toolSuperClose = true;	
+				nToolSuperClose++;
 				enemy.CallChildOnSuperClose();
 			}
 		}
@@ -39,9 +47,13 @@ public class EnemySuperCloseRange : MonoBehaviour
 			}
 			if (reactToTools && other.CompareTag("Respawn"))
 			{
-				toolIsSuperClose = false;
-				if (!playerIsSuperClose && !toolIsSuperClose)
-					enemy.ToggleSuperClose(false);
+				nToolSuperClose--;
+				if (nToolSuperClose <= 0)
+				{
+					toolIsSuperClose = enemy.toolSuperClose = false;	
+					if (!playerIsSuperClose && !toolIsSuperClose)
+						enemy.ToggleSuperClose(false);
+				}
 			}
 		}
 	}

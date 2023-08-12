@@ -15,6 +15,8 @@ public class BreakableWall : Breakable
 				foreach (Breakable breakable in breakables)
 					if (breakable != null)
 						breakable.EnableCanBeHit();
+				foreach (GameObject extraTile in extraTiles)
+					extraTile.SetActive(false);
 				Destroy(gameObject);
 			}
 			else if (exactName != "" && gm.CheckDestroyedList(exactName, true))
@@ -22,6 +24,8 @@ public class BreakableWall : Breakable
 				foreach (Breakable breakable in breakables)
 					if (breakable != null)
 						breakable.EnableCanBeHit();
+				foreach (GameObject extraTile in extraTiles)
+					extraTile.SetActive(false);
 				Destroy(gameObject);
 			}
 		}

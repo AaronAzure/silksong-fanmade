@@ -60,6 +60,7 @@ public abstract class Enemy : MonoBehaviour
 	[Space] [Header("Platformer Related")]
 	[SerializeField] protected bool isSmart; // if attacked face direction;
 	[SerializeField] protected bool isStupid; // if attacked face direction;
+	[SerializeField] protected bool noWalkingAround;
 	[SerializeField] protected bool facePlayerOnSpawn;
 
 	[field: SerializeField] public bool isFlying {get; private set;}
@@ -106,6 +107,7 @@ public abstract class Enemy : MonoBehaviour
 	public bool inRange; // player in area
 	public bool inSight; // player in line of sight within area
 	public bool isClose; // player in close area
+	public bool toolSuperClose; // player in close area
 	public bool isSuperClose; // player in close area
 	protected bool cannotRotate;
 	protected float moveDir;
@@ -415,6 +417,14 @@ public abstract class Enemy : MonoBehaviour
 		}
 	}
 
+	public void CallMasterOnShield(bool canBlock)
+	{
+		if (isShielding && canBlock && FacingPlayer())
+		{
+			CallChildOnShielded();
+		}
+	}
+
 	protected virtual void CallChildOnLoseHp(int dmg)
 	{
 		if (!cannotTakeDmg)
@@ -544,8 +554,8 @@ public abstract class Enemy : MonoBehaviour
 			inArea.OnMasterDeath();
 		}
 		if (shake) CinemachineShake.Instance.ShakeCam(2.5f, 0.5f);
-		StartCoroutine( DiedCo() );
 		CallChildOnDeath();
+		StartCoroutine( DiedCo() );
 	}
 	
 	IEnumerator DiedCo()
@@ -597,8 +607,10 @@ public abstract class Enemy : MonoBehaviour
 
 	public void ACTIVATE_HITBOX()
 	{
-		if (!died)
+		if (!died && col != null)
 			col.enabled = true;
+		if (!died && col2 != null)
+			col2.enabled = true;
 		spawningIn = false;
 		if (hasSpawningInAnim && anim != null)
 			anim.SetBool("spawningIn", false);
@@ -684,6 +696,8 @@ public abstract class Enemy : MonoBehaviour
 
 	protected void WalkAround()
 	{
+		if (noWalkingAround) return;
+
 		if (idleTotalCounter > 0)
 		{
 			idleCounter += Time.fixedDeltaTime;

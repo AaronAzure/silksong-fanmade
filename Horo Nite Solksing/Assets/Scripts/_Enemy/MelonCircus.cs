@@ -165,7 +165,6 @@ public class MelonCircus : Enemy
 				);
 				momentumSpeed = rb.velocity.x;
 			}
-
 		}
 		
 		if (anim != null) 

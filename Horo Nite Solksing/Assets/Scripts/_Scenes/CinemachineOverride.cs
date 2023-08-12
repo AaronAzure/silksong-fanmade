@@ -24,7 +24,7 @@ public class CinemachineOverride : MonoBehaviour
 			}
 			newCam.m_Priority = 100;
 			if (CinemachineMaster.Instance != null) 
-				CinemachineMaster.Instance.SetCinemachineShakeOnHighestPriority();
+				CinemachineMaster.Instance.SetLiveCinemachineShakeDelay();
 		}
 	}
 	
@@ -40,6 +40,6 @@ public class CinemachineOverride : MonoBehaviour
 	{
 		newCam.m_Priority = -100;
 		if (CinemachineMaster.Instance != null) 
-			CinemachineMaster.Instance.SetCinemachineShakeOnHighestPriority();
+			CinemachineMaster.Instance.SetLiveCinemachineShakeDelay();
 	}
 }
