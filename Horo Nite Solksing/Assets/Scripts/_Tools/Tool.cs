@@ -159,4 +159,24 @@ public abstract class Tool : MonoBehaviour
 	{
 		Destroy(gameObject);
 	}
+
+	public string GetToolLevel(int number)
+	{
+		if ((number < 0) || (number > 3999)) return "-";
+		if (number < 1) return string.Empty;            
+		if (number >= 1000) return "M" + GetToolLevel(number - 1000);
+		if (number >= 900) return "CM" + GetToolLevel(number - 900); 
+		if (number >= 500) return "D" + GetToolLevel(number - 500);
+		if (number >= 400) return "CD" + GetToolLevel(number - 400);
+		if (number >= 100) return "C" + GetToolLevel(number - 100);            
+		if (number >= 90) return "XC" + GetToolLevel(number - 90);
+		if (number >= 50) return "L" + GetToolLevel(number - 50);
+		if (number >= 40) return "XL" + GetToolLevel(number - 40);
+		if (number >= 10) return "X" + GetToolLevel(number - 10);
+		if (number >= 9) return "IX" + GetToolLevel(number - 9);
+		if (number >= 5) return "V" + GetToolLevel(number - 5);
+		if (number >= 4) return "IV" + GetToolLevel(number - 4);
+		if (number >= 1) return "I" + GetToolLevel(number - 1);
+		return "-";
+	}
 }

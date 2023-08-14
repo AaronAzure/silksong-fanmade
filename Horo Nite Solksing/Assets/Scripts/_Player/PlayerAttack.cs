@@ -7,7 +7,10 @@ public class PlayerAttack : MonoBehaviour
 	[SerializeField] Vector2 forceDir;
 	[SerializeField] float force=5;
 	[SerializeField] bool canGoThruShield;
+
 	[Space] [SerializeField] bool hasRecoil;
+	bool melonSwordHit;
+	[SerializeField] bool isMelonSword;
 	[SerializeField] bool isShawAttack;
 	[SerializeField] bool isDashAttack;
 	[SerializeField] bool isRisingAttack;
@@ -37,8 +40,20 @@ public class PlayerAttack : MonoBehaviour
 		{
 			alreadyHit.Clear();
 		}
-		if (col != null)
+		if (!isMelonSword && col != null)
 			col.enabled = true;
+		melonSwordHit = false;
+	}
+
+	private void OnDisable() 
+	{
+		if (isMelonSword)	
+		{
+			if (melonSwordHit)
+				p.IncreaseMelonSwordDmg();
+			else
+				p.ResetMelonSwordDmg();
+		}
 	}
 
 	private void OnTriggerEnter2D(Collider2D other) 
@@ -67,7 +82,7 @@ public class PlayerAttack : MonoBehaviour
 				else
 					alreadyHit.Add(other.gameObject);
 			}
-			if (col != null)
+			if (!isMelonSword && col != null)
 				col.enabled = false;
 
 			float bounceMultiplier = 1.3f;
@@ -110,6 +125,11 @@ public class PlayerAttack : MonoBehaviour
 				}
 
 				int dmg = !isStabAttack ? (!isGossamerStorm ? p.atkDmg[p.crestNum] : p.gossamerDmg) : p.stabDmg;
+				if (isMelonSword)
+				{
+					dmg = p.GetMelonSwordDmg();
+					melonSwordHit = true;
+				}
 				if (isRushAttack)
 					dmg = p.rushDmg;
 				if (isStabAttack || isGossamerStorm || isRushAttack)
@@ -139,7 +159,7 @@ public class PlayerAttack : MonoBehaviour
 
 
 				// simple attack
-				if (!isStabAttack && !isRushAttack && !isGossamerStorm && 
+				if (!isStabAttack && !isRushAttack && !isGossamerStorm && !isMelonSword &&
 					!target.inParryState && (canGoThruShield || !target.isShielding))
 					p.SetSilk(1);
 
@@ -188,6 +208,11 @@ public class PlayerAttack : MonoBehaviour
 				}
 				
 				int dmg = !isStabAttack ? (!isGossamerStorm ? p.atkDmg[p.crestNum] : p.gossamerDmg) : p.stabDmg;
+				if (isMelonSword)
+				{
+					dmg = p.GetMelonSwordDmg();
+					melonSwordHit = true;
+				}
 				if (isRushAttack)
 					dmg = p.rushDmg;
 

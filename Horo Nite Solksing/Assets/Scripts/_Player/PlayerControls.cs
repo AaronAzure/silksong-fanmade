@@ -234,6 +234,7 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] GameObject healingPs;
 	[SerializeField] GameObject bloodBurstPs;
 	[SerializeField] GameObject bindPs;
+	[SerializeField] GameObject greenGooPs;
 	[SerializeField] ParticleSystem soulLeakPs;
 	[SerializeField] ParticleSystem soulLeakShortPs;
 	[SerializeField] Animator animeLinesAnim;
@@ -275,6 +276,7 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] Caltrops caltrops;
 	[SerializeField] SawBlade sawBlade;
 	[SerializeField] Syringe syringe;
+	[SerializeField] MelonSword melonSword;
 
 	[Space] [SerializeField] Transform toolSummonPos;
 	[SerializeField] GameObject toolGaugeUi;
@@ -286,6 +288,7 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] GameObject caltropsToolUi;
 	[SerializeField] GameObject shawbladesToolUi;
 	[SerializeField] GameObject syringeToolUi;
+	[SerializeField] GameObject melonSwordToolUi;
 	[SerializeField] GameObject shieldToolUi;
 	[SerializeField] GameObject spoolToolUi;
 	[SerializeField] GameObject lootCharmToolUi;
@@ -297,6 +300,7 @@ public class PlayerControls : MonoBehaviour
 	private float nToolSlowUses2;
 	[Space] [SerializeField] Image toolUses1; // progress bar
 	[SerializeField] Image toolUses2; // progress bar
+	[SerializeField] TextMeshProUGUI tool1Version;
 	
 
 	[Space] [SerializeField] bool hasShield;
@@ -503,6 +507,7 @@ public class PlayerControls : MonoBehaviour
 	{
 		if (cacoonObj != null) Destroy(cacoonObj);
 		if (bindPs != null) Destroy(bindPs);
+		if (greenGooPs != null) Destroy(greenGooPs);
 		if (healingPs != null) Destroy(healingPs);
 		if (bloodBurstPs != null) Destroy(bloodBurstPs);
 		Destroy(gameObject);
@@ -523,6 +528,7 @@ public class PlayerControls : MonoBehaviour
 
 		activeMoveSpeed = moveSpeed;
 		bindPs.transform.parent = null;
+		if (greenGooPs != null) greenGooPs.transform.parent = null;
 		healingPs.transform.parent = null;
 		bloodBurstPs.transform.parent = null;
 		cacoonObj.transform.parent = null;
@@ -1876,22 +1882,61 @@ public class PlayerControls : MonoBehaviour
 		}
 	}
 
+	public void ResetMelonSwordDmg()
+	{
+		if (melonSword != null)
+			melonSword.level = 0;
+		tool1Version.text = melonSword.GetToolLevel(melonSword.level + 1);
+		if (melonSwordCo != null)
+			StopCoroutine(melonSwordCo);
+		melonSwordCo = StartCoroutine( RechargeMelonSwordUseCo() );
+	}
+	public void IncreaseMelonSwordDmg()
+	{
+		if (melonSword != null)
+			melonSword.level += 1;
+		tool1Version.text = melonSword.GetToolLevel(melonSword.level + 1);
+		melonSword.usesLeft = 1;
+		refillUses = true;
+		if (melonSwordCo != null)
+			StopCoroutine(melonSwordCo);
+		melonSwordCo = StartCoroutine( DepleteMelonSwordUseCo() );
+	}
+	public int GetMelonSwordDmg()
+	{
+		if (melonSword != null)
+			return 10 + (10 * melonSword.level);
+		return 0;
+	}
+
 	IEnumerator UseToolCo(int tool=0)
 	{
 		if (toolCo != null) yield break;
 		isTool1 = (tool == 0);
 		bool isSyringe = ((isTool1 || tool2 == null ? tool1 : tool2) == syringe);
+		bool isMelonSword = ((isTool1 || tool2 == null ? tool1 : tool2) == melonSword);
 		
 		if (isWallSliding)
 			Flip();
 
 		CancelDash();
 		
-		// syringe tool
-		if (isSyringe)
+		// melon sword tool
+		if (isMelonSword)
 		{
 			rb.gravityScale = 0;
 			rb.velocity = Vector2.zero;
+			isJumping = false;
+			CancelDash();
+			atkDir = 6;
+		}
+		// syringe tool
+		else if (isSyringe)
+		{
+			rb.gravityScale = 0;
+			rb.velocity = Vector2.zero;
+			isJumping = false;
+			CancelDash();
 			atkDir = 5;
 		}
 		// ordinary tool
@@ -1903,9 +1948,12 @@ public class PlayerControls : MonoBehaviour
 		anim.SetBool("isAttacking", true);
 		MusicManager.Instance.PlayHornetAtkSfx(atk1);
 
-		yield return new WaitForSeconds(isSyringe ? 0.5f : 0.25f);
+		if (isMelonSword)
+			yield return new WaitForSeconds(0.75f);
+		else
+			yield return new WaitForSeconds(isSyringe ? 0.5f : 0.25f);
 		anim.SetBool("isAttacking", false);
-		if (isSyringe)
+		if (isSyringe || isMelonSword)
 			rb.gravityScale = fallGrav;
 
 		// atk cooldown
@@ -1917,8 +1965,17 @@ public class PlayerControls : MonoBehaviour
 
 	public void USE_TOOL()
 	{
+		// melon sword tool
+		if ((isTool1 || tool2 == null ? tool1 : tool2) == melonSword)
+		{
+			if (!infiniteToolUses)
+			{
+				if (isTool1) tool1.usesLeft--;
+				else tool2.usesLeft--;
+			}
+		}
 		// syringe tool
-		if ((isTool1 || tool2 == null ? tool1 : tool2) == syringe)
+		else if ((isTool1 || tool2 == null ? tool1 : tool2) == syringe)
 		{
 			if (!infiniteToolUses)
 			{
@@ -1960,6 +2017,29 @@ public class PlayerControls : MonoBehaviour
 		}
 	}
 
+	Coroutine melonSwordCo;
+	public IEnumerator DepleteMelonSwordUseCo()
+	{
+		yield return new WaitForSeconds(10);
+		if (tool1 == melonSword)
+		{
+			if (melonSword != null)
+				melonSword.level = 0;
+			tool1Version.text = melonSword.GetToolLevel(melonSword.level + 1);
+		}
+		melonSwordCo = null;
+	}
+	public IEnumerator RechargeMelonSwordUseCo()
+	{
+		yield return new WaitForSeconds(8);
+		if (tool1 == melonSword)
+		{
+			melonSword.usesLeft = 1;
+			refillUses = true;
+		}
+		melonSwordCo = null;
+	}
+
 	public void EquipSkill(int n)
 	{
 		// no change
@@ -1996,11 +2076,18 @@ public class PlayerControls : MonoBehaviour
 			tool1 = tool;
 			nEquipped++;
 			FullRestore();	// equipped
+			if ((isTool1 || tool2 == null ? tool1 : tool2) == melonSword)
+			{
+				if (melonSwordCo != null)
+					StopCoroutine(melonSwordCo);
+				tool1.usesLeft = 1;
+			}
 			if (repairTutorial != null && tool1 != null)
 			{
 				repairTutorial.gameObject.SetActive(false);
 				repairTutorial.gameObject.SetActive(true);
 			}
+			tool1Version.text = tool.GetToolLevel(tool.level + 1);
 			return true;
 		}
 		currToolUi = null;
@@ -2257,7 +2344,9 @@ public class PlayerControls : MonoBehaviour
 			int maxReplenished = Mathf.Max(0, tool1.GetTotalUses() - tool1.usesLeft); 
 			if (maxReplenished > 0)
 			{
-				int nReplenished = Mathf.Clamp(nShellShards / tool1.repairCost, 0, maxReplenished);
+				int nReplenished = (tool1.repairCost == 0 ? 0 :
+					Mathf.Clamp(nShellShards / tool1.repairCost, 0, maxReplenished)
+				);
 				nShellShards -= (nReplenished * tool1.repairCost);
 				tool1.usesLeft += nReplenished;
 				refillUses = true;
@@ -2277,7 +2366,7 @@ public class PlayerControls : MonoBehaviour
 		if (tool1 != null && toolUses1 != null)
 		{
 			int maxReplenished = Mathf.Max(0, tool1.GetTotalUses() - tool1.usesLeft); 
-			if (maxReplenished > 0)
+			if (maxReplenished > 0 && tool1.repairCost != 0)
 			{
 				int nReplenished = Mathf.Clamp(nShellShards / tool1.repairCost, 0, maxReplenished);
 				return nReplenished * tool1.repairCost;
@@ -2287,7 +2376,7 @@ public class PlayerControls : MonoBehaviour
 	}
 	public string GetNumberOfToolsFixed()
 	{
-		if (tool1 != null)
+		if (tool1 != null && tool1.repairCost != 0)
 		{
 			int maxReplenished = Mathf.Max(0, tool1.GetTotalUses() - tool1.usesLeft); 
 			int nReplenished = Mathf.Clamp(nShellShards / tool1.repairCost, 0, maxReplenished);
@@ -2757,6 +2846,7 @@ public class PlayerControls : MonoBehaviour
 			// Can control again
 			yield return new WaitForSeconds(0.25f);
 			beenHurt = false;
+			anim.SetBool("isHurt", false);
 
 			// invincibility over
 			yield return new WaitForSeconds(gm.invincibilityDuration);
@@ -3212,6 +3302,8 @@ public class PlayerControls : MonoBehaviour
 		SpawnExistingObjAtSelf(bindPs);
 		if (isResting)
 		{
+			if ((isTool1 || tool2 == null ? tool1 : tool2) == melonSword)
+				tool1.usesLeft = 1;
 			LoseAllTempHp();
 			FullRestore(true); // rest
 			canUnrest = true;
@@ -3229,7 +3321,7 @@ public class PlayerControls : MonoBehaviour
 		foreach (SpriteRenderer sprite in sprites)
 			sprite.material = greenMat;
 
-		// SpawnExistingObjAtSelf(bindPs);
+		SpawnExistingObjAtSelf(greenGooPs);
 
 		yield return new WaitForSeconds(0.1f);
 		foreach (SpriteRenderer sprite in sprites)
@@ -3480,7 +3572,7 @@ public class PlayerControls : MonoBehaviour
 			{
 				case 1:  lootCharmToolUi.SetActive(true); lootCharmToolShopUi.SetActive(true); break;
 				case 2:  syringeToolUi.SetActive(true); syringeToolShopUi.SetActive(true); break;
-				case 3:  break;
+				case 3:  melonSwordToolUi.SetActive(true); break;
 			}
 		}
 		isAtShop = false;
