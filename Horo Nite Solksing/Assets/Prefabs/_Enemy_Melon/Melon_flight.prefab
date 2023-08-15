@@ -270,6 +270,7 @@ MonoBehaviour:
   rb: {fileID: 1376537067151301455}
   col: {fileID: 1376537066910156642}
   col2: {fileID: 0}
+  frictionedMat: {fileID: 6200000, guid: 0b13b884acbc146ba8414933d762a2c1, type: 2}
   closeRangeFinder: {fileID: 0}
   distRangeFinder: {fileID: 7496133052882791808}
   superCloseRangeFinder: {fileID: 0}
@@ -281,6 +282,8 @@ MonoBehaviour:
   nShells: 1
   isSmart: 1
   isStupid: 0
+  noWalkingAround: 0
+  facePlayerOnSpawn: 0
   <isFlying>k__BackingField: 1
   controlledByAnim: 0
   cannotTakeKb: 0
@@ -309,14 +312,17 @@ MonoBehaviour:
   groundCheckSize: {x: 0, y: 0}
   currentAction: 0
   idleTotalCounter: 3
+  stationaryThres: 2.5
   immediateFlip: 0
   initDir: -1
   stillAttacking: 0
   target: {fileID: 0}
   alwaysInRange: 0
+  neverLoseSight: 0
   inRange: 0
   inSight: 0
   isClose: 0
+  toolSuperClose: 0
   isSuperClose: 0
   maxSearchTime: 2
   spawningIn: 0

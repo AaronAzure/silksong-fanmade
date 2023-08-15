@@ -21,6 +21,9 @@ public class MusicManager : MonoBehaviour
 	[Space] public AudioSource arenaMusic;
 	[field: SerializeField] public float arenaMusicVol {get; private set;}
 
+	[Space] public AudioSource arenaMusic2;
+	[field: SerializeField] public float arenaMusicVol2 {get; private set;}
+
 	[Space] public AudioSource mainThemeMusic;
 	[field: SerializeField] public float mainThemeMusicVol {get; private set;}
 	
@@ -37,7 +40,7 @@ public class MusicManager : MonoBehaviour
 
 	private AudioSource currentMusic;
 	private AudioSource nextMusic;
-	public AudioSource prevMusic {get; private set;}
+	[field: SerializeField] public AudioSource prevMusic {get; private set;}
 	public float prevMusicVol {get; private set;}
 
 	private float timer;
@@ -112,6 +115,29 @@ public class MusicManager : MonoBehaviour
 		else
 			currencySfx.Play();
 	}
+
+	public void PlayArenaMusic()
+	{
+		if (PlayerControls.Instance != null && PlayerControls.Instance.inTemple)
+		{
+			PlayMusic(arenaMusic2, arenaMusicVol2, true);
+		}
+		else
+		{
+			PlayMusic(arenaMusic, arenaMusicVol, true);
+		}
+	}
+
+	public void PlayBossMusic(int nBoss)
+	{
+		switch (nBoss)
+		{
+			default:
+				PlayMusic(bossMusic, bossMusicVol, true);
+				break;
+		}
+	}
+
     public void SoftenBgMusic(float duration=1)
 	{
 		if (softenCo != null)

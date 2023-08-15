@@ -411,6 +411,7 @@ MonoBehaviour:
   rb: {fileID: 2548594410250036075}
   col: {fileID: 8740706842338356179}
   col2: {fileID: 3808852213596119915}
+  frictionedMat: {fileID: 6200000, guid: 0b13b884acbc146ba8414933d762a2c1, type: 2}
   closeRangeFinder: {fileID: 0}
   distRangeFinder: {fileID: 0}
   superCloseRangeFinder: {fileID: 0}
@@ -422,6 +423,7 @@ MonoBehaviour:
   nShells: 1
   isSmart: 1
   isStupid: 0
+  noWalkingAround: 0
   facePlayerOnSpawn: 0
   <isFlying>k__BackingField: 0
   controlledByAnim: 0
@@ -457,9 +459,11 @@ MonoBehaviour:
   stillAttacking: 0
   target: {fileID: 0}
   alwaysInRange: 0
+  neverLoseSight: 0
   inRange: 0
   inSight: 0
   isClose: 0
+  toolSuperClose: 0
   isSuperClose: 0
   maxSearchTime: 2
   spawningIn: 0
@@ -475,8 +479,12 @@ MonoBehaviour:
   isWaiting: 0
   alert: {fileID: 0}
   offset: 30
+  dontFallOff: 0
+  behindDetect: {fileID: 0}
   melonBallObj: {fileID: 2386870217892002904}
   ballAnim: {fileID: 2753309720067196625}
+  ballCol: {fileID: 0}
+  ballRb: {fileID: 0}
   inAttackAnim: 0
   mainBody: {fileID: 7472443124669027537}
 --- !u!95 &5593111934968438492

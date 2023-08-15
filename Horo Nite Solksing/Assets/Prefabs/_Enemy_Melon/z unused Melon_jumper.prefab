@@ -218,6 +218,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   value: 5
   rosary: {fileID: 6128387865865937862, guid: 014b4766ecfaf47029dd734a70c89a84, type: 3}
+  nShellShards: 1
+  shellShard: {fileID: 0}
   xForce: 3
   yMinForce: 6
   yMaxForce: 8
@@ -281,13 +283,14 @@ MonoBehaviour:
   hasJumpVelocityAnim: 1
   hasIsGroundedAnim: 1
   hasIsMovingAnim: 1
+  hasMoveSpeedAnim: 1
   hasIsDeadAnim: 1
   hasSpawnAnim: 1
   hasSpawningInAnim: 1
-  hasMoveSpeedAnim: 1
   rb: {fileID: 1376537067151301455}
   col: {fileID: 1376537066910156642}
   col2: {fileID: 0}
+  frictionedMat: {fileID: 6200000, guid: 0b13b884acbc146ba8414933d762a2c1, type: 2}
   closeRangeFinder: {fileID: 7369005850624395163}
   distRangeFinder: {fileID: 8063037988372662778}
   superCloseRangeFinder: {fileID: 196697017005344421}
@@ -296,8 +299,12 @@ MonoBehaviour:
   sortGroup: {fileID: 7356468585035187103}
   loot: {fileID: 2828130944199802275}
   nLoot: 4
+  nShells: 1
   isSmart: 1
   isStupid: 0
+  noWalkingAround: 0
+  facePlayerOnSpawn: 0
+  <isFlying>k__BackingField: 0
   controlledByAnim: 0
   cannotTakeKb: 0
   cannotTakeDmg: 0
@@ -319,21 +326,23 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 72
   isGrounded: 0
-  isFlying: 0
   cannotTakeYKb: 0
   idleActionOnly: 0
   groundCheck: {fileID: 7452915362852078129}
   groundCheckSize: {x: 1.19, y: 0.05}
   currentAction: 0
   idleTotalCounter: 5
+  stationaryThres: 2.5
   immediateFlip: 0
   initDir: -1
   stillAttacking: 0
   target: {fileID: 0}
   alwaysInRange: 0
+  neverLoseSight: 0
   inRange: 0
   inSight: 0
   isClose: 0
+  toolSuperClose: 0
   isSuperClose: 0
   maxSearchTime: 2
   spawningIn: 0
@@ -344,10 +353,22 @@ MonoBehaviour:
   bloodEffectObj: {fileID: 355843636956985508}
   silkEffectObj: {fileID: 4006373270758294632}
   stringEffectObj: {fileID: 1629200900604851618}
+  <mainPos>k__BackingField: {fileID: 0}
   room: {fileID: 0}
   isWaiting: 0
   alert: {fileID: 0}
   offset: 30
+  closeCounter: 0
+  hasHighJump: 0
+  highJumpSpeedX: 2.5
+  highJumpSpeedY: 12
+  longJumpSpeedX: 7
+  longJumpSpeedY: 7
+  closeDist: 6
+  closeLimit: 0.5
+  inAtkA: 0
+  inJumpA: 0
+  isFacingPlayerA: 0
 --- !u!1 &3433202526179080487
 GameObject:
   m_ObjectHideFlags: 0

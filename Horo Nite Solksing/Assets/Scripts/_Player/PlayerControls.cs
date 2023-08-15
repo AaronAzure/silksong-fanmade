@@ -83,7 +83,7 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] ParticleSystem dustWallSlideTrailPsRight;
 	[SerializeField] ParticleSystem dustWallSlideTrailPsLeft;
 
-	private bool inTemple;
+	[HideInInspector] public bool inTemple;
 	private bool isDustTrailPlaying=true;
 	private bool isWallSlideTrailPlaying=true;
 	[SerializeField] float moveSpeed=5;
@@ -240,6 +240,7 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] Animator animeLinesAnim;
 	[SerializeField] Transform dashSpawnPos;
 	[SerializeField] Animator flashAnim;
+	[SerializeField] GameObject melonSwordSparklePs;
 
 
 	[Space] [Header("ANIMATOR CONTROLLED")]
@@ -277,6 +278,11 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] SawBlade sawBlade;
 	[SerializeField] Syringe syringe;
 	[SerializeField] MelonSword melonSword;
+
+	[Space] [SerializeField] Animator melonSwordMagicAnim;
+	[SerializeField] ParticleSystem melonSwordReadyPs;
+	[SerializeField] float melonSwordComboTime=5;
+	[SerializeField] float melonSwordRechargeTime=8;
 
 	[Space] [SerializeField] Transform toolSummonPos;
 	[SerializeField] GameObject toolGaugeUi;
@@ -2018,9 +2024,11 @@ public class PlayerControls : MonoBehaviour
 	}
 
 	Coroutine melonSwordCo;
+	// slowly go back to level 1
 	public IEnumerator DepleteMelonSwordUseCo()
 	{
-		yield return new WaitForSeconds(10);
+		melonSwordMagicAnim.SetTrigger("reset");
+		yield return new WaitForSeconds(melonSwordRechargeTime);
 		if (tool1 == melonSword)
 		{
 			if (melonSword != null)
@@ -2029,13 +2037,24 @@ public class PlayerControls : MonoBehaviour
 		}
 		melonSwordCo = null;
 	}
+	// missed completely
 	public IEnumerator RechargeMelonSwordUseCo()
 	{
-		yield return new WaitForSeconds(8);
+		melonSwordMagicAnim.SetTrigger("deplete");
+		melonSwordReadyPs.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+
+		yield return new WaitForSeconds(melonSwordComboTime);
+		melonSwordReadyPs.Play();
+		melonSwordMagicAnim.SetTrigger("recharge");
 		if (tool1 == melonSword)
 		{
 			melonSword.usesLeft = 1;
 			refillUses = true;
+		}
+		if (melonSwordSparklePs != null)
+		{
+			melonSwordSparklePs.SetActive(false);		
+			melonSwordSparklePs.SetActive(true);
 		}
 		melonSwordCo = null;
 	}
@@ -2076,11 +2095,19 @@ public class PlayerControls : MonoBehaviour
 			tool1 = tool;
 			nEquipped++;
 			FullRestore();	// equipped
+
+			// is melon sword tool
 			if ((isTool1 || tool2 == null ? tool1 : tool2) == melonSword)
 			{
+				melonSwordMagicAnim.gameObject.SetActive(true);
+				melonSwordMagicAnim.SetTrigger("recharge");
 				if (melonSwordCo != null)
 					StopCoroutine(melonSwordCo);
 				tool1.usesLeft = 1;
+			}
+			else
+			{
+				melonSwordMagicAnim.gameObject.SetActive(false);
 			}
 			if (repairTutorial != null && tool1 != null)
 			{
@@ -2097,6 +2124,7 @@ public class PlayerControls : MonoBehaviour
 		tools[0] = null;
 		tool1 = null;
 		nEquipped--;
+		melonSwordMagicAnim.gameObject.SetActive(false);
 		FullRestore();
 		if (repairTutorial != null && repairTutorial.gameObject.activeSelf)
 		{

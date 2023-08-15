@@ -365,6 +365,7 @@ MonoBehaviour:
   rb: {fileID: 1376537067151301455}
   col: {fileID: 1376537066910156642}
   col2: {fileID: 0}
+  frictionedMat: {fileID: 6200000, guid: 0b13b884acbc146ba8414933d762a2c1, type: 2}
   closeRangeFinder: {fileID: 8190994913948571210}
   distRangeFinder: {fileID: 2060897094714683738}
   superCloseRangeFinder: {fileID: 0}
@@ -376,6 +377,7 @@ MonoBehaviour:
   nShells: 3
   isSmart: 1
   isStupid: 0
+  noWalkingAround: 0
   facePlayerOnSpawn: 0
   <isFlying>k__BackingField: 1
   controlledByAnim: 0
@@ -411,9 +413,11 @@ MonoBehaviour:
   stillAttacking: 0
   target: {fileID: 0}
   alwaysInRange: 0
+  neverLoseSight: 0
   inRange: 0
   inSight: 0
   isClose: 0
+  toolSuperClose: 0
   isSuperClose: 0
   maxSearchTime: 3.5
   spawningIn: 0
@@ -5656,11 +5660,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hurtBox: {fileID: 7263542433464916235, guid: 9f8cb6304e6db40d7a2ca36789a6fb6f, type: 3}
   rb: {fileID: 4703471568014261880}
+  anim: {fileID: 0}
   sr: {fileID: 1171874475767995808}
   canHitback: 0
   hitBackForce: 5
   canBreak: 0
   canDestroy: 1
+  deactivateOnGrounded: 1
+  destroyOnStop: 0
   breakAfter: 0.25
   breakOnPlayerHit: 0
   breakVfx: {fileID: 5692485631329784873}

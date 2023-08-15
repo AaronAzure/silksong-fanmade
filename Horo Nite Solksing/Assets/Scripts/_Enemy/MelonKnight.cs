@@ -119,6 +119,7 @@ public class MelonKnight : Enemy
 		{
 			if (!dontFallOff || CheckCliff())
 			{
+				anim.SetBool("isMoving", true);
 				rb.AddForce(new Vector2(moveSpeed * playerDir * 5, 0), ForceMode2D.Force);
 				rb.velocity = new Vector2(
 					Mathf.Clamp(rb.velocity.x, -moveSpeed, moveSpeed), 
@@ -126,14 +127,17 @@ public class MelonKnight : Enemy
 				);
 			}
 			else
+			{
+				anim.SetBool("isMoving", false);
 				rb.velocity = new Vector2(0, rb.velocity.y);
+			}
 		}
 		
 		if (anim != null) 
 		{
 			if (hasMoveSpeedAnim && !isFlying)
 				anim.SetFloat("moveSpeed", Mathf.Abs(rb.velocity.x));
-			if (hasIsMovingAnim)
+			if (hasIsMovingAnim && (!dontFallOff || CheckCliff()))
 				anim.SetBool("isMoving", true);
 		}
 	}

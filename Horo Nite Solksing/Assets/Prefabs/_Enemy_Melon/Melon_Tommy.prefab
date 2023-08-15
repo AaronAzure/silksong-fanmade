@@ -294,6 +294,7 @@ MonoBehaviour:
   rb: {fileID: 1376537067151301455}
   col: {fileID: 1376537066910156642}
   col2: {fileID: 0}
+  frictionedMat: {fileID: 6200000, guid: 0b13b884acbc146ba8414933d762a2c1, type: 2}
   closeRangeFinder: {fileID: 2784919318780409866}
   distRangeFinder: {fileID: 8280079970757899613}
   superCloseRangeFinder: {fileID: 6642797277060117954}
@@ -305,6 +306,7 @@ MonoBehaviour:
   nShells: 2
   isSmart: 1
   isStupid: 0
+  noWalkingAround: 0
   facePlayerOnSpawn: 0
   <isFlying>k__BackingField: 0
   controlledByAnim: 0
@@ -340,9 +342,11 @@ MonoBehaviour:
   stillAttacking: 0
   target: {fileID: 0}
   alwaysInRange: 0
+  neverLoseSight: 0
   inRange: 0
   inSight: 0
   isClose: 0
+  toolSuperClose: 0
   isSuperClose: 0
   maxSearchTime: 2
   spawningIn: 0
@@ -361,6 +365,7 @@ MonoBehaviour:
   hidingA: 0
   backDashingA: 0
   inAtkA: 0
+  atkTimer: 1.9
   atkTimerLimit: 2
   shotPos: {fileID: 1291256522151423446}
   shotForce: 10

@@ -55,6 +55,7 @@ public class MelonBee : Enemy
 	protected override void CallChildOnInSight()
 	{
 		currentAction = CurrentAction.none;
+		anim.SetTrigger("alert");
 		anim.SetBool("isChasing", true);
 	}
 	protected override void CallChildOnLostSight()

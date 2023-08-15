@@ -21,7 +21,10 @@ public class Room : MonoBehaviour
 	[Space] [Header("Waves")] 
 	[SerializeField] int nDefeated;
 	public int nExtras;
+
 	[Space] [SerializeField] bool isBossRoom;
+	[SerializeField] int nBoss;
+	
 	[Space] [SerializeField] bool isWaveRoom;
 	[SerializeField] int nWaves;
 	// [SerializeField] int nSpawnersDefeated;
@@ -186,11 +189,10 @@ public class Room : MonoBehaviour
 				invisibleWall.SetActive(true);
 
 			MusicManager m = MusicManager.Instance;
-			m.PlayMusic(
-				!isBossRoom ? m.arenaMusic : m.bossMusic, 
-				!isBossRoom ? m.arenaMusicVol : m.bossMusicVol, 
-				true
-			);
+			if (!isBossRoom)
+				m.PlayArenaMusic();
+			else
+				m.PlayBossMusic(nBoss);
 
 			roomCam.SetActive(true);
 			if (CinemachineMaster.Instance != null) 

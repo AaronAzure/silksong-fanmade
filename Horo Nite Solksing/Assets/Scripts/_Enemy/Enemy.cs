@@ -40,6 +40,7 @@ public abstract class Enemy : MonoBehaviour
 	[Space] [SerializeField] protected Rigidbody2D rb;
 	[SerializeField] [Tooltip("Model")] protected Collider2D col;
 	[SerializeField] protected Collider2D col2;
+	[SerializeField] PhysicsMaterial2D frictionedMat;
 	
 
 	[Space][SerializeField] protected GameObject closeRangeFinder;
@@ -482,6 +483,7 @@ public abstract class Enemy : MonoBehaviour
 		if (!died && hp <= 0)
 		{
 			died = true;
+			// rb.velocity *= 1.5f;
 			rb.AddForce(Vector2.up * 5, ForceMode2D.Impulse);
 			if (room == null)
 				GameManager.Instance.RegisterNameToEnemiesDefeated(gameObject.name);
@@ -539,6 +541,10 @@ public abstract class Enemy : MonoBehaviour
 	void Died(bool shake)
 	{
 		StopAllCoroutines();
+		if (rb != null && frictionedMat != null)
+		{
+			rb.sharedMaterial = frictionedMat;
+		}
 		if (loot != null)
 		{
 			loot.SpawnLoot( 
@@ -567,7 +573,7 @@ public abstract class Enemy : MonoBehaviour
 		if (col != null) col.enabled = false;
 		if (col2 != null) col2.enabled = false;
 		this.gameObject.layer = 5;
-		rb.velocity = Vector2.zero;
+		// rb.velocity = Vector2.zero;
 		rb.gravityScale = 1;
 		this.enabled = false;
 		// if (alert != null) alert.SetActive( false );
