@@ -2,45 +2,48 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
+using Sirenix.OdinInspector;
 
 public abstract class Enemy : MonoBehaviour
 {
-	[SerializeField] protected int hp=10;
-	[SerializeField] protected int easyHp=5;
-	[Space] [SerializeField] protected int phase2;
-	[SerializeField] protected int easyPhase2;
+	[FoldoutGroup("HP")]  [SerializeField] protected int hp=10;
+	[FoldoutGroup("HP")]  [SerializeField] protected int easyHp=5;
+
+
+	[FoldoutGroup("PHASE RELATED")] [SerializeField] protected int phase2;
+	[FoldoutGroup("PHASE RELATED")] [SerializeField] protected int easyPhase2;
 	protected bool atPhase2;
-	[SerializeField] protected int phase3;
-	[SerializeField] protected int easyPhase3;
+	[FoldoutGroup("PHASE RELATED")] [SerializeField] protected int phase3;
+	[FoldoutGroup("PHASE RELATED")] [SerializeField] protected int easyPhase3;
 	protected bool atPhase3;
+	[FoldoutGroup("PHASE RELATED")] [Space] [SerializeField] protected int staggerCount=150;
+	[FoldoutGroup("PHASE RELATED")] [SerializeField] protected int hitCount;
+	[FoldoutGroup("PHASE RELATED")] [SerializeField] protected float recoverTime=1f;
+	[FoldoutGroup("PHASE RELATED")] [SerializeField] protected float recoverTimer;
 
 
 	[Space] [SerializeField] protected DmgPopup dmgPopup;
 	[SerializeField] protected OnTriggerTest inArea;
 
 
-	[Space] [SerializeField] protected int staggerCount=150;
-	[SerializeField] protected int hitCount;
-	[SerializeField] protected float recoverTime=1f;
-	[SerializeField] protected float recoverTimer;
 
 	[Space] public Transform self;
 	[SerializeField] protected Transform model;
 	[SerializeField] protected Transform eyes;
-	[SerializeField] SpriteRenderer[] sprites;
 	[SerializeField] protected Animator anim;
-	[SerializeField] protected bool hasJumpVelocityAnim=true;
-	[SerializeField] protected bool hasIsGroundedAnim=true;
-	[SerializeField] protected bool hasIsMovingAnim=true;
-	[SerializeField] protected bool hasMoveSpeedAnim=true;
-	[SerializeField] protected bool hasIsDeadAnim=true;
-	[SerializeField] protected bool hasSpawnAnim=true;
-	[SerializeField] protected bool hasSpawningInAnim=true;
+	[SerializeField] SpriteRenderer[] sprites;
+	[FoldoutGroup("HAS ANIMATION")] [SerializeField] protected bool hasJumpVelocityAnim=true;
+	[FoldoutGroup("HAS ANIMATION")] [SerializeField] protected bool hasIsGroundedAnim=true;
+	[FoldoutGroup("HAS ANIMATION")] [SerializeField] protected bool hasIsMovingAnim=true;
+	[FoldoutGroup("HAS ANIMATION")] [SerializeField] protected bool hasMoveSpeedAnim=true;
+	[FoldoutGroup("HAS ANIMATION")] [SerializeField] protected bool hasIsDeadAnim=true;
+	[FoldoutGroup("HAS ANIMATION")] [SerializeField] protected bool hasSpawnAnim=true;
+	[FoldoutGroup("HAS ANIMATION")] [SerializeField] protected bool hasSpawningInAnim=true;
 	
-	[Space] [SerializeField] protected Rigidbody2D rb;
-	[SerializeField] [Tooltip("Model")] protected Collider2D col;
-	[SerializeField] protected Collider2D col2;
-	[SerializeField] PhysicsMaterial2D frictionedMat;
+	[FoldoutGroup("RIGIDBODY")] [SerializeField] protected Rigidbody2D rb;
+	[FoldoutGroup("RIGIDBODY")] [SerializeField] [Tooltip("Model")] protected Collider2D col;
+	[FoldoutGroup("RIGIDBODY")] [SerializeField] protected Collider2D col2;
+	[FoldoutGroup("RIGIDBODY")] [SerializeField] PhysicsMaterial2D frictionedMat;
 	
 
 	[Space][SerializeField] protected GameObject closeRangeFinder;
@@ -58,34 +61,34 @@ public abstract class Enemy : MonoBehaviour
 	[SerializeField] int nShells=1;
 
 	
-	[Space] [Header("Platformer Related")]
-	[SerializeField] protected bool isSmart; // if attacked face direction;
-	[SerializeField] protected bool isStupid; // if attacked face direction;
-	[SerializeField] protected bool noWalkingAround;
-	[SerializeField] protected bool facePlayerOnSpawn;
+	// [Space] [Header("Platformer Related")]
+	[FoldoutGroup("PLATFORMER RELATED")] [SerializeField] protected bool isSmart; // if attacked face direction;
+	[FoldoutGroup("PLATFORMER RELATED")] [SerializeField] protected bool isStupid; // if attacked face direction;
+	[FoldoutGroup("PLATFORMER RELATED")] [SerializeField] protected bool noWalkingAround;
+	[FoldoutGroup("PLATFORMER RELATED")] [SerializeField] protected bool facePlayerOnSpawn;
 
-	[field: SerializeField] public bool isFlying {get; private set;}
-	[Space] [SerializeField] protected bool controlledByAnim;
-	[SerializeField] protected bool cannotTakeKb;
-	[SerializeField] protected bool cannotTakeDmg;
-	[SerializeField] protected float moveSpeed=2.5f;
-	[SerializeField] protected float chaseSpeed=7.5f;
-	[SerializeField] protected float jumpForce=10f;
-	[SerializeField] protected float maxSpeed=5;
-	[field: SerializeField] protected Transform groundDetect;
-	[field: SerializeField] protected Transform wallDetect;
-	[field: SerializeField] protected float groundDistDetect=1f;
-	[field: SerializeField] protected float wallDistDetect=0.5f;
-	[field: SerializeField] protected  LayerMask whatIsPlayer;
-	[field: SerializeField] protected  LayerMask whatIsGround;
-	[field: SerializeField] protected  LayerMask finalMask;
-	[SerializeField] protected bool isGrounded;
-	[SerializeField] bool cannotTakeYKb;
-	public bool idleActionOnly;
+	[FoldoutGroup("PLATFORMER RELATED")] [ShowInInspector] public bool isFlying {get; private set;}
+	[FoldoutGroup("PLATFORMER RELATED")] [Space] [SerializeField] protected bool controlledByAnim;
+	[FoldoutGroup("PLATFORMER RELATED")] [SerializeField] protected bool cannotTakeKb;
+	[FoldoutGroup("PLATFORMER RELATED")] [SerializeField] protected bool cannotTakeDmg;
+	[FoldoutGroup("PLATFORMER RELATED")] [SerializeField] protected float moveSpeed=2.5f;
+	[FoldoutGroup("PLATFORMER RELATED")] [SerializeField] protected float chaseSpeed=7.5f;
+	[FoldoutGroup("PLATFORMER RELATED")] [SerializeField] protected float jumpForce=10f;
+	[FoldoutGroup("PLATFORMER RELATED")] [SerializeField] protected float maxSpeed=5;
+	[FoldoutGroup("PLATFORMER RELATED")] [field: SerializeField] protected Transform groundDetect;
+	[FoldoutGroup("PLATFORMER RELATED")] [field: SerializeField] protected Transform wallDetect;
+	[FoldoutGroup("PLATFORMER RELATED")] [field: SerializeField] protected float groundDistDetect=1f;
+	[FoldoutGroup("PLATFORMER RELATED")] [field: SerializeField] protected float wallDistDetect=0.5f;
+	[FoldoutGroup("PLATFORMER RELATED")] [field: SerializeField] protected  LayerMask whatIsPlayer;
+	[FoldoutGroup("PLATFORMER RELATED")] [field: SerializeField] protected  LayerMask whatIsGround;
+	[FoldoutGroup("PLATFORMER RELATED")] [field: SerializeField] protected  LayerMask finalMask;
+	[FoldoutGroup("PLATFORMER RELATED")] [SerializeField] protected bool isGrounded;
+	[FoldoutGroup("PLATFORMER RELATED")] [SerializeField] bool cannotTakeYKb;
+	[FoldoutGroup("PLATFORMER RELATED")] public bool idleActionOnly;
 	protected bool beenHurt;
 	protected bool receivingKb;
-	[field: SerializeField] protected Transform groundCheck;
-	[field: SerializeField] protected Vector2 groundCheckSize;
+	[FoldoutGroup("PLATFORMER RELATED")] [field: SerializeField] protected Transform groundCheck;
+	[FoldoutGroup("PLATFORMER RELATED")] [field: SerializeField] protected Vector2 groundCheckSize;
 
 	
 	[Space] [SerializeField] protected CurrentAction currentAction=0;
@@ -100,27 +103,26 @@ public abstract class Enemy : MonoBehaviour
 	protected bool died;
 
 
-	[Space] [Header("Target Related")]
-	public PlayerControls target;
-	protected Transform targetDest;
-	public bool alwaysInRange;
-	public bool neverLoseSight;
-	public bool inRange; // player in area
-	public bool inSight; // player in line of sight within area
-	public bool isClose; // player in close area
-	public bool toolSuperClose; // player in close area
-	public bool isSuperClose; // player in close area
-	protected bool cannotRotate;
+	// [Space] [Header("Target Related")]
+	[FoldoutGroup("TARGET RELATED")] public PlayerControls target;
+	[FoldoutGroup("TARGET RELATED")] public bool alwaysInRange;
+	[FoldoutGroup("TARGET RELATED")] public bool neverLoseSight;
+	[FoldoutGroup("TARGET RELATED")] public bool inRange; // player in area
+	[FoldoutGroup("TARGET RELATED")] public bool inSight; // player in line of sight within area
+	[FoldoutGroup("TARGET RELATED")] public bool isClose; // player in close area
+	[FoldoutGroup("TARGET RELATED")] public bool toolSuperClose; // player in close area
+	[FoldoutGroup("TARGET RELATED")] public bool isSuperClose; // player in close area
+	// protected bool cannotRotate;
 	protected float moveDir;
 	protected bool attackingPlayer;
 	protected float searchCounter;
-	[SerializeField] protected float maxSearchTime=2;
-	[SerializeField] protected bool spawningIn; // set by animation
+	[FoldoutGroup("TARGET RELATED")] [SerializeField] protected float maxSearchTime=2;
+	[FoldoutGroup("TARGET RELATED")] [SerializeField] protected bool spawningIn; // set by animation
 	private bool summoned;
-	public bool cannotAtk;
-	public bool activated;
-	public bool inParryState;
-	public bool isShielding;
+	[FoldoutGroup("TARGET RELATED")] public bool cannotAtk;
+	[FoldoutGroup("TARGET RELATED")] public bool activated;
+	[FoldoutGroup("TARGET RELATED")] public bool inParryState;
+	[FoldoutGroup("TARGET RELATED")] public bool isShielding;
 
 
 
@@ -137,9 +139,9 @@ public abstract class Enemy : MonoBehaviour
 	public bool isWaiting;
 
 
-	[Space] [Header("Debug")]
-	[SerializeField] GameObject alert;
-	[SerializeField] float offset=30;
+	// [Space] [Header("Debug")]
+	// [SerializeField] GameObject alert;
+	float offset=30;
 
 
 	protected enum CurrentAction {left=-1, none=0, right=1}

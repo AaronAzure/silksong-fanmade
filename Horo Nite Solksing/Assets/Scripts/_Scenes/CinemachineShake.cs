@@ -2,10 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
+using Sirenix.OdinInspector;
 
 public class CinemachineShake : MonoBehaviour
 {
-	public static CinemachineShake Instance;
+	[ShowInInspector] public static CinemachineShake Instance;
 	public CinemachineVirtualCamera cm;
 	private CinemachineBasicMultiChannelPerlin bmcp;
 	private float shakeTimer;

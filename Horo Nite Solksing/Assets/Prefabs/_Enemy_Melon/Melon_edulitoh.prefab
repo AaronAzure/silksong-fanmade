@@ -255,18 +255,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e73de4eb956d4ed194d9ea048fa55ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hp: 39
-  easyHp: 24
+  hp: 50
+  easyHp: 30
   phase2: 0
   easyPhase2: 0
   phase3: 0
   easyPhase3: 0
-  dmgPopup: {fileID: 8494225618789353728}
-  inArea: {fileID: 4408640832910011354}
   staggerCount: 150
   hitCount: 0
   recoverTime: 1
   recoverTimer: 0
+  dmgPopup: {fileID: 8494225618789353728}
+  inArea: {fileID: 4408640832910011354}
   self: {fileID: 1376537067151301452}
   model: {fileID: 1376537066910156643}
   eyes: {fileID: 6227911179671446368}
@@ -315,8 +315,8 @@ MonoBehaviour:
   defaultMat: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
   sortGroup: {fileID: 110861285945438993}
   loot: {fileID: 2828130944199802275}
-  nLoot: 7
-  nShells: 1
+  nLoot: 10
+  nShells: 4
   isSmart: 1
   isStupid: 0
   noWalkingAround: 0

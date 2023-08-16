@@ -7,7 +7,7 @@ using UnityEngine.UI;
 using Rewired;
 using ED.SC;
 using TMPro;
-// using SmartConsole;
+using Sirenix.OdinInspector;
 
 public class PlayerControls : MonoBehaviour
 {
@@ -20,20 +20,20 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] Rewired.InputManager rm;
 
 
-	[Space] [Header("STATUS")]
+	[Space] 
 	private int maxHp=6;
-	[SerializeField] int hp;
-	public int nBonusHp;
-	[SerializeField] int nTempHp;
+	[FoldoutGroup("STATUS")] [SerializeField] int hp;
+	[FoldoutGroup("STATUS")] public int nBonusHp;
+	[FoldoutGroup("STATUS")] [SerializeField] int nTempHp;
 
 	private int maxSilk=9;
-	[SerializeField] int nSilk;
-	public int nBonusSilk;
+	[FoldoutGroup("STATUS")] [SerializeField] int nSilk;
+	[FoldoutGroup("STATUS")] public int nBonusSilk;
 	
 	
-	[Space] [SerializeField] int nRosaries;
-	[SerializeField] int nRosaryStrings;
-	[SerializeField] int nShellShards;
+	[FoldoutGroup("STATUS")] [SerializeField] int nRosaries;
+	[FoldoutGroup("STATUS")] [SerializeField] int nRosaryStrings;
+	[FoldoutGroup("STATUS")] [SerializeField] int nShellShards;
 	private int nGoldenWatermelons;
 	private int nGoldenWatermelonsTraded;
 	
@@ -64,10 +64,10 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] GameObject silkGlowNorm;
 	[SerializeField] GameObject silkGlowHarp;
 	[SerializeField] SpriteRenderer[] sprites;
-	[SerializeField] Material defaultMat;
-	[SerializeField] Material dmgMat;
-	[SerializeField] Material greenMat;
-	[SerializeField] Material flashMat;
+	[FoldoutGroup("MATERIALS")] [SerializeField] Material defaultMat;
+	[FoldoutGroup("MATERIALS")] [SerializeField] Material dmgMat;
+	[FoldoutGroup("MATERIALS")] [SerializeField] Material greenMat;
+	[FoldoutGroup("MATERIALS")] [SerializeField] Material flashMat;
 
 
 	[Space] [Header("PLATFORMER")]
@@ -89,24 +89,24 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] float moveSpeed=5;
 
 
-	[Space] [Header("JUMP RELATED")]
-	[SerializeField] float jumpDashForce=10;
-	[SerializeField] float jumpForce=10;
-	[SerializeField] float jumpingOutOfSceneForce=10;
-	[SerializeField] [Range(0f,1f)] float jumpCutoffForce=0.75f;
-	[SerializeField] [Range(0f,1f)] float maxJumpCutoffForce=0.6f;
-	[SerializeField] float fallSpeed=3;
-	[SerializeField] float fallClampSpeed=-10f;
-	[SerializeField] float fallGrav=1.2f;
-	[SerializeField] float jumpMaxTimer=0.5f;
-	private float coyoteTimer;
-	[SerializeField] float coyoteThreshold=0.1f;
-	private float jumpBufferTimer;
-	[SerializeField] float jumpBufferThreshold=0.2f;
-	private float wallJumpTimer;
-	[SerializeField] float wallJumpMin=0.125f; // can be released
-	[SerializeField] float wallJumpControlThreshold=0.25f; // can control
-	[SerializeField] float wallJumpThreshold=0.5f; // max height
+	[Space] [Title("JUMP RELATED")]
+	[FoldoutGroup("JUMP RELATED")] [SerializeField] float jumpDashForce=10;
+	[FoldoutGroup("JUMP RELATED")] [SerializeField] float jumpForce=10;
+	[FoldoutGroup("JUMP RELATED")] [SerializeField] float jumpingOutOfSceneForce=10;
+	[FoldoutGroup("JUMP RELATED")] [SerializeField] [Range(0f,1f)] float jumpCutoffForce=0.75f;
+	[FoldoutGroup("JUMP RELATED")] [SerializeField] [Range(0f,1f)] float maxJumpCutoffForce=0.6f;
+	[FoldoutGroup("JUMP RELATED")] [SerializeField] float fallSpeed=3;
+	[FoldoutGroup("JUMP RELATED")] [SerializeField] float fallClampSpeed=-10f;
+	[FoldoutGroup("JUMP RELATED")] [SerializeField] float fallGrav=1.2f;
+	[FoldoutGroup("JUMP RELATED")] [SerializeField] float jumpMaxTimer=0.5f;
+	[FoldoutGroup("JUMP RELATED")] [ReadOnly] private float coyoteTimer;
+	[FoldoutGroup("JUMP RELATED")] [SerializeField] float coyoteThreshold=0.1f;
+	[FoldoutGroup("JUMP RELATED")] [ReadOnly] private float jumpBufferTimer;
+	[FoldoutGroup("JUMP RELATED")] [SerializeField] float jumpBufferThreshold=0.2f;
+	[FoldoutGroup("JUMP RELATED")] [ReadOnly] private float wallJumpTimer;
+	[FoldoutGroup("JUMP RELATED")] [SerializeField] float wallJumpMin=0.125f; // can be released
+	[FoldoutGroup("JUMP RELATED")] [SerializeField] float wallJumpControlThreshold=0.25f; // can control
+	[FoldoutGroup("JUMP RELATED")] [SerializeField] float wallJumpThreshold=0.5f; // max height
 	private float wallJumpDir;
 	private float lookTimer;
 	[SerializeField] float lookThreshold=0.5f;
@@ -221,44 +221,43 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] TextMeshProUGUI areaCanvasTxt;
 
 
-	[Space] [Header("SOUND EFFECTS")]
-	[SerializeField] AudioSource shawSound;
-	[SerializeField] AudioSource agaleSound;
-	[SerializeField] AudioSource adimaSound;
-	[SerializeField] AudioSource gitGudSound;
+	// [Space] [Header("SOUND EFFECTS")]
+	[FoldoutGroup("SOUND EFFECTS")]  AudioSource shawSound;
+	[FoldoutGroup("SOUND EFFECTS")]  AudioSource agaleSound;
+	[FoldoutGroup("SOUND EFFECTS")]  AudioSource adimaSound;
+	[FoldoutGroup("SOUND EFFECTS")]  AudioSource gitGudSound;
 
 
-	[Space] [Header("PARTICLE EFFECTS")]
-	[SerializeField] GameObject dashEffectL;
-	[SerializeField] GameObject dashEffectR;
-	[SerializeField] GameObject healingPs;
-	[SerializeField] GameObject bloodBurstPs;
-	[SerializeField] GameObject bindPs;
-	[SerializeField] GameObject greenGooPs;
-	[SerializeField] ParticleSystem soulLeakPs;
-	[SerializeField] ParticleSystem soulLeakShortPs;
-	[SerializeField] Animator animeLinesAnim;
-	[SerializeField] Transform dashSpawnPos;
-	[SerializeField] Animator flashAnim;
-	[SerializeField] GameObject melonSwordSparklePs;
+	[FoldoutGroup("PARTICLE EFFECTS")] [SerializeField] GameObject dashEffectL;
+	[FoldoutGroup("PARTICLE EFFECTS")] [SerializeField] GameObject dashEffectR;
+	[FoldoutGroup("PARTICLE EFFECTS")] [SerializeField] GameObject healingPs;
+	[FoldoutGroup("PARTICLE EFFECTS")] [SerializeField] GameObject bloodBurstPs;
+	[FoldoutGroup("PARTICLE EFFECTS")] [SerializeField] GameObject bindPs;
+	[FoldoutGroup("PARTICLE EFFECTS")] [SerializeField] GameObject greenGooPs;
+	[FoldoutGroup("PARTICLE EFFECTS")] [SerializeField] ParticleSystem soulLeakPs;
+	[FoldoutGroup("PARTICLE EFFECTS")] [SerializeField] ParticleSystem soulLeakShortPs;
+	[FoldoutGroup("PARTICLE EFFECTS")] [SerializeField] Animator animeLinesAnim;
+	[FoldoutGroup("PARTICLE EFFECTS")] [SerializeField] Transform dashSpawnPos;
+	[FoldoutGroup("PARTICLE EFFECTS")] [SerializeField] Animator flashAnim;
+	[FoldoutGroup("PARTICLE EFFECTS")] [SerializeField] GameObject melonSwordSparklePs;
 
 
 	[Space] [Header("ANIMATOR CONTROLLED")]
-	[SerializeField] bool isLedgeGrabbing; // controlled by animator
-	[SerializeField] bool inAnimation;
-	[SerializeField] bool inRushSkill;
-	[SerializeField] bool inInvincibleAnim;
-	[SerializeField] bool performingGossamerStorm;
-	[SerializeField] bool cantRotate;
+	[FoldoutGroup("ANIMATOR CONTROLLED")] [SerializeField] bool isLedgeGrabbing; // controlled by animator
+	[FoldoutGroup("ANIMATOR CONTROLLED")] [SerializeField] bool inAnimation;
+	[FoldoutGroup("ANIMATOR CONTROLLED")] [SerializeField] bool inRushSkill;
+	[FoldoutGroup("ANIMATOR CONTROLLED")] [SerializeField] bool inInvincibleAnim;
+	[FoldoutGroup("ANIMATOR CONTROLLED")] [SerializeField] bool performingGossamerStorm;
+	[FoldoutGroup("ANIMATOR CONTROLLED")] [SerializeField] bool cantRotate;
 	private bool cantRotate2;
-	[SerializeField] bool inAirDash;
-	[SerializeField] bool inAtkState;
-	[SerializeField] bool inShawAtk;
-	[SerializeField] bool isBinding;
-	[SerializeField] bool downwardStrike;
-	[SerializeField] bool dashStrike;
-	[SerializeField] bool beenHurt;
-	[SerializeField] bool risingAtk;
+	[FoldoutGroup("ANIMATOR CONTROLLED")] [SerializeField] bool inAirDash;
+	[FoldoutGroup("ANIMATOR CONTROLLED")] [SerializeField] bool inAtkState;
+	[FoldoutGroup("ANIMATOR CONTROLLED")] [SerializeField] bool inShawAtk;
+	[FoldoutGroup("ANIMATOR CONTROLLED")] [SerializeField] bool isBinding;
+	[FoldoutGroup("ANIMATOR CONTROLLED")] [SerializeField] bool downwardStrike;
+	[FoldoutGroup("ANIMATOR CONTROLLED")] [SerializeField] bool dashStrike;
+	[FoldoutGroup("ANIMATOR CONTROLLED")] [SerializeField] bool beenHurt;
+	[FoldoutGroup("ANIMATOR CONTROLLED")] [SerializeField] bool risingAtk;
 	private bool holdingRiseButton;
 	private bool isDead=false;
 	public bool isFinished=false;
@@ -271,42 +270,43 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] bool startWalkingIn;
 
 
-	[Space] [Header("TOOLS")]
-	[SerializeField] StraightPin straightPin;
-	[SerializeField] Pimpillo pimpillo;
-	[SerializeField] Caltrops caltrops;
-	[SerializeField] SawBlade sawBlade;
-	[SerializeField] Syringe syringe;
-	[SerializeField] MelonSword melonSword;
+	// [Space] [Header("TOOLS")]
+	[FoldoutGroup("TOOLS")] [SerializeField] StraightPin straightPin;
+	[FoldoutGroup("TOOLS")] [SerializeField] Pimpillo pimpillo;
+	[FoldoutGroup("TOOLS")] [SerializeField] Caltrops caltrops;
+	[FoldoutGroup("TOOLS")] [SerializeField] SawBlade sawBlade;
+	[FoldoutGroup("TOOLS")] [SerializeField] Syringe syringe;
+	[FoldoutGroup("TOOLS")] [SerializeField] MelonSword melonSword;
 
-	[Space] [SerializeField] Animator melonSwordMagicAnim;
-	[SerializeField] ParticleSystem melonSwordReadyPs;
-	[SerializeField] float melonSwordComboTime=5;
-	[SerializeField] float melonSwordRechargeTime=8;
+	[FoldoutGroup("TOOLS")] [Space] [SerializeField] Animator melonSwordMagicAnim;
+	[FoldoutGroup("TOOLS")] [SerializeField] ParticleSystem melonSwordReadyPs;
+	[FoldoutGroup("TOOLS")] [SerializeField] float melonSwordComboTime=5;
+	[FoldoutGroup("TOOLS")] [SerializeField] float melonSwordRechargeTime=8;
 
-	[Space] [SerializeField] Transform toolSummonPos;
-	[SerializeField] GameObject toolGaugeUi;
-	[SerializeField] Tool[] tools;
+	[FoldoutGroup("TOOLS")] [Space] [SerializeField] Transform toolSummonPos;
+	[FoldoutGroup("TOOLS")] [SerializeField] GameObject toolGaugeUi;
+	[FoldoutGroup("TOOLS")] [SerializeField] Tool[] tools;
 	private Tool tool1;
 	private Tool tool2;
-	[SerializeField] GameObject straightPinUi;
-	[SerializeField] GameObject pimpilloToolUi;
-	[SerializeField] GameObject caltropsToolUi;
-	[SerializeField] GameObject shawbladesToolUi;
-	[SerializeField] GameObject syringeToolUi;
-	[SerializeField] GameObject melonSwordToolUi;
-	[SerializeField] GameObject shieldToolUi;
-	[SerializeField] GameObject spoolToolUi;
-	[SerializeField] GameObject lootCharmToolUi;
+	[FoldoutGroup("TOOLS UI")] [SerializeField] GameObject straightPinUi;
+	[FoldoutGroup("TOOLS UI")] [SerializeField] GameObject pimpilloToolUi;
+	[FoldoutGroup("TOOLS UI")] [SerializeField] GameObject caltropsToolUi;
+	[FoldoutGroup("TOOLS UI")] [SerializeField] GameObject shawbladesToolUi;
+	[FoldoutGroup("TOOLS UI")] [SerializeField] GameObject syringeToolUi;
+	[FoldoutGroup("TOOLS UI")] [SerializeField] GameObject melonSwordToolUi;
+	[FoldoutGroup("TOOLS UI")] [SerializeField] GameObject shieldToolUi;
+	[FoldoutGroup("TOOLS UI")] [SerializeField] GameObject spoolToolUi;
+	[FoldoutGroup("TOOLS UI")] [SerializeField] GameObject lootCharmToolUi;
 
-	[Space] [SerializeField] GameObject lootCharmToolShopUi;
-	[Space] [SerializeField] GameObject syringeToolShopUi;
+	[FoldoutGroup("TOOLS UI")] [Space] [SerializeField] GameObject lootCharmToolShopUi;
+	[FoldoutGroup("TOOLS UI")] [Space] [SerializeField] GameObject syringeToolShopUi;
+
 	private bool refillUses;
 	private float nToolSlowUses1;
 	private float nToolSlowUses2;
-	[Space] [SerializeField] Image toolUses1; // progress bar
-	[SerializeField] Image toolUses2; // progress bar
-	[SerializeField] TextMeshProUGUI tool1Version;
+	[FoldoutGroup("TOOLS UI")] [Space] [SerializeField] Image toolUses1; // progress bar
+	[FoldoutGroup("TOOLS UI")] [SerializeField] Image toolUses2; // progress bar
+	[FoldoutGroup("TOOLS UI")] [SerializeField] TextMeshProUGUI tool1Version;
 	
 
 	[Space] [SerializeField] bool hasShield;
@@ -319,16 +319,16 @@ public class PlayerControls : MonoBehaviour
 
 	[Space] [SerializeField] bool hasExtraSpool;
 	public int nExtraSpoolBonus;
-	[SerializeField] GameObject[] spoolObj;
-	[SerializeField] GameObject[] extraSpoolObj;
-	[SerializeField] Image spoolBindMarkerImg6;
-	[SerializeField] Image spoolBindMarkerImg9;
-	[SerializeField] Image extraMidMarkerImg;
-	[SerializeField] Sprite spoolNormSpr;
-	[SerializeField] Sprite spoolBindMarkerSpr;
-	[SerializeField] Sprite extraMidMarkerSpr;
-	[SerializeField] Sprite extraBindMarkerSpr;
-	[SerializeField] GameObject spoolEndObj;
+	[FoldoutGroup("NOTCH UI RELATED")] [SerializeField] GameObject[] spoolObj;
+	[FoldoutGroup("NOTCH UI RELATED")] [SerializeField] GameObject[] extraSpoolObj;
+	[FoldoutGroup("NOTCH UI RELATED")] [SerializeField] Image spoolBindMarkerImg6;
+	[FoldoutGroup("NOTCH UI RELATED")] [SerializeField] Image spoolBindMarkerImg9;
+	[FoldoutGroup("NOTCH UI RELATED")] [SerializeField] Image extraMidMarkerImg;
+	[FoldoutGroup("NOTCH UI RELATED")] [SerializeField] Sprite spoolNormSpr;
+	[FoldoutGroup("NOTCH UI RELATED")] [SerializeField] Sprite spoolBindMarkerSpr;
+	[FoldoutGroup("NOTCH UI RELATED")] [SerializeField] Sprite extraMidMarkerSpr;
+	[FoldoutGroup("NOTCH UI RELATED")] [SerializeField] Sprite extraBindMarkerSpr;
+	[FoldoutGroup("NOTCH UI RELATED")] [SerializeField] GameObject spoolEndObj;
 
 	[Space] [SerializeField] bool hasLootCharm;
 	public int nLootCharmBonus;
