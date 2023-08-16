@@ -151,8 +151,8 @@ public class Room : MonoBehaviour
 		if (!alwaysLockCam)
 		{
 			roomCam.SetActive(false);
-			if (CinemachineMaster.Instance != null) 
-				CinemachineMaster.Instance.SetLiveCinemachineShakeDelay();
+			// if (CinemachineMaster.Instance != null) 
+			// 	CinemachineMaster.Instance.SetLiveCinemachineShakeDelay();
 		}
 	}
 
@@ -195,15 +195,15 @@ public class Room : MonoBehaviour
 				m.PlayBossMusic(nBoss);
 
 			roomCam.SetActive(true);
-			if (CinemachineMaster.Instance != null) 
-				CinemachineMaster.Instance.SetLiveCinemachineShakeDelay();
+			// if (CinemachineMaster.Instance != null) 
+			// 	CinemachineMaster.Instance.SetLiveCinemachineShakeDelay();
 			this.enabled = false;
 		}
 		if (done && alwaysLockCam && other.CompareTag("Player"))
 		{
 			roomCam.SetActive(true);
-			if (CinemachineMaster.Instance != null) 
-				CinemachineMaster.Instance.SetLiveCinemachineShakeDelay();
+			// if (CinemachineMaster.Instance != null) 
+			// 	CinemachineMaster.Instance.SetLiveCinemachineShakeDelay();
 		}
 	}
 
@@ -212,8 +212,8 @@ public class Room : MonoBehaviour
 		if (done && alwaysLockCam && other.CompareTag("Player"))
 		{
 			roomCam.SetActive(false);
-			if (CinemachineMaster.Instance != null) 
-				CinemachineMaster.Instance.SetLiveCinemachineShakeDelay();
+			// if (CinemachineMaster.Instance != null) 
+			// 	CinemachineMaster.Instance.SetLiveCinemachineShakeDelay();
 		}
 	}
 }

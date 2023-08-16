@@ -6,6 +6,7 @@ using Cinemachine;
 public class CinemachineMaster : MonoBehaviour
 {
     [SerializeField] CinemachineVirtualCamera[] vcams;
+    [SerializeField] CinemachineShake shakeInstance;
     [SerializeField] CinemachineShake[] vShakes;
 	public static CinemachineMaster Instance;
 	private Vector3 origOffset;
@@ -22,7 +23,6 @@ public class CinemachineMaster : MonoBehaviour
 	private void Start() 
 	{
 		Debug.Log("New cinemachineMaster");
-		// SetCinemachineShakeOnHighestPriority();	
 		SetLiveCinemachineShakeDelay();
 	}
 
@@ -32,6 +32,7 @@ public class CinemachineMaster : MonoBehaviour
 		if (v != null)
 		{
 			CinemachineShake.Instance = v.gameObject.GetComponent<CinemachineShake>();
+			shakeInstance = CinemachineShake.Instance;
 			origOffset = v.GetCinemachineComponent<CinemachineTransposer>().m_FollowOffset;
 		}
 		else
@@ -50,6 +51,7 @@ public class CinemachineMaster : MonoBehaviour
 		if (v != null)
 		{
 			CinemachineShake.Instance = v.gameObject.GetComponent<CinemachineShake>();
+			shakeInstance = CinemachineShake.Instance;
 			origOffset = v.GetCinemachineComponent<CinemachineTransposer>().m_FollowOffset;
 		}
 		else

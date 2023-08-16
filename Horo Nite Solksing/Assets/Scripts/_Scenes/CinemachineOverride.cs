@@ -23,8 +23,8 @@ public class CinemachineOverride : MonoBehaviour
 				isSecret = false;
 			}
 			newCam.m_Priority = 100;
-			if (CinemachineMaster.Instance != null) 
-				CinemachineMaster.Instance.SetLiveCinemachineShakeDelay();
+			// if (CinemachineMaster.Instance != null) 
+			// 	CinemachineMaster.Instance.SetLiveCinemachineShakeDelay();
 		}
 	}
 	
@@ -39,7 +39,7 @@ public class CinemachineOverride : MonoBehaviour
 	public void ExitCamLock()
 	{
 		newCam.m_Priority = -100;
-		if (CinemachineMaster.Instance != null) 
-			CinemachineMaster.Instance.SetLiveCinemachineShakeDelay();
+		// if (CinemachineMaster.Instance != null) 
+		// 	CinemachineMaster.Instance.SetLiveCinemachineShakeDelay();
 	}
 }

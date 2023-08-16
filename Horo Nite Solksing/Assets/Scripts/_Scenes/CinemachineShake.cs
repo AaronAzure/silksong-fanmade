@@ -13,7 +13,8 @@ public class CinemachineShake : MonoBehaviour
 	private float startingIntensity;
 	private bool forever;
 
-	private void Awake() {
+	private void Awake() 
+	{
 		Instance = this;
 	}
 

@@ -2665,6 +2665,21 @@ public class PlayerControls : MonoBehaviour
 		}
 	}
 
+	private void OnCollisionEnter2D(Collision2D other) 
+	{
+		if (other.gameObject.CompareTag("MovingTutorial"))
+		{
+			transform.parent = other.transform;
+		}
+	}
+	private void OnCollisionExit2D(Collision2D other) 
+	{
+		if (other.gameObject.CompareTag("MovingTutorial"))
+		{
+			transform.parent = null;
+		}
+	}
+
 	public void _GAIN_TEMP_HP(int tempHpToGain)
 	{
 		for (int i=0 ; i<tempHpToGain ; i++)
