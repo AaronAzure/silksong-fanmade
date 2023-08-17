@@ -62,7 +62,10 @@ public class MelonCircus : Enemy
 	{
 		inArea.SwapParent();
 		if (!died)
+		{
+			Debug.Log("poikjpasd ");
 			melonBallObj.SetActive(false);
+		}
 	}
 
 	protected override bool CallChildOnIsPlayerInSight() 

@@ -66,8 +66,8 @@ public abstract class Enemy : MonoBehaviour
 	[FoldoutGroup("PLATFORMER RELATED")] [SerializeField] protected bool isStupid; // if attacked face direction;
 	[FoldoutGroup("PLATFORMER RELATED")] [SerializeField] protected bool noWalkingAround;
 	[FoldoutGroup("PLATFORMER RELATED")] [SerializeField] protected bool facePlayerOnSpawn;
+	[FoldoutGroup("PLATFORMER RELATED")] public bool isFlying;
 
-	[FoldoutGroup("PLATFORMER RELATED")] [ShowInInspector] public bool isFlying {get; private set;}
 	[FoldoutGroup("PLATFORMER RELATED")] [Space] [SerializeField] protected bool controlledByAnim;
 	[FoldoutGroup("PLATFORMER RELATED")] [SerializeField] protected bool cannotTakeKb;
 	[FoldoutGroup("PLATFORMER RELATED")] [SerializeField] protected bool cannotTakeDmg;
@@ -254,6 +254,10 @@ public abstract class Enemy : MonoBehaviour
 		{
 			CallChildOnInAreaSwap();
 		}
+		// if (room != null && inArea != null)
+		// {
+		// 	inArea.done = true;
+		// }
     }
 
 	public virtual void FixedUpdate()
@@ -559,6 +563,7 @@ public abstract class Enemy : MonoBehaviour
 		if (superCloseRangeFinder != null) Destroy(superCloseRangeFinder);
 		if (inArea != null) 
 		{
+			inArea.done = true;
 			inArea.OnMasterDeath();
 		}
 		if (shake) CinemachineShake.Instance.ShakeCam(2.5f, 0.5f);
@@ -578,7 +583,6 @@ public abstract class Enemy : MonoBehaviour
 		// rb.velocity = Vector2.zero;
 		rb.gravityScale = 1;
 		this.enabled = false;
-		// if (alert != null) alert.SetActive( false );
 		if (hasIsDeadAnim && anim != null)
 			anim.SetBool("isDead", true);
 		sortGroup.sortingOrder = -1000 + PlayerControls.Instance.IncreaseKills();

@@ -11,6 +11,7 @@ public class OnTriggerTest : MonoBehaviour
 	[Space] [SerializeField] bool alwaysActive;
 
 	[Space] [SerializeField] bool isMelonCircus;
+	public bool done;
 	
 
 	private void Awake() 
@@ -25,15 +26,18 @@ public class OnTriggerTest : MonoBehaviour
 
 	private void OnEnable() 
 	{
-		if (obj == null)
-			this.gameObject.SetActive(false);	
-		else
-			master = obj.transform;
+		if (!done)
+		{
+			if (obj == null)
+				this.gameObject.SetActive(false);	
+			else
+				master = obj.transform;
+		}
 	}
 
 	public void SwapParent(bool thisIsParent=true)
 	{
-		if (master != null)
+		if (master != null && !done)
 		{
 			if (master != null && mainHolder != null && transform.parent != null)
 				transform.parent = thisIsParent ? mainHolder : master;
@@ -75,7 +79,7 @@ public class OnTriggerTest : MonoBehaviour
 
 	private void OnTriggerExit2D(Collider2D other) 
 	{
-		if (obj != null && other.CompareTag("MainCamera2"))	
+		if (obj != null && other.CompareTag("MainCamera2") && !done)	
 		{
 			obj.SetActive(false);
 			SwapParent(true);

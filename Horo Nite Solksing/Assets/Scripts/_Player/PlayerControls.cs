@@ -74,6 +74,7 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] Rigidbody2D rb;
 	public Transform model;
 	public Transform camTarget;
+	[SerializeField] Transform camTargetMain;
 	private float camFaceTimer;
 	[SerializeField] float camFaceSpeed=2;
 	private bool facingRight;
@@ -1218,6 +1219,21 @@ public class PlayerControls : MonoBehaviour
 
 	void DashMechanic(bool alreadyRegistered=false)
 	{
+		if (hurtCo == null)
+		{
+			CinemachineMaster.Instance.SetCamDamp(
+				player.GetButton("Dash") ? 0.75f : 1, 
+				rb.velocity.y < fallSpeed ? 0.25f : 1
+			);
+		}
+		else
+		{
+			CinemachineMaster.Instance.SetCamDamp(
+				1, 
+				1
+			);
+		}
+
 		// First frame of pressing dash button
 		if (alreadyRegistered || (!isLedgeGrabbing && player.GetButtonDown("Dash") 
 			&& dashCounter <= 0 && dashCooldownCounter <= 0))
@@ -2382,6 +2398,11 @@ public class PlayerControls : MonoBehaviour
 		anim.SetBool("isAirDash", false);
 		CancelDash();
 		jumpDashed = false;
+		// if (ledgeGrabCamAnim != null)
+		// {
+		// 	ledgeGrabCamAnim.enabled = true;
+		// 	ledgeGrabCamAnim.SetBool("isLeft", model.localScale.x < 0);
+		// }
 
 		moveDir = model.localScale.x;
 		rb.gravityScale = 0;
@@ -2393,6 +2414,8 @@ public class PlayerControls : MonoBehaviour
 	}
 	public void GRAB_LEDGE()
 	{
+		// if (ledgeGrabCamAnim != null)
+		// 	ledgeGrabCamAnim.enabled = false;
 		transform.position += new Vector3(moveDir * 0.5f, 0.8f);
 		isJumping = isWallSliding = canLedgeGrab = ledgeGrab = false;
 		dashCooldownCounter = dashCounter = 0;
