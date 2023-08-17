@@ -13,8 +13,8 @@ public class CinemachineTarget : MonoBehaviour
         CinemachineVirtualCamera cm = this.GetComponent<CinemachineVirtualCamera>();
 		if (cm != null)
 		{
-			cm.m_Follow = PlayerControls.Instance.model;
-			// cm.m_Follow = PlayerControls.Instance.camTarget;
+			// cm.m_Follow = PlayerControls.Instance.model;
+			cm.m_Follow = PlayerControls.Instance.camTarget;
 			// cm.m_Follow = GameObject.Find("HORNET (PLAYER)/Model").transform;
 		}
     }

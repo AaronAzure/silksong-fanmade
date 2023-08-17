@@ -52,14 +52,24 @@ public class MelonBee : Enemy
 		// 	closeDistTimer -= (Time.fixedDeltaTime * 0.5f);
 	}
 
+	private bool sighted;
+
 	protected override void CallChildOnInSight()
 	{
-		currentAction = CurrentAction.none;
-		anim.SetTrigger("alert");
-		anim.SetBool("isChasing", true);
+		if (!sighted)
+		{
+			sighted = true;
+			currentAction = CurrentAction.none;
+			anim.SetTrigger("alert");
+			anim.SetBool("isChasing", true);
+		}
 	}
 	protected override void CallChildOnLostSight()
 	{
-		anim.SetBool("isChasing", false);
+		if (sighted)
+		{
+			sighted = false;
+			anim.SetBool("isChasing", false);
+		}
 	}
 }

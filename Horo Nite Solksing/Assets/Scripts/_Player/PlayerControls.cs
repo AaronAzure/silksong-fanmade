@@ -74,6 +74,12 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] Rigidbody2D rb;
 	public Transform model;
 	public Transform camTarget;
+	private float camFaceTimer;
+	[SerializeField] float camFaceSpeed=2;
+	private bool facingRight;
+	private Vector2 camTargetPos;
+	private Vector2 camTargetStartPos;
+	private Vector2 camTargetEndPos;
 
 	[Space] [SerializeField] ParticleSystem leafTrailPs;
 	[SerializeField] ParticleSystem leafWallSlideTrailPsRight;
@@ -527,6 +533,14 @@ public class PlayerControls : MonoBehaviour
 		self = transform;
 		tools = new Tool[1];
 		origGrav = rb.gravityScale;
+		facingRight = IsFacingRight();
+		if (camTarget != null)
+		{
+			camTargetStartPos = camTarget.localPosition;
+			camTargetEndPos = new Vector2(facingRight ? 0.5f : -0.5f, 0);
+			camTarget.localPosition = camTargetEndPos;
+		}
+		MoveCamTarget();
 
 		savedScene = SceneManager.GetActiveScene().name;
 		savedPos = self.position;
@@ -1024,7 +1038,10 @@ public class PlayerControls : MonoBehaviour
 
 				// Normal movement
 				if (!inAirDash)
+				{
 					Move();
+					MoveCamTarget();
+				}
 				// Air dashed
 				else if (!isWallJumping)
 					rb.velocity = new Vector2(model.localScale.x * dashSpeed * airDashMultiplier, rb.velocity.y / 2);
@@ -1615,14 +1632,44 @@ public class PlayerControls : MonoBehaviour
 		// dashing
 		else
 		{
-			bool facingRight = IsFacingRight();
+			bool isFacingRight = IsFacingRight();
 			rb.AddForce(
-				new Vector2((facingRight ? 1 : -1) * activeMoveSpeed * 5 * (risingAtk ? 0.5f : 1), 0), 
+				new Vector2((isFacingRight ? 1 : -1) * activeMoveSpeed * 5 * (risingAtk ? 0.5f : 1), 0), 
 				ForceMode2D.Force
 			);
 			rb.velocity = new Vector2(
 				Mathf.Clamp(rb.velocity.x, -dashSpeed * (risingAtk ? 0.5f : 1), dashSpeed * (risingAtk ? 0.5f : 1)), 
 				rb.velocity.y
+			);
+		}
+	}
+
+	void MoveCamTarget()
+	{
+		if (camTarget != null)
+		{
+			// Just faced right
+			if (!facingRight && model.localScale.x > 0)
+			{
+				facingRight = true;
+				camTargetStartPos = camTarget.localPosition;
+				camFaceTimer = 0;
+				camTargetEndPos = new Vector2(0.5f, 0);
+			}
+			// Just faced left
+			else if (facingRight && model.localScale.x < 0)
+			{
+				facingRight = false;
+				camTargetStartPos = camTarget.localPosition;
+				camFaceTimer = 0;
+				camTargetEndPos = new Vector2(-0.5f, 0);
+			}
+			if (camFaceTimer < 1)
+				camFaceTimer = Mathf.Min(1, camFaceTimer + Time.fixedDeltaTime * camFaceSpeed);
+			camTarget.localPosition = Vector2.Lerp(
+				camTargetStartPos, 
+				camTargetEndPos, 
+				Mathf.SmoothStep(0, 1, camFaceTimer)
 			);
 		}
 	}

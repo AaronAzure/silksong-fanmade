@@ -66,6 +66,6 @@ public class CinemachineMaster : MonoBehaviour
 		// }
 		if (v != null)
 			v.GetCinemachineComponent<CinemachineTransposer>().m_FollowOffset =
-				Vector3.Lerp(origOffset, origOffset + newOffset, t);
+				Vector3.Lerp(origOffset, origOffset + newOffset, Mathf.SmoothStep(0, 1, t));
 	}
 }
