@@ -238,15 +238,16 @@ MonoBehaviour:
   easyPhase2: 0
   phase3: 0
   easyPhase3: 0
-  dmgPopup: {fileID: 8494225618789353728}
-  inArea: {fileID: 4408640832910011354}
   staggerCount: 150
   hitCount: 0
   recoverTime: 1
   recoverTimer: 0
+  dmgPopup: {fileID: 8494225618789353728}
+  inArea: {fileID: 4408640832910011354}
   self: {fileID: 1376537067151301452}
   model: {fileID: 1376537066910156643}
   eyes: {fileID: 0}
+  anim: {fileID: 3219864685213907636}
   sprites:
   - {fileID: 3233622526052297486}
   - {fileID: 311838161023224186}
@@ -259,7 +260,6 @@ MonoBehaviour:
   - {fileID: 8082311519327702612}
   - {fileID: 8166597412696331022}
   - {fileID: 8806868824021725658}
-  anim: {fileID: 3219864685213907636}
   hasJumpVelocityAnim: 0
   hasIsGroundedAnim: 0
   hasIsMovingAnim: 0
@@ -284,7 +284,6 @@ MonoBehaviour:
   isStupid: 0
   noWalkingAround: 0
   facePlayerOnSpawn: 0
-  <isFlying>k__BackingField: 1
   controlledByAnim: 0
   cannotTakeKb: 0
   cannotTakeDmg: 0
@@ -336,8 +335,6 @@ MonoBehaviour:
   <mainPos>k__BackingField: {fileID: 0}
   room: {fileID: 0}
   isWaiting: 0
-  alert: {fileID: 0}
-  offset: 30
   canChaseAnim: 0
 --- !u!114 &7695218857849479814
 MonoBehaviour:

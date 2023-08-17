@@ -110,12 +110,13 @@ public class PlayerControls : MonoBehaviour
 	private float wallJumpDir;
 	private float lookTimer;
 	[SerializeField] float lookThreshold=0.5f;
-	[SerializeField] float lookOffset=2.5f;
+	[SerializeField] float lookOffset=3f;
 	[SerializeField] float lookOffsetMultiplier=2.5f;
 	private Vector3 camOffset;
 	private bool camOffsetReset;
+	private bool camOffsetFinish;
 	private float lookLerpTimer;
-	private float lookLerpThres=1;
+	[SerializeField] float lookLerpThres=0.5f;
 
 	[Space] [SerializeField] float risingForce=10;
 	[SerializeField] Vector2 wallJumpForce;
@@ -222,10 +223,10 @@ public class PlayerControls : MonoBehaviour
 
 
 	// [Space] [Header("SOUND EFFECTS")]
-	[FoldoutGroup("SOUND EFFECTS")]  AudioSource shawSound;
-	[FoldoutGroup("SOUND EFFECTS")]  AudioSource agaleSound;
-	[FoldoutGroup("SOUND EFFECTS")]  AudioSource adimaSound;
-	[FoldoutGroup("SOUND EFFECTS")]  AudioSource gitGudSound;
+	[FoldoutGroup("SOUND EFFECTS")] [SerializeField] AudioSource shawSound;
+	[FoldoutGroup("SOUND EFFECTS")] [SerializeField] AudioSource agaleSound;
+	[FoldoutGroup("SOUND EFFECTS")] [SerializeField] AudioSource adimaSound;
+	[FoldoutGroup("SOUND EFFECTS")] [SerializeField] AudioSource gitGudSound;
 
 
 	[FoldoutGroup("PARTICLE EFFECTS")] [SerializeField] GameObject dashEffectL;
@@ -1019,7 +1020,7 @@ public class PlayerControls : MonoBehaviour
 
 				// Dash
 				CalcDash();
-				LookAround();
+				// LookAround();
 
 				// Normal movement
 				if (!inAirDash)
@@ -1075,6 +1076,14 @@ public class PlayerControls : MonoBehaviour
 			{
 				t2 = 0;
 			}
+		}
+	}
+
+	void LateUpdate() 
+	{
+		if (CanControl() && !inShawAtk)
+		{
+			LookAround();
 		}
 	}
 
@@ -1411,37 +1420,54 @@ public class PlayerControls : MonoBehaviour
 	{
 		float temp = player.GetAxis("Move Vertical");
 		
-		if (!isGrounded || (lookLerpTimer <= 0 && player.GetButtonDown("Attack")))
+		// cannot look whilst in the air, or moving left or right
+		if (!isGrounded || moveX != 0 || isDashing)
 		{
 			lookTimer = 0;
 		}
 
-		if (isGrounded && (temp >= 0.85f || temp <= -0.85f))
+		// 
+		if (isGrounded && !isDashing && moveX == 0 && (temp >= 0.85f || temp <= -0.85f))
 		{
-			if (!camOffsetReset)
-			{
-				camOffsetReset = true;
-				camOffset = new Vector3(0,temp > 0 ? lookOffset : -lookOffset);
-			}
+			// delay
 			if (lookTimer < lookThreshold)
 			{
-				lookTimer += Time.deltaTime;
+				lookTimer += Time.fixedDeltaTime;
 			}
+			// in effect
 			else if (lookLerpTimer < lookLerpThres)
 			{
-				lookLerpTimer = Mathf.Min(1, lookLerpTimer + Time.deltaTime * lookOffsetMultiplier);
+				// first frame
+				if (!camOffsetReset)
+				{
+					camOffsetFinish = true;
+					camOffsetReset = true;
+					float yOffset = Mathf.Abs(CinemachineEventHandler.Instance.position.y - model.position.y);
+					CinemachineMaster.Instance.SetCamOrigOffset(CinemachineEventHandler.Instance.position - model.position);
+					camOffset = new Vector3(0,temp > 0 ? lookOffset - yOffset : -(lookOffset - yOffset));
+					anim.SetFloat("idleDir", temp > 0 ? 1 : -1);
+				}
+				lookLerpTimer = Mathf.Min(1, lookLerpTimer + Time.fixedDeltaTime * lookOffsetMultiplier * (1/lookLerpThres));
 				CinemachineMaster.Instance.SetCamOffset(camOffset, lookLerpTimer);
 			}
 		}
+		// not looking (and have looked), reset to origin
 		else if (lookTimer > 0 || lookLerpTimer > 0)
 		{
+			// first frame
 			if (camOffsetReset)
 			{
 				camOffsetReset = false;
+				anim.SetFloat("idleDir", 0);
 			}
 			lookTimer = 0;
-			lookLerpTimer = Mathf.Max(0, lookLerpTimer - Time.deltaTime * lookOffsetMultiplier * 2);
+			lookLerpTimer = Mathf.Max(0, lookLerpTimer - Time.fixedDeltaTime * lookOffsetMultiplier * (1/lookLerpThres));
 			CinemachineMaster.Instance.SetCamOffset(camOffset, lookLerpTimer);
+		}
+		else if (camOffsetFinish)
+		{
+			camOffsetFinish = false;
+			CinemachineMaster.Instance.SetCamOrigOffset(Vector2.zero);
 		}
 	}
 

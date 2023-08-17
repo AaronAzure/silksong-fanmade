@@ -6,13 +6,25 @@ using Sirenix.OdinInspector;
 
 public class CinemachineShake : MonoBehaviour
 {
-	[ShowInInspector] public static CinemachineShake Instance;
+	[ReadOnly] [ShowInInspector] public static CinemachineShake Instance;
+	[ReadOnly] [ShowInInspector] public static CinemachineFramingTransposer cft;
 	public CinemachineVirtualCamera cm;
 	private CinemachineBasicMultiChannelPerlin bmcp;
 	private float shakeTimer;
 	private float shakeTotalTimer;
 	private float startingIntensity;
 	private bool forever;
+	public CinemachineCameraOffset c;
+
+	[Button("Get Cinemachine Camera Offset")]
+	public void GetCinemachineCameraOffset()
+	{
+		if (cm == null)
+			cm = GetComponent<CinemachineVirtualCamera>();
+		c = GetComponent<CinemachineCameraOffset>();
+		if (cm != null)
+			cft = cm.GetCinemachineComponent<CinemachineFramingTransposer>();
+	}
 
 	private void Awake() 
 	{
@@ -36,7 +48,7 @@ public class CinemachineShake : MonoBehaviour
 		}
 	}
 
-	void Update() 
+	void FixedUpdate() 
 	{
 		if (!forever && shakeTimer > 0)
 		{
@@ -44,5 +56,11 @@ public class CinemachineShake : MonoBehaviour
 			bmcp.m_AmplitudeGain = 
 				Mathf.Lerp(startingIntensity, 0f, 1 - (shakeTimer/shakeTotalTimer));
 		}	
+	}
+
+	public void _NEW_LIVE_CAM()
+	{
+		Debug.Log($"<color=yellow>{this.name}</color>");
+		CinemachineShake.Instance = this;
 	}
 }
