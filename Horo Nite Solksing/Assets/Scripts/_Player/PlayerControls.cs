@@ -867,25 +867,26 @@ public class PlayerControls : MonoBehaviour
 						if (nAaronTalked == 0)
 							uiDialogue.SetLines(npc.dialogue[nAaronTalked].lines);
 
-						if (!uiDialogue.IsDefaultText())
+						// Golden watermelon dialogue
+						if (nGoldenWatermelons > 0)
+						{
+							uiDialogue.SetLines(npc.goldenMelonDialogue[0].lines);
+							uiDialogue.isGoldenWatermelonAfter = true;
+						}
+						// Welcome again
+						else if (!uiDialogue.IsDefaultText())
 							nAaronTalked++;
 
 						// sold out
 						if (uiShopHighlight != null && !uiShopHighlight.HasStuffToPurchase())
 						{
-							if (nGoldenWatermelons > 0)
-							{
-								uiDialogue.SetLines(npc.goldenMelonDialogue[0].lines);
-								uiDialogue.isGoldenWatermelonAfter = true;
-							}
-							else
-							{
-								uiDialogue.SetLines(npc.soldDialogue[0].lines);
-								uiDialogue.isShopAfter = false;
-							}
+							uiDialogue.SetLines(npc.soldDialogue[0].lines);
+							uiDialogue.isShopAfter = false;
 						}
+						// shop after first dialogue
 						else
 							uiDialogue.isShopAfter = true;
+
 						uiDialogue.gameObject.SetActive(true);
 						SetMainUI(false);
 						npc.ToggleTextbox(false);
@@ -956,7 +957,7 @@ public class PlayerControls : MonoBehaviour
 				repairTutorial.anim.SetTrigger("close");
 			}
 		}
-		// leave shop
+		// Leave Shop
 		else if (isAtShop && shopCanvas.activeSelf && player.GetButtonDown("No"))
 		{
 			if (madeFirstPurchase && !seenInventoryTutorial)
@@ -974,21 +975,14 @@ public class PlayerControls : MonoBehaviour
 			if (npc != null)
 			{
 				SetMainUI(false);
-				// has golden watermelons
-				if (nGoldenWatermelons > 0)
-				{
-					uiDialogue.SetLines(npc.goldenMelonDialogue[0].lines);
-					uiDialogue.isGoldenWatermelonAfter = true;
-				}
+				
 				// goodbye text
-				else
-				{
-					uiDialogue.SetLines(npc.endDialogue[0].lines);
-					uiDialogue.isGoldenWatermelonAfter = false;
-				}
+				uiDialogue.SetLines(npc.endDialogue[0].lines);
+
+				uiDialogue.isGoldenWatermelonAfter = false;
 				uiDialogue.isShopAfter = false;
 				uiDialogue.gameObject.SetActive(true);
-				npc.ToggleTextbox(false);
+				// npc.ToggleTextbox(false);
 			}
 		}
 	
@@ -3743,6 +3737,9 @@ public class PlayerControls : MonoBehaviour
 					break;
 			}
 		}
+
+		if (npc != null)
+			npc.ToggleTextbox(true);
 		isAtShop = false;
 		SetMainUI(true);
 	}

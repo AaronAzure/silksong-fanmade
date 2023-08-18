@@ -85,15 +85,16 @@ public class UiDialogue : MonoBehaviour
 		gameObject.SetActive(false);
 		if (PlayerControls.Instance != null)
 		{
-			if (isShopAfter)
-			{
-				Debug.Log(" - UiDialogue = ToggleShop");
-				PlayerControls.Instance.ToggleShop(true);
-			}
-			else if (isGoldenWatermelonAfter)
+			if (isGoldenWatermelonAfter)
 			{
 				Debug.Log(" - UiDialogue = TradeGoldenWatermelon");
 				PlayerControls.Instance.TradeGoldenWatermelon(true);
+				isGoldenWatermelonAfter = false;
+			}
+			else if (isShopAfter)
+			{
+				Debug.Log(" - UiDialogue = ToggleShop");
+				PlayerControls.Instance.ToggleShop(true);
 			}
 			else
 			{
