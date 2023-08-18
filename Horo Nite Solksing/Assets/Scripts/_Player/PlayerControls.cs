@@ -27,14 +27,14 @@ public class PlayerControls : MonoBehaviour
 	[FoldoutGroup("STATUS")] [SerializeField] int nTempHp;
 
 	private int maxSilk=9;
-	[FoldoutGroup("STATUS")] [SerializeField] int nSilk;
+	[FoldoutGroup("STATUS")] [Space] [SerializeField] int nSilk;
 	[FoldoutGroup("STATUS")] public int nBonusSilk;
 	
 	
-	[FoldoutGroup("STATUS")] [SerializeField] int nRosaries;
-	[FoldoutGroup("STATUS")] [SerializeField] int nRosaryStrings;
-	[FoldoutGroup("STATUS")] [SerializeField] int nShellShards;
-	private int nGoldenWatermelons;
+	[FoldoutGroup("CURRENCY")] [Space] [SerializeField] int nRosaries;
+	[FoldoutGroup("CURRENCY")] [SerializeField] int nRosaryStrings;
+	[FoldoutGroup("CURRENCY")] [SerializeField] int nShellShards;
+	[FoldoutGroup("CURRENCY")] [SerializeField] int nGoldenWatermelons;
 	private int nGoldenWatermelonsTraded;
 	
 	[Space] [SerializeField] int maxShellShards=400;
@@ -358,7 +358,14 @@ public class PlayerControls : MonoBehaviour
 	[SerializeField] CanvasGroup inventoryI;
 	[SerializeField] Button conversionBtn;
 	[SerializeField] Button conversionConfirmBtn;
-	[SerializeField] GameObject collectedUi;
+	
+	[FoldoutGroup("COLLECTED UI")] [SerializeField] GameObject collectedUi;
+	[FoldoutGroup("COLLECTED UI")] [SerializeField] Image collectedImg;
+	[FoldoutGroup("COLLECTED UI")] [SerializeField] TextMeshProUGUI collectedTxt;
+	[FoldoutGroup("COLLECTED UI")] [Space] [SerializeField] Sprite goldenWatermelonSpr;
+	[FoldoutGroup("COLLECTED UI")] [SerializeField] Sprite shieldSpr;
+	[FoldoutGroup("COLLECTED UI")] [SerializeField] Sprite extraSpoolSpr;
+	[FoldoutGroup("COLLECTED UI")] [SerializeField] Sprite lootCharmSpr;
 
 	[Space] [SerializeField] GameObject pauseMenu;
 	[SerializeField] Animator pauseAnim;
@@ -3510,6 +3517,17 @@ public class PlayerControls : MonoBehaviour
 		if (isResting)
 			ToggleConversionUi(n == 0);
 	}
+
+	public void ShowCollectedUi(Sprite spr, string text)
+	{
+		if (collectedImg != null)
+			collectedImg.sprite = spr;
+		if (collectedTxt != null)
+			collectedTxt.text = text;
+		collectedUi.SetActive(false);
+		collectedUi.SetActive(true);
+	}
+
 	public void ZoomInMap()
 	{
 		mapUiAnim.SetBool("zoomIn", true);
@@ -3709,9 +3727,20 @@ public class PlayerControls : MonoBehaviour
 			goldenWatermelonTxt.text = nGoldenWatermelons.ToString();
 			switch (nGoldenWatermelonsTraded)
 			{
-				case 1:  lootCharmToolUi.SetActive(true); lootCharmToolShopUi.SetActive(true); break;
-				case 2:  syringeToolUi.SetActive(true); syringeToolShopUi.SetActive(true); break;
-				case 3:  melonSwordToolUi.SetActive(true); break;
+				case 1:  
+					ShowCollectedUi(lootCharmSpr, "Some kind of lucky charm thing?");
+					lootCharmToolUi.SetActive(true); 
+					lootCharmToolShopUi.SetActive(true); 
+					break;
+				case 2:  
+					ShowCollectedUi(syringe.icon, "Definitely not Drugs");
+					syringeToolUi.SetActive(true); 
+					syringeToolShopUi.SetActive(true); 
+					break;
+				case 3:  
+					ShowCollectedUi(melonSword.icon, "Melon Sword");
+					melonSwordToolUi.SetActive(true); 
+					break;
 			}
 		}
 		isAtShop = false;
@@ -3811,8 +3840,7 @@ public class PlayerControls : MonoBehaviour
 	{
 		nGoldenWatermelons++;
 		goldenWatermelonTxt.text = nGoldenWatermelons.ToString();
-		collectedUi.SetActive(false);
-		collectedUi.SetActive(true);
+		ShowCollectedUi(goldenWatermelonSpr, "Golden Watermelon");
 		StartCoroutine( FlashCo() );
 	}
 
@@ -4029,24 +4057,31 @@ public class PlayerControls : MonoBehaviour
 		{
 			case UiShopButton.Upgrade.pin:
 				straightPinUi.SetActive(true);
+				ShowCollectedUi(straightPin.icon, "Literally a Pin");
 				break;
 			case UiShopButton.Upgrade.pimpillo:
 				pimpilloToolUi.SetActive(true);
+				ShowCollectedUi(pimpillo.icon, "Literally a Bomb");
 				break;
 			case UiShopButton.Upgrade.caltrop:
 				caltropsToolUi.SetActive(true);
+				ShowCollectedUi(caltrops.icon, "Literally some Thumbtacks");
 				break;
 			case UiShopButton.Upgrade.sawblade:
 				shawbladesToolUi.SetActive(true);
+				ShowCollectedUi(sawBlade.icon, "SHAWblade");
 				break;
 			case UiShopButton.Upgrade.syringe:
 				syringeToolUi.SetActive(true);
+				ShowCollectedUi(syringe.icon, "Definitely not Drugs");
 				break;
 			case UiShopButton.Upgrade.shield:
 				shieldToolUi.SetActive(true);
+				ShowCollectedUi(shieldSpr, "Some kind of shield?");
 				break;
 			case UiShopButton.Upgrade.extraSpool:
 				spoolToolUi.SetActive(true);
+				ShowCollectedUi(extraSpoolSpr, "Some kind of spool extension thing?");
 				SetUiSilk();
 				break;
 		}

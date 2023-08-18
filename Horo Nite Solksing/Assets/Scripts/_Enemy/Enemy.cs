@@ -118,7 +118,7 @@ public abstract class Enemy : MonoBehaviour
 	protected float searchCounter;
 	[FoldoutGroup("TARGET RELATED")] [SerializeField] protected float maxSearchTime=2;
 	[FoldoutGroup("TARGET RELATED")] [SerializeField] protected bool spawningIn; // set by animation
-	private bool summoned;
+	[ReadOnly] [ShowInInspector] private bool summoned;
 	[FoldoutGroup("TARGET RELATED")] public bool cannotAtk;
 	[FoldoutGroup("TARGET RELATED")] public bool activated;
 	[FoldoutGroup("TARGET RELATED")] public bool inParryState;
@@ -242,25 +242,25 @@ public abstract class Enemy : MonoBehaviour
 			if (facePlayerOnSpawn)
 				FacePlayer();
 		}
-
 		
 		initDir = (model.localScale.x > 0) ? 1 : -1;
 		currentAction = (initDir == 1) ? CurrentAction.right : CurrentAction.left;
 		
-
 		CallChildOnStart();
 
-		if (room == null && inArea != null)
+		// not spawned
+		if (room == null && !summoned && inArea != null)
 		{
 			CallChildOnInAreaSwap();
 		}
-		// if (room != null && inArea != null)
-		// {
-		// 	inArea.done = true;
-		// }
+		EnemyMaster.Instance.AddEnemy(this);
     }
 
-	public virtual void FixedUpdate()
+	// public virtual void FixedUpdate()
+	// {
+	// 	EnemyAction();
+	// }
+	public void EnemyAction()
     {
 		if (cannotAtk || !activated || (target == null))
 			return;
@@ -491,7 +491,7 @@ public abstract class Enemy : MonoBehaviour
 			died = true;
 			// rb.velocity *= 1.5f;
 			rb.AddForce(Vector2.up * 5, ForceMode2D.Impulse);
-			if (room == null)
+			if (room == null && !summoned)
 				GameManager.Instance.RegisterNameToEnemiesDefeated(gameObject.name);
 			Died(canShake);
 			yield break;
@@ -547,6 +547,7 @@ public abstract class Enemy : MonoBehaviour
 	void Died(bool shake)
 	{
 		StopAllCoroutines();
+		EnemyMaster.Instance.RemoveEnemy(this);
 		if (rb != null && frictionedMat != null)
 		{
 			rb.sharedMaterial = frictionedMat;
@@ -596,9 +597,10 @@ public abstract class Enemy : MonoBehaviour
 		// this.enabled = false;
 	}
 
-	public void SpawnIn()
+	public void SpawnIn(float spawnSpeed=1)
 	{
 		summoned = true;
+		anim.SetFloat("spawnSpeed", spawnSpeed);
 		if (hasSpawnAnim && anim != null) 
 			anim.SetTrigger("spawn");
 		if (PlayerControls.Instance != null)

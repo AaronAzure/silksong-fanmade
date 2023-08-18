@@ -54,7 +54,7 @@ public class CinemachineMaster : MonoBehaviour
 
 	public void SetCamDamp(float xDamp, float yDamp)
 	{
-		if (v != null)
+		if (v != null && v.GetCinemachineComponent<CinemachineTransposer>() != null)
 		{
 			v.GetCinemachineComponent<CinemachineTransposer>().m_XDamping = xDamp;
 			v.GetCinemachineComponent<CinemachineTransposer>().m_YDamping = yDamp;
@@ -64,13 +64,13 @@ public class CinemachineMaster : MonoBehaviour
 	public void SetCamOrigOffset(Vector2 newOffset)
 	{
 		origOffset = new Vector3(0, newOffset.y, -10);
-		if (v != null)
+		if (v != null && v.GetCinemachineComponent<CinemachineTransposer>() != null)
 			v.GetCinemachineComponent<CinemachineTransposer>().m_FollowOffset = origOffset;
 	}
 
 	public void SetCamOffset(Vector3 newOffset, float t)
 	{
-		if (v != null)
+		if (v != null && v.GetCinemachineComponent<CinemachineTransposer>() != null)
 			v.GetCinemachineComponent<CinemachineTransposer>().m_FollowOffset =
 				Vector3.Lerp(origOffset, origOffset + newOffset, Mathf.SmoothStep(0, 1, t));
 	}
